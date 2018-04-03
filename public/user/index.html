@@ -1,0 +1,102 @@
+<html>
+    <head>
+        <title>User Landing Page: DEM Fleet Reservation</title>
+
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+        <link rel="stylesheet" href="styles/main.css">
+    </head>
+
+    <body>
+        <div id="topbar">
+            <img id="logo" src="http://www.dem.ri.gov/assets/agency-template/img/ri-dem-logo.png" alt="DEM logo">
+
+            <div id="user">
+                <h5>Welcome, {{ user }}.</h5>
+                <h6>Log out</h6>
+            </div>
+        </div>
+
+        <div id="content">
+            <button type="button" class="btn btn-primary" id="new-res">+ Make a new reservation</button>
+
+            <h3>Upcoming Reservations</h3>
+            <div class="row">
+                <div class="card border-success mb-3" style="width: 18rem;">
+                    <img class = "card-img-top" src="https://upload.wikimedia.org/wikipedia/commons/5/5f/DCA_Prius_1Gen_12_2011_3592.JPG" alt="prius placeholder image">
+                    <div class="card-body">
+                        <h5 class="card-title">Toyota Prius 787ZXC</h5>
+                        <p class="card-text"><b>Start</b>: April 15, 2018 10:00am<br>
+                            <b>End</b>: April 15, 2018 11:30am<br>
+                            <b>Pickup</b>: DEM Lot</p>
+                        <a href="#" class="btn btn-primary edit">Edit reservation</a>
+                        <a href="#" class="btn btn-secondary">Cancel </a>
+                    </div>
+                </div>
+
+                <div class="card border-danger mb-3" style="width: 18rem;">
+                    <img class = "card-img-top" src="https://media.ed.edmunds-media.com/ford/explorer/2017/oem/2017_ford_explorer_4dr-suv_platinum_rq_oem_1_815.jpg" alt="explorer placeholder image">
+                    <div class="card-body">
+                        <h5 class="card-title">Ford Explorer 721ZYD</h5>
+                        <p class="card-text"><b>Start</b>: April 15, 2018 10:00am<br>
+                            <b>End</b>: April 15, 2018 11:30am<br>
+                            <b>Pickup</b>: DEM Lot</p>
+                        <a href="#" class="btn btn-primary edit">Edit reservation</a>
+                        <a href="#" class="btn btn-secondary">Cancel </a>
+                    </div>
+                </div>
+            </div>
+            <h3>Past Reservations</h3>
+            <div class="row">
+                <div class="card border-success mb-3" style="width: 18rem;">
+                    <img class = "card-img-top" src="https://upload.wikimedia.org/wikipedia/commons/5/5f/DCA_Prius_1Gen_12_2011_3592.JPG" alt="prius placeholder image">
+                    <div class="card-body">
+                        <h5 class="card-title">Toyota Prius 787ZXC</h5>
+                        <p class="card-text"><b>Start</b>: April 15, 2018 10:00am<br>
+                            <b>End</b>: April 15, 2018 11:30am</p>
+                        <a href="#" class="btn btn-primary edit">Make report </a>
+                    </div>
+                </div>
+
+                <div class="card border-danger mb-3" style="width: 18rem;">
+                    <img class = "card-img-top" src="https://media.ed.edmunds-media.com/ford/explorer/2017/oem/2017_ford_explorer_4dr-suv_platinum_rq_oem_1_815.jpg" alt="explorer placeholder image">
+                    <div class="card-body">
+                        <h5 class="card-title">Ford Explorer 721ZYD</h5>
+                        <p class="card-text"><b>Start</b>: April 15, 2018 10:00am<br>
+                            <b>End</b>: April 15, 2018 11:30am</p>
+                        <a href="#" class="btn btn-primary edit">Make report </a>
+                    </div>
+                </div>
+
+                <div class="card border-danger mb-3" style="width: 18rem;">
+                    <img class = "card-img-top" src="https://media.ed.edmunds-media.com/ford/explorer/2017/oem/2017_ford_explorer_4dr-suv_platinum_rq_oem_1_815.jpg" alt="explorer placeholder image">
+                    <div class="card-body">
+                        <h5 class="card-title">Ford Explorer 721ZYD</h5>
+                        <p class="card-text"><b>Start</b>: April 15, 2018 10:00am<br>
+                            <b>End</b>: April 15, 2018 11:30am</p>
+                        <a href="#" class="btn btn-primary edit">Make report </a>
+                    </div>
+                </div>
+
+                <div class="card border-success mb-3" style="width: 18rem;">
+                    <img class = "card-img-top" src="https://upload.wikimedia.org/wikipedia/commons/5/5f/DCA_Prius_1Gen_12_2011_3592.JPG" alt="prius placeholder image">
+                    <div class="card-body">
+                        <h5 class="card-title">Toyota Prius 787ZXC</h5>
+                        <p class="card-text"><b>Start</b>: April 15, 2018 10:00am<br>
+                            <b>End</b>: April 15, 2018 11:30am</p>
+                        <a href="#" class="btn btn-primary edit">Make report </a>
+                    </div>
+                </div>
+
+                <div class="card border-danger mb-3" style="width: 18rem;">
+                    <img class = "card-img-top" src="https://media.ed.edmunds-media.com/ford/explorer/2017/oem/2017_ford_explorer_4dr-suv_platinum_rq_oem_1_815.jpg" alt="explorer placeholder image">
+                    <div class="card-body">
+                        <h5 class="card-title">Ford Explorer 721ZYD</h5>
+                        <p class="card-text"><b>Start</b>: April 15, 2018 10:00am<br>
+                            <b>End</b>: April 15, 2018 11:30am</p>
+                        <a href="#" class="btn btn-primary edit">Make report </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

@@ -1,0 +1,50 @@
+body {
+    font-family: sans-serif;
+}
+
+#topbar {
+    background-color: #17426D;
+    color: white;
+    padding: 10px;
+    position: relative;
+}
+
+#user {
+    display: inline-block;
+    float: right;
+    position: absolute;
+    bottom: 10;
+    right: 10;
+}
+
+h6 {
+    color: #d7a342;
+}
+
+#content {
+    padding-left: 30px;
+}
+
+#new-res {
+    margin-top: 20px;
+    background-color: #6ab351;
+    border: 0px;
+    font-weight: bold;
+}
+
+h3 {
+    margin-top: 20px;
+}
+
+.row {
+    margin: 0;
+}
+
+.card {
+    margin: 10px;
+}
+
+.edit {
+    background-color: #4c719d;
+    border: 0px;
+}
