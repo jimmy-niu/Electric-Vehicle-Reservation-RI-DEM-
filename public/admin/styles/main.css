@@ -1,20 +1,23 @@
 body{
     font-family: sans-serif;
-    background: url("../media/lighthouse.png") no-repeat center center fixed;
-    -webkit-background-size: cover;
-    -moz-background-size: cover;
-    -o-background-size: cover;
-    background-size: cover;
+    background-color: white;
+    margin: 0px;
 }
 
 .header{
     display: flex;
+    justify-content: space-between;
+    align-items: flex-end; 
+    background-color: #17426D;
+    padding: 2vh 2vw 2vh 2vw;
+}
+
+#first-part{
+    display: flex;
     justify-content: flex-start;
     align-items: flex-end; 
-    background: linear-gradient(to right, #17426D, rgba(23, 66, 109, 0.5));
-    padding: 2vh 0vw 2vh 2vw;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
 }
+
 
 #logo{
     height: 8vh;
@@ -26,6 +29,12 @@ body{
     color: white;
 }
 
+#user{
+    color: white;
+    font-size: 3vh;
+    text-align: right;
+    float: right !important;
+}
 .Nav-Buttons{
     display: flex;
     justify-content: flex-start;
@@ -41,7 +50,6 @@ body{
     margin-right: 1vw;
     border: white solid #D7A342;
     cursor: pointer;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
 }
 
 .button:hover{
@@ -49,24 +57,22 @@ body{
 }
 
 .content{
-    #color: white;
-    #background-color: rgba(23, 66, 109, 0.9);
-    background-color: rgba(255, 255, 255, 0.8);
-    padding: 2vh 2vw 2vh 2vw;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+    padding: 2vh 2vw 2vh 2vw;   
 }
 
 .table{
     display: grid;
     padding: 2vh 2vw 1vh 2vw;
-    grid-template-columns: 10% 15% 15% 30% 30%;
+    grid-template-columns: 15% 20% 20% 25% 20%;
     border-top: 2px solid black;
 }
+
 .table-header{
     display: flex;
     justify-content: space-around;
     border: 2px solid black;
 }
+
 
 .table-header-entry{
     border-bottom: 2px solid black;
@@ -78,4 +84,23 @@ body{
 .col-entry{
     border: 2px solid black;
     padding: 1vh 1vw 1vh 1vw;
+    overflow-wrap: break-word;
+}
+
+.red{
+    background-color: red;
+}
+
+.red:hover{
+    background-color: #ff8f8f;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+}
+
+.justi{
+    display: none;
+    grid-column: 1 / span 5; 
+}
+
+.drop-shadow{
+    box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
 }
