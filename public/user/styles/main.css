@@ -2,19 +2,36 @@ body {
     font-family: sans-serif;
 }
 
-#topbar {
+.header{
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end; 
     background-color: #17426D;
-    color: white;
-    padding: 10px;
-    position: relative;
+    padding: 2vh 2vw 2vh 2vw;
 }
 
-#user {
-    display: inline-block;
-    float: right;
-    position: absolute;
-    bottom: 10;
-    right: 10;
+#first-part{
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-end; 
+}
+
+
+#logo{
+    height: 8vh;
+    padding-right: 1vw;
+}
+
+#title{
+    font-size: 5vh;
+    color: white;
+}
+
+#user{
+    color: white;
+    font-size: 3vh;
+    text-align: right;
+    float: right !important;
 }
 
 h6 {

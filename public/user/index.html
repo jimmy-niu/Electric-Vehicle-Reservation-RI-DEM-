@@ -4,20 +4,110 @@
 
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
         <link rel="stylesheet" href="styles/main.css">
+        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js" integrity="sha384-cs/chFZiN24E4KMATLdqdvsezGxaGsi4hLGOzlXwp5UZB1LY//20VyM2taTB4QvJ" crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js" integrity="sha384-uefMccjFJAIv6A+rW+L4AHf99KvxDjWSu1z9VI8SKNVmz4sk7buKt/6v9KI65qnm" crossorigin="anonymous"></script>
     </head>
 
     <body>
-        <div id="topbar">
-            <img id="logo" src="http://www.dem.ri.gov/assets/agency-template/img/ri-dem-logo.png" alt="DEM logo">
-
-            <div id="user">
-                <h5>Welcome, {{ user }}.</h5>
-                <h6>Log out</h6>
+        <div class = "header drop-shadow">
+            <div id = "first-part">
+                <img id = "logo" src = "media/ri-dem-logo.png"> 
+                <div id = "title" >
+                    <span style = "font-size: 6vh;">V</span>ehicle Reservations
+                </div>
             </div>
+
+            <div>
+                <div id = "user">
+                    Welcome, {{user}} <br>
+                    <a href = "../index.html" style = "font-size: 2vh; color: #D7A342">Logout</a>
+                </div>
+            </div>
+
+
         </div>
 
         <div id="content">
-            <button type="button" class="btn btn-primary" id="new-res">+ Make a new reservation</button>
+            <button type="button" class="btn btn-primary" id="new-res" data-toggle="modal" data-target="#new-res-form">+ Make a new reservation</button>
+
+            <!-- Modal -->
+            <div class="modal fade" id="new-res-form" tabindex="-1" role="dialog" aria-labelledby="new-res-label" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="new-res-label">Reserve a DEM Vehicle</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <form>
+                                <div class="form-group">
+                                    <label for="start-date">Reservation Start</label>
+                                    <input type="datetime-local" class="form-control" id="start-date">
+                                </div>
+                                <div class="form-group">
+                                    <label for="end-date">Reservation End</label>
+                                    <input type="datetime-local" class="form-control" id="end-date">
+                                </div>
+                                <div class="form-group">
+                                    <label>Pickup Location</label>
+                                    <input type=text class="form-control">
+                                </div>
+                                <div class="form-group">
+                                    <label>Destination</label>
+                                    <input type=text class="form-control">
+                                </div>
+                                <div class="form-group">
+                                    <label>Extra Features</label>
+                                    <div class="form-check">
+                                        <input type="checkbox" class="form-check-input" id="trunk">
+                                        <label class="form-check-label" for="trunk">Extra trunk space</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input type="checkbox" class="form-check-input" id="offroading">
+                                        <label class="form-check-label" for="offroading">Offroading capabilities</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input type="checkbox" class="form-check-input" id="kayak">
+                                        <label class="form-check-label" for="kayak">Equipment rack</label>
+                                    </div>
+                                </div>
+                                <label>Remind Me</label>
+                                <div class="form-group">
+                                    <div class="form-check form-check-inline">
+                                        <input type="checkbox" class="form-check-input" id="email">
+                                        <label class="form-check-label" for="email">Email</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input type="checkbox" class="form-check-input" id="text">
+                                        <label class="form-check-label" for="text">Text</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input type="checkbox" class="form-check-input" id="outlook">
+                                        <label class="form-check-label" for="outlook">Outlook notification</label>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="form-check form-check-inline">
+                                            <input type="checkbox" class="form-check-input" id="day">
+                                            <label class="form-check-label" for="day">One day before</label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input type="checkbox" class="form-check-input" id="bour">
+                                            <label class="form-check-label" for="hour">One hour before</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                            <button type="button" class="btn btn-primary">Make reservation</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
             <h3>Upcoming Reservations</h3>
             <div class="row">
