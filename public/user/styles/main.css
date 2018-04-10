@@ -49,6 +49,11 @@ h6 {
     font-weight: bold;
 }
 
+#submit-res {
+    background-color: #6ab351;
+    border: 1px solid #6ab351;
+}
+
 h3 {
     margin-top: 20px;
 }
