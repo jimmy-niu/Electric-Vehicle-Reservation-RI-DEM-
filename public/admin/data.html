@@ -2,7 +2,7 @@
 
 <html>
     <head>
-        <title>ADMIN: DEM Vehicle Reservation</title>
+        <title>ADMIN: DEM Vehicle Data</title>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
         <link rel="stylesheet" type = "text/css" href = "./styles/main.css">
         <script src="scripts/main.js"></script> 
@@ -14,7 +14,7 @@
         <div id = "first-part">
             <img id = "logo" src = "media/ri-dem-logo.png"> 
             <div id = "title" >
-                <span style = "font-size: 6vh;">V</span>ehicle Reservations
+                <span style = "font-size: 6vh;">D</span>ata Collection
             </div>
         </div>
         
@@ -30,13 +30,13 @@
     
     <div style = "padding: 1vh 2vw 1vh 2vw;">
         <div class = "Nav-Buttons">
+            <a href = "index.html"><div class = "button drop-shadow">Reservations</div></a>
             <a href = "fleet.html"><div class = "button drop-shadow">Manage Fleet</div></a>
-            <a href = "data.html"><div class = "button drop-shadow">Data Collection</div></a>
         </div>
 
-        <div class = "content drop-shadow">
-            <h2 onclick = "toggle_hidden('upcoming', this)" class = "table-title">Upcoming Reservations: ▼</h2>
-            <div id = "upcoming" class = "table">
+        <div id = "upcoming" class = "content drop-shadow">
+            <h2 onclick = "toggle_table(this)" class = "table-title">Upcoming Reservations: ▼</h2>
+            <div class = "table">
                 <div class = "table-header-entry">User</div>
                 <div class = "table-header-entry">Start</div>
                 <div class = "table-header-entry">End</div>
@@ -52,9 +52,9 @@
                 <div class = "col-entry">Josiah Carberry</div>
                 <div class = "col-entry">January 1, 2018 || 7:00pm</div>
                 <div class = "col-entry">April 1, 2018 || 9:00pm</div>
-                <div class = "col-entry red drop-shadow" style = "cursor: pointer;" onclick = "toggle_hidden('38SG5A-justi', this)">97BD08 Ford Explorer [GAS] ▲</div>
+                <div class = "col-entry red drop-shadow" style = "cursor: pointer;" onclick = "toggle_next_row(this)">97BD08 Ford Explorer [GAS] ▲</div>
                 <div class = "col-entry">DEM Garage</div>
-                <div id = "38SG5A-justi" class = "col-entry justi hidden"><span style = "font-weight: bold;">Justification: </span>Aut est aut veniam et autem impedit quisquam ea. Ad temporibus commodi enim iusto odio. Quos qui et dolorum aliquid dolorem praesentium assumenda repellendus. Eveniet tempore sequi qui qui consequatur possimus nisi. Autem neque impedit eum eligendi est aliquid. </div>
+                <div class = "col-entry justi"><span style = "font-weight: bold;">Justification: </span>Aut est aut veniam et autem impedit quisquam ea. Ad temporibus commodi enim iusto odio. Quos qui et dolorum aliquid dolorem praesentium assumenda repellendus. Eveniet tempore sequi qui qui consequatur possimus nisi. Autem neque impedit eum eligendi est aliquid. </div>
                 
                 <div class = "col-entry">John Smith</div>
                 <div class = "col-entry">April 3, 2018 || 3:00pm</div>
@@ -65,17 +65,17 @@
                 <div class = "col-entry">Josiah Carberry</div>
                 <div class = "col-entry">January 1, 2018 || 7:00pm</div>
                 <div class = "col-entry">April 1, 2018 || 9:00pm</div>
-                <div class = "col-entry red drop-shadow" style = "cursor: pointer;" onclick = "toggle_hidden('15SG5A-justi', this)">97BD08 Ford Explorer [GAS] ▲</div>
+                <div class = "col-entry red drop-shadow" style = "cursor: pointer;" onclick = "toggle_next_row(this)">97BD08 Ford Explorer [GAS] ▲</div>
                 <div class = "col-entry">DEM Garage</div>
-                <div id = "15SG5A-justi" class = "col-entry justi hidden"><span style = "font-weight: bold;">Justification: </span>Aut est aut veniam et autem impedit quisquam ea. Ad temporibus commodi enim iusto odio. Quos qui et dolorum aliquid dolorem praesentium assumenda repellendus. Eveniet tempore sequi qui qui consequatur possimus nisi. Autem neque impedit eum eligendi est aliquid. </div>
+                <div class = "col-entry justi"><span style = "font-weight: bold;">Justification: </span>Aut est aut veniam et autem impedit quisquam ea. Ad temporibus commodi enim iusto odio. Quos qui et dolorum aliquid dolorem praesentium assumenda repellendus. Eveniet tempore sequi qui qui consequatur possimus nisi. Autem neque impedit eum eligendi est aliquid. </div>
             </div>
         </div>
         
         <br>
         
         <div class = "content drop-shadow">
-            <h2 class = "table-title" onclick = "toggle_hidden('past-table', this)">Past Reservations: ▲</h2>
-            <div id = "past-table" class = "table hidden">
+            <h2 class = "table-title" onclick = "toggle_table(this)">Past Reservations: ▲</h2>
+            <div id = "past-table" class = "table">
                 <div class = "table-header-entry">User</div>
                 <div class = "table-header-entry">Start</div>
                 <div class = "table-header-entry">End</div>
@@ -91,9 +91,9 @@
                 <div class = "col-entry">Josiah Carberry</div>
                 <div class = "col-entry">January 1, 2018 || 7:00pm</div>
                 <div class = "col-entry">April 1, 2018 || 9:00pm</div>
-                <div class = "col-entry red drop-shadow" style = "cursor: pointer;" onclick = "toggle_hidden('WS5RXA-justi', this)">97BD08 Ford Explorer [GAS] ▲</div>
+                <div class = "col-entry red drop-shadow" style = "cursor: pointer;" onclick = "toggle_next_row(this)">97BD08 Ford Explorer [GAS] ▲</div>
                 <div class = "col-entry">DEM Garage</div>
-                <div id = "WS5RXA-justi" class = "col-entry justi hidden"><span style = "font-weight: bold;">Justification: </span>Aut est aut veniam et autem impedit quisquam ea. Ad temporibus commodi enim iusto odio. Quos qui et dolorum aliquid dolorem praesentium assumenda repellendus. Eveniet tempore sequi qui qui consequatur possimus nisi. Autem neque impedit eum eligendi est aliquid. </div>
+                <div class = "col-entry justi"><span style = "font-weight: bold;">Justification: </span>Aut est aut veniam et autem impedit quisquam ea. Ad temporibus commodi enim iusto odio. Quos qui et dolorum aliquid dolorem praesentium assumenda repellendus. Eveniet tempore sequi qui qui consequatur possimus nisi. Autem neque impedit eum eligendi est aliquid. </div>
             </div>
         </div>
     </div>

@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <title>ADMIN: DEM Vehicle Reservation</title>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+        <link rel="stylesheet" type = "text/css" href = "./styles/main.css">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+        <script src="scripts/main.js"></script> 
+        
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    </head>
+    
+    <div class = "header drop-shadow">
+        <div id = "first-part">
+            <img id = "logo" src = "media/ri-dem-logo.png"> 
+            <div id = "title" >
+                <span style = "font-size: 6vh;">F</span>leet Management
+            </div>
+        </div>
+        
+        <div>
+            <div id = "user">
+                Welcome, {{user}} <br>
+                <a href = "../index.html" style = "font-size: 2vh; color: #D7A342">Logout</a>
+            </div>
+        </div>
+        
+        
+    </div>
+    
+    <div style = "padding: 1vh 2vw 1vh 2vw;">
+        <div class = "Nav-Buttons">
+            <a href = "index.html"><div class = "button drop-shadow">Reservations</div></a>
+            <a href = "data.html"><div class = "button drop-shadow">Data</div></a>
+        </div>
+
+        <div class = "content drop-shadow">
+            <h2 onclick = "toggle_hidden('in_use', this)" class = "table-title"> In-Use Vehicles: ▼</h2>
+            <div id = "in_use" class="row fleet_grid">
+                <div class="card border-success mb-3" style="width: 18rem;">
+                    <img class = "card-img-top" src="https://upload.wikimedia.org/wikipedia/commons/5/5f/DCA_Prius_1Gen_12_2011_3592.JPG" alt="prius placeholder image">
+                    <div class="card-body">
+                        <h5 class="card-title">Toyota Prius 787ZXC</h5>
+                        <p class="card-text"><b>Start</b>: April 15, 2018 10:00am<br>
+                            <b>End</b>: April 15, 2018 11:30am</p>
+                        <a href="#" class="btn btn-primary edit">Make report </a>
+                    </div>
+                </div>
+
+                <div class="card border-danger mb-3" style="width: 18rem;">
+                    <img class = "card-img-top" src="https://media.ed.edmunds-media.com/ford/explorer/2017/oem/2017_ford_explorer_4dr-suv_platinum_rq_oem_1_815.jpg" alt="explorer placeholder image">
+                    <div class="card-body">
+                        <h5 class="card-title">Ford Explorer 721ZYD</h5>
+                        <p class="card-text"><b>Start</b>: April 15, 2018 10:00am<br>
+                            <b>End</b>: April 15, 2018 11:30am</p>
+                        <a href="#" class="btn btn-primary edit">Make report </a>
+                    </div>
+                </div>
+
+                <div class="card border-danger mb-3" style="width: 18rem;">
+                    <img class = "card-img-top" src="https://media.ed.edmunds-media.com/ford/explorer/2017/oem/2017_ford_explorer_4dr-suv_platinum_rq_oem_1_815.jpg" alt="explorer placeholder image">
+                    <div class="card-body">
+                        <h5 class="card-title">Ford Explorer 721ZYD</h5>
+                        <p class="card-text"><b>Start</b>: April 15, 2018 10:00am<br>
+                            <b>End</b>: April 15, 2018 11:30am</p>
+                        <a href="#" class="btn btn-primary edit">Make report </a>
+                    </div>
+                </div>
+
+                <div class="card border-success mb-3" style="width: 18rem;">
+                    <img class = "card-img-top" src="https://upload.wikimedia.org/wikipedia/commons/5/5f/DCA_Prius_1Gen_12_2011_3592.JPG" alt="prius placeholder image">
+                    <div class="card-body">
+                        <h5 class="card-title">Toyota Prius 787ZXC</h5>
+                        <p class="card-text"><b>Start</b>: April 15, 2018 10:00am<br>
+                            <b>End</b>: April 15, 2018 11:30am</p>
+                        <a href="#" class="btn btn-primary edit">Make report </a>
+                    </div>
+                </div>
+
+                <div class="card border-danger mb-3" style="width: 18rem;">
+                    <img class = "card-img-top" src="https://media.ed.edmunds-media.com/ford/explorer/2017/oem/2017_ford_explorer_4dr-suv_platinum_rq_oem_1_815.jpg" alt="explorer placeholder image">
+                    <div class="card-body">
+                        <h5 class="card-title">Ford Explorer 721ZYD</h5>
+                        <p class="card-text"><b>Start</b>: April 15, 2018 10:00am<br>
+                            <b>End</b>: April 15, 2018 11:30am</p>
+                        <a href="#" class="btn btn-primary edit">Make report </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</html> 

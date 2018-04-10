@@ -1,20 +1,10 @@
-function toggle_next_row(object){
+function toggle_hidden(id, object){
     if(object.innerHTML.includes("▼")){
         object.innerHTML = object.innerHTML.replace("▼", "▲");
-        object.nextSibling.nextSibling.nextSibling.nextSibling.style.display = "none";
     } else {
         object.innerHTML = object.innerHTML.replace("▲", "▼");
-        object.nextSibling.nextSibling.nextSibling.nextSibling.style.display = "inherit";
     }
-}
-
-function toggle_table(object){
-    if(object.innerHTML.includes("▼")){
-        object.innerHTML = object.innerHTML.replace("▼", "▲");
-        object.nextSibling.nextSibling.style.display = "none";
-    } else {
-        object.innerHTML = object.innerHTML.replace("▲", "▼");
-        object.nextSibling.nextSibling.style.display = "grid";
-    }
-    
+    console.log(document.getElementById(id));
+    console.log(object.innerHTML);
+    document.getElementById(id).classList.toggle('hidden');
 }
