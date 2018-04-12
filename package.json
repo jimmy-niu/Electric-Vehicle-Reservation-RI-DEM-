@@ -1,0 +1,28 @@
+{
+  "name": "cs132finalproject",
+  "version": "1.0.0",
+  "description": "A Vehicle Reservation Webapp for Rhode Island DEM",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jimmy-niu/cs132FinalProject.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jimmy-niu/cs132FinalProject/issues"
+  },
+  "homepage": "https://github.com/jimmy-niu/cs132FinalProject#readme",
+  "dependencies": {
+    "any-db": "^2.2.1",
+    "any-db-sqlite3": "^2.1.4",
+    "body-parser": "^1.18.2",
+    "express": "^4.16.3",
+    "pug": "^2.0.3",
+    "socket.io": "^2.1.0"
+  }
+}
