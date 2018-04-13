@@ -18,10 +18,10 @@ var anyDB = require('any-db');
 app.set('view engine', 'pug');
 app.use(express.static('public'));
 
-app.get('/', function(request, response){
+app.get('/home/user', function(request, response){
 	console.log('- Request received:', request.method, request.url);
 
-	response.send("hello, world");
+	response.render('user');
 });
 
 /*Sets up the server on port 8080.*/
