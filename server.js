@@ -15,32 +15,16 @@ app.use(bodyParser.json());
 var anyDB = require('any-db');
 var conn = anyDB.createConnection('sqlite3://DEM.db');
 
-//Resevervations
-conn.query('CREATE TABLE vehicles(id INTEGER PRIMARY KEY AUTOINCREMENT, license TEXT, model TEXT, color TEXT, inService BOOLEAN, miles DOUBLE PRECISION)', function(error, data){
-    if(error !== null && error.errno !== 1){ // Ignore the error sent when the table is already created.
-        console.log("Error: vehicles table was not created in database");
-    }
-});
-//Vehicles
-conn.query('CREATE TABLE reservations(id INTEGER PRIMARY KEY AUTOINCREMENT, license TEXT, startTime TEXT, endTime TEXT, startDate TEXT, endDate TEXT, stops JSON, override BOOLEAN, justification TEXT)', function(error, data){
-    if(error !== null && error.errno !== 1){ // Ignore the error sent when the table is already created.
-        console.log("Error: reservations table was not created in database");
-    }
-});
-//Reports
-conn.query('CREATE TABLE reports(id INTEGER PRIMARY KEY AUTOINCREMENT, reservation INTEGER, report TEXT)', function(error, data){
-    if(error !== null && error.errno !== 1){ // Ignore the error sent when the table is already created.
-        console.log("Error: reports table was not created in database");
-    }
-});
-
-
 app.set('view engine', 'pug');
 app.use(express.static('public'));
 
 
-
-
+//Resevervations
+conn.query('CREATE TABLE IF NOT EXISTS vehicles(id INTEGER PRIMARY KEY AUTOINCREMENT, license TEXT, model TEXT, color TEXT, inService BOOLEAN, miles DOUBLE PRECISION)');
+//Vehicles
+conn.query('CREATE TABLE IF NOT EXISTS reservations(id INTEGER PRIMARY KEY AUTOINCREMENT, license TEXT, startTime TEXT, endTime TEXT, startDate TEXT, endDate TEXT, stops JSON, override BOOLEAN, justification TEXT)');
+//Reports
+conn.query('CREATE TABLE IF NOT EXISTS reports(id INTEGER PRIMARY KEY AUTOINCREMENT, reservation INTEGER, report TEXT)');
 
 app.get('/home/user', function(request, response){
 	console.log('- Request received:', request.method, request.url);
