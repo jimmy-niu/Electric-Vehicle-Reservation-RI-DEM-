@@ -22,14 +22,16 @@ app.use(express.static('public'));
 //Resevervations
 conn.query('CREATE TABLE IF NOT EXISTS vehicles(id INTEGER PRIMARY KEY AUTOINCREMENT, license TEXT, model TEXT, color TEXT, inService BOOLEAN, miles DOUBLE PRECISION)');
 //Vehicles
-conn.query('CREATE TABLE IF NOT EXISTS reservations(id INTEGER PRIMARY KEY AUTOINCREMENT, license TEXT, startTime TEXT, endTime TEXT, startDate TEXT, endDate TEXT, stops JSON, override BOOLEAN, justification TEXT)');
+conn.query('CREATE TABLE IF NOT EXISTS reservations(id INTEGER PRIMARY KEY AUTOINCREMENT, user TEXT, license TEXT, startTime TEXT, endTime TEXT, startDate TEXT, endDate TEXT, stops JSON, override BOOLEAN, justification TEXT)');
 //Reports
 conn.query('CREATE TABLE IF NOT EXISTS reports(id INTEGER PRIMARY KEY AUTOINCREMENT, reservation INTEGER, report TEXT)');
 
 app.get('/home/user', function(request, response){
 	console.log('- Request received:', request.method, request.url);
 
-	response.render('user');
+    createReservation("Jenna Tishler", "ABC123", "8:20AM", "10:30AM", "04/14/18", "04/14/18", ["1 Johnson Lane, Providence RI", "2 Brown Court, Barrington, RI"], false, "");
+    getMyReservations("Jenna Tishler");
+    response.render('user');
 });
 
 /*Sets up the server on port 8080.*/
@@ -67,3 +69,26 @@ function removeVehicle(license){
 }
 
 // USER
+function getMyReservations(currrentUser){
+    conn.query('SELECT * FROM reservations WHERE user = ?', [currrentUser], function(error, data){
+        console.log(data);
+    });
+}
+
+function createReservation(user, license, startTime, endTime, startDate, endDate, stops, override, justification){
+    conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?, ?)',[user, license, startTime, endTime, startDate, endDate, stops, override, justification],function(error, data){
+
+    });
+}
+
+function cancelReservation(id){
+    conn.query('DELETE FROM reservations WHERE id = ?', [id], function(error, data){
+
+    });
+}
+
+function submitFeeback(reservationID, report){
+    conn.query("INSERT INTO reports VALUES(null, ?, ?)", [reservationID, report], function(error, data){
+
+    });
+}
