@@ -2,6 +2,7 @@ var express = require('express')
 var app = express();
 var path = require('path');
 var http =require('http');
+var nodemailer = require('nodemailer');
 var server = http.createServer(app);
 
 var io = require('socket.io')(server, {wsEngine: 'ws'}); //fix Windows10 issue
@@ -18,6 +19,31 @@ var conn = anyDB.createConnection('sqlite3://DEM.db');
 app.set('view engine', 'pug');
 app.use(express.static('public'));
 
+//email sender (will eventually change to a different email)
+var transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: 'jenna_tishler@brown.edu',
+    pass: 'cX]8%GeMFYsa!T-c'
+  }
+});
+
+//example of how to send email
+// var mailOptions = {
+//   from: 'jenna_tishler@brown.edu',
+//   to: 'jenna.tishler@gmail.com',
+//   subject: 'Sending Email using Node.js',
+//   text: 'That was easy!'
+// };
+
+// transporter.sendMail(mailOptions, function(error, info){
+//   if (error) {
+//     console.log(error);
+//   } else {
+//     console.log('Email sent: ' + info.response);
+//   }
+// });
+
 
 //Resevervations
 conn.query('CREATE TABLE IF NOT EXISTS vehicles(id INTEGER PRIMARY KEY AUTOINCREMENT, license TEXT, model TEXT, color TEXT, inService BOOLEAN, miles DOUBLE PRECISION)');
@@ -29,8 +55,10 @@ conn.query('CREATE TABLE IF NOT EXISTS reports(id INTEGER PRIMARY KEY AUTOINCREM
 app.get('/home/user', function(request, response){
 	console.log('- Request received:', request.method, request.url);
 
-    createReservation("Jenna Tishler", "ABC123", "8:20AM", "10:30AM", "04/14/18", "04/14/18", ["1 Johnson Lane, Providence RI", "2 Brown Court, Barrington, RI"], false, "");
-    getMyReservations("Jenna Tishler");
+    //createReservation("Jenna Tishler", "ABC123", "8:20AM", "10:30AM", "04/14/18", "04/14/18", ["1 Johnson Lane, Providence RI", "2 Brown Court, Barrington, RI"], false, "");
+    //getMyReservations("Jenna Tishler");
+
+    submitFeeback(2, "Car is ok");
     response.render('user');
 });
 
@@ -71,7 +99,7 @@ function removeVehicle(license){
 // USER
 function getMyReservations(currrentUser){
     conn.query('SELECT * FROM reservations WHERE user = ?', [currrentUser], function(error, data){
-        console.log(data);
+        //console.log(data);
     });
 }
 
@@ -91,4 +119,24 @@ function submitFeeback(reservationID, report){
     conn.query("INSERT INTO reports VALUES(null, ?, ?)", [reservationID, report], function(error, data){
 
     });
+
+    conn.query('SELECT * FROM reservations WHERE id = ?', [reservationID], function(error, data){
+         var mailOptions = {
+          from: 'jenna_tishler@brown.edu',
+          to: 'jenna.tishler@gmail.com',
+          subject: 'Sending Email using Node.js',
+          html: '<h1>Reservation: ' + data.rows[0].id + '</h1>' + '<h2>Name: ' + data.rows[0].user + '</h2>' + '<h2>License Plate: ' + data.rows[0].license + '</h2>' + '<p>Report: ' + report + '<p>'
+        };
+
+        transporter.sendMail(mailOptions, function(error, info){
+          if (error) {
+            console.log(error);
+          } else {
+            console.log('Email sent: ' + info.response);
+          }
+        });
+    });
+
+    //console.log(reservationData);
+
 }
