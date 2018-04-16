@@ -20,11 +20,12 @@ app.set('view engine', 'pug');
 app.use(express.static('public'));
 
 //email sender (will eventually change to a different email)
+//you can use your email and password to test
 var transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
     user: 'jenna_tishler@brown.edu',
-    pass: 'cX]8%GeMFYsa!T-c'
+    pass: ''
   }
 });
 
