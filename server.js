@@ -101,6 +101,11 @@ app.get("", (req, res) => {
     res.render("index.html");
 });
 
+app.get("/getReservations", (req, res) => {
+    console.log(req);
+    return [];
+});
+
 
 // ADMIN
 function getReservations(){
