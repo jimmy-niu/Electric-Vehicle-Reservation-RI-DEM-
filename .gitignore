@@ -32,4 +32,5 @@ Thumbs.db
 
 # User Folders #
 ######################
-./node_modules
+node_modules/*
+node_modules

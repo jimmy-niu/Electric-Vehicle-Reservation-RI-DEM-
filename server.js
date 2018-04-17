@@ -1,35 +1,38 @@
-var express = require('express')
-var app = express();
-var path = require('path');
-var http =require('http');
-var nodemailer = require('nodemailer');
-var server = http.createServer(app);
+let express = require('express')
+let app = express();
+let path = require('path');
+let http =require('http');
+let nodemailer = require('nodemailer');
+let server = http.createServer(app);
 
-var io = require('socket.io')(server, {wsEngine: 'ws'}); //fix Windows10 issue
+let io = require('socket.io')(server, {wsEngine: 'ws'}); //fix Windows10 issue
 //TO-DO change before handin!
 io.listen(server);
 
-var bodyParser = require('body-parser');
+let bodyParser = require('body-parser');
 app.use(bodyParser.urlencoded({extended:false}));
 app.use(bodyParser.json());
 
 // additional auth dependencies
-var cookieParser = require('cookie-parser');
-var session = require('express-session');
-var moment = require('moment');
-var querystring = require('querystring');
-var outlook = require('node-outlook');
-var auth = require('./auth');
+let cookieParser = require('cookie-parser');
+let session = require('express-session');
+let moment = require('moment');
+let querystring = require('querystring');
+let outlook = require('node-outlook');
+let auth = require('./auth');
 
-var anyDB = require('any-db');
-var conn = anyDB.createConnection('sqlite3://DEM.db');
+let anyDB = require('any-db');
+let conn = anyDB.createConnection('sqlite3://DEM.db');
 
-app.set('view engine', 'pug');
-app.use(express.static('public'));
+let engines = require('consolidate');
+app.engine('html', engines.hogan);
+app.set('views', __dirname + '/public'); // tell Express where to find templates, in this case the '/public' directory
+app.set('view engine', 'html'); //register .html extension as template engine so we can render .html pages
+app.use(express.static(__dirname + '/public'));
 
 //email sender (will eventually change to a different email)
 //you can use your email and password to test
-var transporter = nodemailer.createTransport({
+let transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
     user: 'jenna_tishler@brown.edu',
@@ -38,7 +41,7 @@ var transporter = nodemailer.createTransport({
 });
 
 //example of how to send email
-// var mailOptions = {
+// let mailOptions = {
 //   from: 'jenna_tishler@brown.edu',
 //   to: 'jenna.tishler@gmail.com',
 //   subject: 'Sending Email using Node.js',
@@ -80,6 +83,22 @@ server.listen(8080, function(){
 io.sockets.on('connection', function(socket){
 
 
+});
+
+/**
+ * Sets up the landing page to index.html.
+ */
+app.get("/*", (req, res) => {
+    console.log("Serving Login Page.");
+    res.render("index.html");
+});
+
+/**
+ * Sets up the landing page to index.html.
+ */
+app.get("", (req, res) => {
+    console.log("Serving Login Page 2.");
+    res.render("index.html");
 });
 
 
@@ -130,7 +149,7 @@ function submitFeeback(reservationID, report){
     });
 
     conn.query('SELECT * FROM reservations WHERE id = ?', [reservationID], function(error, data){
-         var mailOptions = {
+         let mailOptions = {
           from: 'jenna_tishler@brown.edu',
           to: 'jenna.tishler@gmail.com',
           subject: 'Sending Email using Node.js',
