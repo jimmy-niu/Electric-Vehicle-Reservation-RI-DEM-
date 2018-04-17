@@ -32,6 +32,13 @@ app.use(express.static(__dirname + '/public'));
 
 //email sender (will eventually change to a different email)
 //you can use your email and password to test
+// var transporter = nodemailer.createTransport({
+//   service: 'gmail',
+//   auth: {
+//     user: 'jenna_tishler@brown.edu',
+//     pass: ''
+//   }
+// });
 let transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
@@ -68,7 +75,8 @@ app.get('/home/user', function(request, response){
 	console.log('- Request received:', request.method, request.url);
 
     //createReservation("Jenna Tishler", "ABC123", "8:20AM", "10:30AM", "04/14/18", "04/14/18", ["1 Johnson Lane, Providence RI", "2 Brown Court, Barrington, RI"], false, "");
-    //getMyReservations("Jenna Tishler");
+    console.log(getMyReservations("Jenna Tishler"));
+
 
     submitFeeback(2, "Car is ok");
     response.render('user');
@@ -81,8 +89,17 @@ server.listen(8080, function(){
 
 //handles events when a user is connected
 io.sockets.on('connection', function(socket){
+    //emitted when a user makes a new reservation
+    socket.on('reservation', function(reservationInfo){
+        createReservation(reservationInfo.user, reservationInfo.license, 
+            reservationInfo.startTime, reservationInfo.endTime, reservationInfo.startDate, 
+            reservationInfo.endDate, reservationInfo.stops, reservationInfo.override, 
+            reservationInfo.justification);
 
-
+        conn.query('SELECT * FROM reservations WHERE user = ?', [currrentUser], function(error, data){
+           sockets.to(socket.id).emit('newReservation', data);
+        });
+    });
 });
 
 /**
@@ -132,7 +149,7 @@ function removeVehicle(license){
 // USER
 function getMyReservations(currrentUser){
     conn.query('SELECT * FROM reservations WHERE user = ?', [currrentUser], function(error, data){
-        //console.log(data);
+        return data;
     });
 }
 
@@ -161,13 +178,13 @@ function submitFeeback(reservationID, report){
           html: '<h1>Reservation: ' + data.rows[0].id + '</h1>' + '<h2>Name: ' + data.rows[0].user + '</h2>' + '<h2>License Plate: ' + data.rows[0].license + '</h2>' + '<p>Report: ' + report + '<p>'
         };
 
-        transporter.sendMail(mailOptions, function(error, info){
-          if (error) {
-            console.log(error);
-          } else {
-            console.log('Email sent: ' + info.response);
-          }
-        });
+        // transporter.sendMail(mailOptions, function(error, info){
+        //   if (error) {
+        //     console.log(error);
+        //   } else {
+        //     console.log('Email sent: ' + info.response);
+        //   }
+        // });
     });
 
     //console.log(reservationData);
