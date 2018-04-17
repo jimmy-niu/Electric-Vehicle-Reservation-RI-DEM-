@@ -21,9 +21,15 @@
     "any-db": "^2.2.1",
     "any-db-sqlite3": "^2.1.4",
     "body-parser": "^1.18.2",
+    "cookie-parser": "^1.4.3",
+    "dotenv": "^5.0.1",
     "express": "^4.16.3",
+    "express-session": "^1.15.6",
+    "moment": "^2.22.1",
+    "node-outlook": "^1.1.8",
     "nodemailer": "^4.6.4",
     "pug": "^2.0.3",
+    "simple-oauth2": "^1.5.2",
     "socket.io": "^2.1.0",
     "sqlite3": "^4.0.0"
   }

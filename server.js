@@ -13,6 +13,14 @@ var bodyParser = require('body-parser');
 app.use(bodyParser.urlencoded({extended:false}));
 app.use(bodyParser.json());
 
+// additional auth dependencies
+var cookieParser = require('cookie-parser');
+var session = require('express-session');
+var moment = require('moment');
+var querystring = require('querystring');
+var outlook = require('node-outlook');
+var auth = require('./auth');
+
 var anyDB = require('any-db');
 var conn = anyDB.createConnection('sqlite3://DEM.db');
 
