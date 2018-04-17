@@ -91,15 +91,18 @@ server.listen(8080, function(){
 io.sockets.on('connection', function(socket){
     //emitted when a user makes a new reservation
     socket.on('reservation', function(reservationInfo){
+        console.log("got a reservation!");
         createReservation(reservationInfo.user, reservationInfo.license, 
             reservationInfo.startTime, reservationInfo.endTime, reservationInfo.startDate, 
             reservationInfo.endDate, reservationInfo.stops, reservationInfo.override, 
             reservationInfo.justification);
-
-        conn.query('SELECT * FROM reservations WHERE user = ?', [currrentUser], function(error, data){
-           sockets.to(socket.id).emit('newReservation', data);
+        
+        conn.query('SELECT * FROM reservations WHERE user = ?', "Jenna Tishler", function(error, data){
+           socket.to(socket.id).emit('newReservation', data);
         });
     });
+    
+    
 });
 
 /**
@@ -109,20 +112,6 @@ app.get("/*", (req, res) => {
     console.log("Serving Login Page.");
     res.render("index.html");
 });
-
-/**
- * Sets up the landing page to index.html.
- */
-app.get("", (req, res) => {
-    console.log("Serving Login Page 2.");
-    res.render("index.html");
-});
-
-app.get("/getReservations", (req, res) => {
-    console.log(req);
-    return [];
-});
-
 
 // ADMIN
 function getReservations(){
