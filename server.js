@@ -19,7 +19,9 @@ let session = require('express-session');
 let moment = require('moment');
 let querystring = require('querystring');
 let outlook = require('node-outlook');
+let index = require('./public/index');
 let auth = require('./auth');
+var dotenv = require('dotenv').config();
 
 let anyDB = require('any-db');
 let conn = anyDB.createConnection('sqlite3://DEM.db');
@@ -29,6 +31,14 @@ app.engine('html', engines.hogan);
 app.set('views', __dirname + '/public'); // tell Express where to find templates, in this case the '/public' directory
 app.set('view engine', 'html'); //register .html extension as template engine so we can render .html pages
 app.use(express.static(__dirname + '/public'));
+
+app.use(cookieParser());
+app.use(session(
+  { secret: 's3cr3t',
+    resave: false,
+    saveUninitialized: false 
+  })
+);
 
 // app.set('view engine', 'pug');
 // app.use(express.static('public'));
@@ -146,9 +156,53 @@ io.of('/user').on('connection', function(socket){
 /**
  * Sets up the landing page to index.html.
  */
-app.get("/*", (req, res) => {
-    console.log("Serving Login Page.");
-    res.render("index.html");
+app.get('/', function(req, res) {
+  res.send(index.loginPage(auth.getAuthUrl()));
+});
+
+app.get('/authorize', function(req, res) {
+  var authCode = req.query.code;
+  if (authCode) {
+    console.log('');
+    console.log('Retrieved auth code in /authorize: ' + authCode);
+    auth.getTokenFromCode(authCode, tokenReceived, req, res);
+  }
+  else {
+    console.log('/authorize called without a code parameter, redirecting to login');
+    res.redirect('/');
+  }
+});
+
+function tokenReceived(req, res, error, token) {
+  if (error) {
+    console.log(error);
+    res.send(error);
+  }
+  else {
+    req.session.access_token = token.token.access_token;
+    req.session.refresh_token = token.token.refresh_token;
+    req.session.email = auth.getEmailFromToken(token.token.id_token);
+    res.redirect('/logincomplete');
+  }
+}
+
+app.get('/logincomplete', function(req, res) {
+  var access_token = req.session.access_token;
+  var refresh_token = req.session.access_token;
+  var email = req.session.email;
+  
+  if (access_token === undefined || refresh_token === undefined) {
+    console.log('/logincomplete called while not logged in');
+    res.redirect('/');
+    return;
+  }
+  res.send(index.loginCompletePage(email));
+  //res.sendFile(path.join(__dirname, './public/user/index.html'));
+});
+
+app.get('/logout', function(req, res) {
+  req.session.destroy();
+  res.redirect('/');
 });
 
 // ADMIN
