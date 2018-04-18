@@ -101,6 +101,9 @@ io.of('/admin').on('connection', function(socket){
     socket.on('vehicleEdited', function(id, vehicle){
         editVehicle(id, vehicle);
     });
+    socket.on('vehicleStatusUpdated', function(license, status){
+        updateVehicleStatus(license, status);
+    });
 });
 
 //handles events when a regular user is connnected
