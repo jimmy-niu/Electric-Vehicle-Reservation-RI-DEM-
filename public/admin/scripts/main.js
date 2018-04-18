@@ -17,6 +17,9 @@ $(document).ready(function() {
     adminSocket.on('reservationChange', function(reservations){
         console.log(reservations);
     });
+
+    let newVehicle = {license:'EDU-1324', model:'Honda Civic', color:'Red', inService: 'TRUE', miles: 2.0};
+    addVehicle(newVehicle);
 });
 
 

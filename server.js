@@ -36,7 +36,7 @@ app.use(cookieParser());
 app.use(session(
   { secret: 's3cr3t',
     resave: false,
-    saveUninitialized: false 
+    saveUninitialized: false
   })
 );
 
@@ -104,17 +104,6 @@ conn.query('CREATE TABLE IF NOT EXISTS vehicles(id INTEGER PRIMARY KEY AUTOINCRE
 conn.query('CREATE TABLE IF NOT EXISTS reservations(id INTEGER PRIMARY KEY AUTOINCREMENT, user TEXT, license TEXT, startTime TEXT, endTime TEXT, startDate TEXT, endDate TEXT, stops JSON, override BOOLEAN, justification TEXT)');
 //Reports
 conn.query('CREATE TABLE IF NOT EXISTS reports(id INTEGER PRIMARY KEY AUTOINCREMENT, reservation INTEGER, report TEXT)');
-
-app.get('/home/admin', function(request, response){
-	console.log('- Request received:', request.method, request.url);
-
-    //createReservation("Jenna Tishler", "ABC123", "8:20AM", "10:30AM", "04/14/18", "04/14/18", ["1 Johnson Lane, Providence RI", "2 Brown Court, Barrington, RI"], false, "");
-    console.log(getMyReservations("Jenna Tishler"));
-
-
-    submitFeeback(2, "Car is ok");
-    //response.render('home');
-});
 
 /*Sets up the server on port 8080.*/
 server.listen(8080, function(){
@@ -238,7 +227,7 @@ app.get('/logincomplete', function(req, res) {
   var access_token = req.session.access_token;
   var refresh_token = req.session.access_token;
   var email = req.session.email;
-  
+
   if (access_token === undefined || refresh_token === undefined) {
     console.log('/logincomplete called while not logged in');
     res.redirect('/');
