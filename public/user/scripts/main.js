@@ -15,6 +15,10 @@ function newReservation(){
     userSocket.emit('reservation', {user: "Jimmy Niu", license: "13245", startTime: "6932", endTime: "6361", stops: ["home", "work"], override: true, justification: "my oranges fell into the river."});
 }
 
+function editReservation(){
+    userSocket.emit('edit', {user: "Jimmy Niu", license: "19087", startTime: "6932", endTime: "6361", stops: ["home", "work"], override: false, justification: ""});
+}
+
 //need to figure out current and past
 function updateReservations(){
 

@@ -112,6 +112,13 @@ io.of('/user').on('connection', function(socket){
         
     }); 
 
+    socket.on('edit', function(reservationID, user, license, startTime, endTime, startDate, endDate, stops, override, justification){
+        editReservation(reservationID)
+        
+        updateUserReservations(socketID, user);
+        updateAdminReservations();
+    });
+
     socket.on('cancel', function(reservationID){
         cancelReservation(reservationID);
 
@@ -168,6 +175,12 @@ function updateUserReservations(socketID, user){
 function createReservation(user, license, startTime, endTime, startDate, endDate, stops, override, justification){
     conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?, ?)',[user, license, startTime, endTime, startDate, endDate, stops, override, justification],function(error, data){
         console.log(data);
+    });
+}
+
+function editReservation(id, user, license, startTime, endTime, startDate, endDate, stops, override, justification){
+    conn.query('UPDATE reservations SET license = ?, startTime = ?, endTime = ?, startDate = ?, endDate = ?, stops = ?, override = ?, justification = ? WHERE reservationID = ?', [license, startTime, endTime, startDate, endDate, stops, override, justification, id]. function(error, data){
+
     });
 }
 
