@@ -40,6 +40,27 @@ app.use(session(
   })
 );
 
+// RESERVATION OBJECT FORMAT 
+var newEvent = {
+  "Subject": "Test event",
+  "Body": {
+    "ContentType": "HTML",
+    "Content": "wowee this is a test event"
+  },
+  "Start": "2018-04-27T00:00:00.000Z",
+  "End": "2018-04-27T00:30:00.000Z",
+  "ReminderMinutesBeforeStart": "15",
+  "IsReminderOn": "true",
+  "Attendees": [
+    {
+      "EmailAddress": {
+        "Address": "kyle.cui9@gmail.com",
+        "Name": "Kyle Cui"
+      },
+      "Type": "Required"
+    }
+  ]
+};
 // app.set('view engine', 'pug');
 // app.use(express.static('public'));
 

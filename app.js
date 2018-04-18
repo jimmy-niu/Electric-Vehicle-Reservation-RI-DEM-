@@ -217,6 +217,8 @@ app.get('/addevent', function(req, res) {
     },
     "Start": "2018-04-27T00:00:00.000Z",
     "End": "2018-04-27T00:30:00.000Z",
+    "ReminderMinutesBeforeStart": "15",
+    "IsReminderOn": "true",
     "Attendees": [
       {
         "EmailAddress": {
