@@ -111,6 +111,18 @@ io.of('/admin').on('connection', function(socket){
     socket.on('vehicleEdited', function(id, vehicle){
         editVehicle(id, vehicle);
     });
+    socket.on('vehicleStatusUpdated', function(license, status){
+        updateVehicleStatus(license, status);
+    });
+    socket.on('requestReports',function(callback){
+        callback(getReports());
+    });
+    socket.on('requestSpecificReports', function(reservation, callback){
+        callback(getSpecificReports(reservation));
+    });
+    socket.on('requestVehicles', function(callback){
+        callback(getVehicles());
+    });
 });
 
 //handles events when a regular user is connnected
@@ -231,7 +243,11 @@ function removeVehicle(license){
 
     });
 }
+function updateVehicleStatus(license, status){
+    conn.query('UPDATE vehicles SET inService = ? WHERE license = ?',[status, license],function(error, data){
 
+    });
+}
 function getReports(){
     conn.query('SELECT * FROM reports', function(error, data){
         return data;
