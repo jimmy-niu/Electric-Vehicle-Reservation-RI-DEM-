@@ -20,6 +20,10 @@ $(document).ready(function() {
 
     let newVehicle = {license:'EDU-1324', model:'Honda Civic', color:'Red', inService: 'TRUE', miles: 2.0};
     addVehicle(newVehicle);
+    requestVehicles();
+    removeVehicle('EDU-1324');
+    requestVehicles();
+    //Syncing issues?
 });
 
 
