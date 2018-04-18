@@ -159,7 +159,7 @@ function updateAdminReservations(){
 }
 function getVehicles(){
     conn.query('SELECT * FROM vehicles',function(error, data){
-
+        return data;
     });
 }
 function addVehicle(vehicle){
@@ -180,12 +180,12 @@ function removeVehicle(license){
 
 function getReports(){
     conn.query('SELECT * FROM reports', function(error, data){
-
+        return data;
     });
 }
 function getSpecificReports(reservation){
     conn.query('SELECT * FROM reports WHERE reservation = ?', [reservation], function(error, data){
-
+        return data;
     });
 }
 // USER
@@ -202,7 +202,7 @@ function createReservation(user, license, startTime, endTime, startDate, endDate
 }
 
 function editReservation(id, user, license, startTime, endTime, startDate, endDate, stops, override, justification){
-    conn.query('UPDATE reservations SET license = ?, startTime = ?, endTime = ?, startDate = ?, endDate = ?, stops = ?, override = ?, justification = ? WHERE reservationID = ?', [license, startTime, endTime, startDate, endDate, stops, override, justification, id]. function(error, data){
+    conn.query('UPDATE reservations SET license = ?, startTime = ?, endTime = ?, startDate = ?, endDate = ?, stops = ?, override = ?, justification = ? WHERE reservationID = ?', [license, startTime, endTime, startDate, endDate, stops, override, justification, id], function(error, data){
 
     });
 }
