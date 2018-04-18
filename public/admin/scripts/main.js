@@ -14,7 +14,7 @@ function toggle_hidden(id, object){
 
 // Sets up the sockets.
 $(document).ready(function() {
-    adminSocket.on('newReservation', function(reservations){
+    adminSocket.on('reservationChange', function(reservations){
         console.log(reservations);
     });
 });

@@ -92,21 +92,7 @@ server.listen(8080, function(){
 
 //handles events when an admin user is connected
 io.of('/admin').on('connection', function(socket){
-    //emitted when a user makes a new reservation
-    socket.on('reservation', function(reservationInfo){
-        console.log("got a reservation!");
-        //console.log(reservationInfo.user);
-        createReservation(reservationInfo.user, reservationInfo.license, 
-            reservationInfo.startTime, reservationInfo.endTime, reservationInfo.startDate, 
-            reservationInfo.endDate, reservationInfo.stops, reservationInfo.override, 
-            reservationInfo.justification);
-        
-        conn.query('SELECT * FROM reservations', function(error, data){
-           socket.emit('newReservation', data);
-           console.log(data);
-           //to(socket.id)
-        });
-    }); 
+   
 });
 
 //handles events when a regular user is connnected
@@ -121,17 +107,33 @@ io.of('/user').on('connection', function(socket){
             reservationInfo.justification);
         
         conn.query('SELECT * FROM reservations WHERE user = ?', "Jenna Tishler", function(error, data){
-           socket.emit('newReservation', data);
-           //console.log(data);
-           //to(socket.id)
+           socket.to(socket.id).emit('reservationChange', data);
         });
 
         conn.query('SELECT * FROM reservations', function(error, data){
-           io.of('/admin').emit('newReservation', data);
-           //console.log(data);
-           //to(socket.id)
+           io.of('/admin').emit('reservationChange', data);
         });
     }); 
+
+    socket.on('cancel', function(reservationID){
+        cancelReservation(reservationID);
+
+        conn.query('SELECT * FROM reservations WHERE user = ?', "Jenna Tishler", function(error, data){
+           socket.to(socket.id).emit('reservationChange', data);
+        });
+
+        conn.query('SELECT * FROM reservations', function(error, data){
+           io.of('/admin').emit('reservationChange', data);
+        });
+    });
+
+    socket.on('feedback', function(reservationID, report){
+        submitFeeback(resrevationID, resport);
+
+        conn.query('SELECT * FROM reports', function(error, data){
+           io.of('/admin').emit('reportAdded', data);
+        });
+    });
 });
 
 /**
