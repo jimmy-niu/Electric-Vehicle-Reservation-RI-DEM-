@@ -24,7 +24,9 @@ app.use(session(
   
 
 app.get('/', function(req, res) {
+
   res.send(pages.loginPage(auth.getAuthUrl()));
+  
 });
 
 app.get('/authorize', function(req, res) {

@@ -1,15 +1,15 @@
-var oauth2 = require('simple-oauth2').create({
+const credentials = {
     client: {
-      id: process.env.CLIENT_ID,
-      secret: process.env.CLIENT_SECRET
+      id: '5689926f-c6a0-4d4e-82f4-19760907d166',
+      secret: 'uqlACP41#%sinnKKRW495!|'
     },
     auth: {
       tokenHost: 'https://login.microsoftonline.com',
       tokenPath: 'common/oauth2/v2.0/token',
       authorizePath: 'common/oauth2/v2.0/authorize'
     }
-  }
-);
+  };
+const oauth2 = require('simple-oauth2').create(credentials);
 
 function getAuthUrl() {
   var returnVal = oauth2.authorizationCode.authorizeURL({
