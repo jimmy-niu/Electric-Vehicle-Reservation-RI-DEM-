@@ -31,3 +31,7 @@ function editVehicle(id, vehicle){
 function removeVehicle(license){
     adminSocket.emit('removeVehicle', license);
 }
+
+function updateVehicleStatus(license, status){
+    adminSocket.emit('updateVehicleStatus', license, status);
+}

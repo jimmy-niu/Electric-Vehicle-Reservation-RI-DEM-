@@ -177,7 +177,11 @@ function removeVehicle(license){
 
     });
 }
+function updateVehicleStatus(license, status){
+    conn.query('UPDATE vehicles SET inService = ? WHERE license = ?',[status, license],function(error, data){
 
+    });
+}
 function getReports(){
     conn.query('SELECT * FROM reports', function(error, data){
         return data;
