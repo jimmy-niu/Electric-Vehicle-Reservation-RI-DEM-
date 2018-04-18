@@ -99,7 +99,7 @@ io.of('/admin').on('connection', function(socket){
         removeVehicle(license);
     });
     socket.on('vehicleEdited', function(id, vehicle){
-        editVehicle(id, vehicle)
+        editVehicle(id, vehicle);
     });
 });
 

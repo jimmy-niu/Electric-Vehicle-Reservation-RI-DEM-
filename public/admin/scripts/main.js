@@ -18,3 +18,16 @@ $(document).ready(function() {
         console.log(reservations);
     });
 });
+
+
+function addVehicle(vehicle){
+    adminSocket.emit('addVehicle', vehicle);
+}
+
+function editVehicle(id, vehicle){
+    adminSocket.emit('editVehicle', id, vehicle);
+}
+
+function removeVehicle(license){
+    adminSocket.emit('removeVehicle', license);
+}
