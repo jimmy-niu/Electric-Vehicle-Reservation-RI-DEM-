@@ -157,24 +157,39 @@ io.of('/user').on('connection', function(socket){
             reservationInfo.endDate, reservationInfo.stops, reservationInfo.override,
             reservationInfo.justification);
 
-        updateUserReservations(socket.id, reservationInfo.user);
-        updateAdminReservations();
-
+        conn.query('SELECT * FROM reservations WHERE user = ?', [reservationInfo.user], function(error, data){
+           socket.to(socket.id).emit('reservationChange', data);
+           console.log("sending to user");
+        });
+        
+        conn.query('SELECT * FROM reservations', function(error, data){
+           io.of('/admin').emit('reservationChange', data);
+        });
 
     });
 
     socket.on('edit', function(reservationID, user, license, startTime, endTime, startDate, endDate, stops, override, justification){
         editReservation(reservationID)
 
-        updateUserReservations(socket.id, user);
-        updateAdminReservations();
+        conn.query('SELECT * FROM reservations WHERE user = ?', [user], function(error, data){
+           socket.to(socket.id).emit('reservationChange', data);
+        });
+
+        conn.query('SELECT * FROM reservations', function(error, data){
+           io.of('/admin').emit('reservationChange', data);
+        });
     });
 
-    socket.on('cancel', function(reservationID){
+    socket.on('cancel', function(reservationID, user){
         cancelReservation(reservationID);
 
-        updateUserReservations(socket.id, user);
-        updateAdminReservations();
+        conn.query('SELECT * FROM reservations WHERE user = ?', [user], function(error, data){
+           socket.to(socket.id).emit('reservationChange', data);
+        });
+        
+        conn.query('SELECT * FROM reservations', function(error, data){
+           io.of('/admin').emit('reservationChange', data);
+        });
     });
 
     socket.on('feedback', function(reservationID, report){
@@ -300,7 +315,7 @@ function editReservation(id, user, license, startTime, endTime, startDate, endDa
 
 function cancelReservation(id){
     conn.query('DELETE FROM reservations WHERE id = ?', [id], function(error, data){
-
+        console.log('cancelled');
     });
 }
 
@@ -327,5 +342,4 @@ function submitFeeback(reservationID, report){
     });
 
     //console.log(reservationData);
-
 }
