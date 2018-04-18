@@ -114,7 +114,7 @@ io.of('/user').on('connection', function(socket){
             reservationInfo.endDate, reservationInfo.stops, reservationInfo.override,
             reservationInfo.justification);
 
-        updateUserReservations(socketID, user);
+        updateUserReservations(socket.id, reservationInfo.user);
         updateAdminReservations();
 
 
@@ -123,14 +123,14 @@ io.of('/user').on('connection', function(socket){
     socket.on('edit', function(reservationID, user, license, startTime, endTime, startDate, endDate, stops, override, justification){
         editReservation(reservationID)
 
-        updateUserReservations(socketID, user);
+        updateUserReservations(socket.id, user);
         updateAdminReservations();
     });
 
     socket.on('cancel', function(reservationID){
         cancelReservation(reservationID);
 
-        updateUserReservations(socketID, user);
+        updateUserReservations(socket.id, user);
         updateAdminReservations();
     });
 
