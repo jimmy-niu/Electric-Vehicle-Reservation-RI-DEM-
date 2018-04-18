@@ -104,6 +104,15 @@ io.of('/admin').on('connection', function(socket){
     socket.on('vehicleStatusUpdated', function(license, status){
         updateVehicleStatus(license, status);
     });
+    socket.on('requestReports',function(callback){
+        callback(getReports());
+    });
+    socket.on('requestSpecificReports', function(reservation, callback){
+        callback(getSpecificReports(reservation));
+    });
+    socket.on('requestVehicles', function(callback){
+        callback(getVehicles());
+    });
 });
 
 //handles events when a regular user is connnected

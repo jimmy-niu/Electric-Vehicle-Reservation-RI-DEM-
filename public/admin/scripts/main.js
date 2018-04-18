@@ -35,3 +35,20 @@ function removeVehicle(license){
 function updateVehicleStatus(license, status){
     adminSocket.emit('updateVehicleStatus', license, status);
 }
+
+function requestReports(){
+    adminSocket.emit('requestReports', function(data){
+        console.log(data);
+    });
+}
+
+function requestSpecificReports(){
+    adminSocket.emit('requestSpecificReports', reservation, function(data){
+        console.log(data);
+    });
+}
+function requestVehicles(){
+    adminSocket.emit('requestVehicles', function(data){
+        console.log(data);
+    });
+}
