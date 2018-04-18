@@ -40,17 +40,16 @@ app.use(session(
   })
 );
 
-// RESERVATION OBJECT FORMAT 
-var newEvent = {
+app.get('/addevent', function(req, res) {
+  var access_token = req.session.access_token;
+  var newEvent = {
   "Subject": "Test event",
   "Body": {
     "ContentType": "HTML",
-    "Content": "wowee this is a test event"
+    "Content": "wowee this is a test event",
   },
   "Start": "2018-04-27T00:00:00.000Z",
   "End": "2018-04-27T00:30:00.000Z",
-  "ReminderMinutesBeforeStart": "15",
-  "IsReminderOn": "true",
   "Attendees": [
     {
       "EmailAddress": {
@@ -61,6 +60,31 @@ var newEvent = {
     }
   ]
 };
+  var userInfo = {
+    email: 'kyle.cui9@gmail.com'
+  };
+
+  var addEventParameters = {
+    token: access_token,
+    event: newEvent,
+    user: userInfo
+  };
+
+  outlook.calendar.createEvent(addEventParameters,
+    function(error, result) {
+      if (error) {
+        console.log(error);
+        res.send(error);
+      }
+      else {
+        res.redirect('/sync');
+      }
+    });
+});
+
+// RESERVATION OBJECT FORMAT 
+
+
 // app.set('view engine', 'pug');
 // app.use(express.static('public'));
 
