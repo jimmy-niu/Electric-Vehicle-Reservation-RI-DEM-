@@ -30,6 +30,9 @@ app.set('views', __dirname + '/public'); // tell Express where to find templates
 app.set('view engine', 'html'); //register .html extension as template engine so we can render .html pages
 app.use(express.static(__dirname + '/public'));
 
+// app.set('view engine', 'pug');
+// app.use(express.static('public'));
+
 //email sender (will eventually change to a different email)
 //you can use your email and password to test
 // var transporter = nodemailer.createTransport({
@@ -71,7 +74,7 @@ conn.query('CREATE TABLE IF NOT EXISTS reservations(id INTEGER PRIMARY KEY AUTOI
 //Reports
 conn.query('CREATE TABLE IF NOT EXISTS reports(id INTEGER PRIMARY KEY AUTOINCREMENT, reservation INTEGER, report TEXT)');
 
-app.get('/home/user', function(request, response){
+app.get('/home/admin', function(request, response){
 	console.log('- Request received:', request.method, request.url);
 
     //createReservation("Jenna Tishler", "ABC123", "8:20AM", "10:30AM", "04/14/18", "04/14/18", ["1 Johnson Lane, Providence RI", "2 Brown Court, Barrington, RI"], false, "");
@@ -79,7 +82,7 @@ app.get('/home/user', function(request, response){
 
 
     submitFeeback(2, "Car is ok");
-    response.render('user');
+    //response.render('home');
 });
 
 /*Sets up the server on port 8080.*/
@@ -87,22 +90,48 @@ server.listen(8080, function(){
 	console.log('- Server listening on port 8080');
 });
 
-//handles events when a user is connected
-io.sockets.on('connection', function(socket){
+//handles events when an admin user is connected
+io.of('/admin').on('connection', function(socket){
     //emitted when a user makes a new reservation
     socket.on('reservation', function(reservationInfo){
         console.log("got a reservation!");
+        //console.log(reservationInfo.user);
+        createReservation(reservationInfo.user, reservationInfo.license, 
+            reservationInfo.startTime, reservationInfo.endTime, reservationInfo.startDate, 
+            reservationInfo.endDate, reservationInfo.stops, reservationInfo.override, 
+            reservationInfo.justification);
+        
+        conn.query('SELECT * FROM reservations', function(error, data){
+           socket.emit('newReservation', data);
+           console.log(data);
+           //to(socket.id)
+        });
+    }); 
+});
+
+//handles events when a regular user is connnected
+io.of('/user').on('connection', function(socket){
+    //emitted when a user makes a new reservation
+    socket.on('reservation', function(reservationInfo){
+        console.log("got a reservation!");
+        //console.log(reservationInfo.user);
         createReservation(reservationInfo.user, reservationInfo.license, 
             reservationInfo.startTime, reservationInfo.endTime, reservationInfo.startDate, 
             reservationInfo.endDate, reservationInfo.stops, reservationInfo.override, 
             reservationInfo.justification);
         
         conn.query('SELECT * FROM reservations WHERE user = ?', "Jenna Tishler", function(error, data){
-           socket.to(socket.id).emit('newReservation', data);
+           socket.emit('newReservation', data);
+           //console.log(data);
+           //to(socket.id)
         });
-    });
-    
-    
+
+        conn.query('SELECT * FROM reservations', function(error, data){
+           io.of('/admin').emit('newReservation', data);
+           //console.log(data);
+           //to(socket.id)
+        });
+    }); 
 });
 
 /**
@@ -144,7 +173,7 @@ function getMyReservations(currrentUser){
 
 function createReservation(user, license, startTime, endTime, startDate, endDate, stops, override, justification){
     conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?, ?)',[user, license, startTime, endTime, startDate, endDate, stops, override, justification],function(error, data){
-
+        console.log(data);
     });
 }
 

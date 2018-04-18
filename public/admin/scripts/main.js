@@ -1,4 +1,4 @@
-let socket = io.connect();
+let adminSocket = io.connect('http://localhost:8080/admin', {forceNew: true});
 
 function toggle_hidden(id, object){
     if(object.innerHTML.includes("▼")){
@@ -14,9 +14,7 @@ function toggle_hidden(id, object){
 
 // Sets up the sockets.
 $(document).ready(function() {
-    socket.on('newReservation', function(reservations){
+    adminSocket.on('newReservation', function(reservations){
         console.log(reservations);
     });
-
-    socket.emit('reservation', {user: "duck", license: "13245", startTime: Date.now(), endTime: "6361", stops: [1, 2, 3, 4, 5], override: true, justification: "my oranges fell into the river."});
 });
