@@ -16,7 +16,6 @@ function getAuthUrl() {
     redirect_uri: process.env.REDIRECT_URI,
     scope: process.env.CLIENT_SCOPES
   });
-  console.log(returnVal)
   return returnVal;
 }
 
