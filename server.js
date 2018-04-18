@@ -106,25 +106,17 @@ io.of('/user').on('connection', function(socket){
             reservationInfo.endDate, reservationInfo.stops, reservationInfo.override, 
             reservationInfo.justification);
         
-        conn.query('SELECT * FROM reservations WHERE user = ?', "Jenna Tishler", function(error, data){
-           socket.to(socket.id).emit('reservationChange', data);
-        });
+        updateUserReservations(socketID, user);
+        updateAdminReservations();
 
-        conn.query('SELECT * FROM reservations', function(error, data){
-           io.of('/admin').emit('reservationChange', data);
-        });
+        
     }); 
 
     socket.on('cancel', function(reservationID){
         cancelReservation(reservationID);
 
-        conn.query('SELECT * FROM reservations WHERE user = ?', "Jenna Tishler", function(error, data){
-           socket.to(socket.id).emit('reservationChange', data);
-        });
-
-        conn.query('SELECT * FROM reservations', function(error, data){
-           io.of('/admin').emit('reservationChange', data);
-        });
+        updateUserReservations(socketID, user);
+        updateAdminReservations();
     });
 
     socket.on('feedback', function(reservationID, report){
@@ -145,10 +137,10 @@ app.get("/*", (req, res) => {
 });
 
 // ADMIN
-function getReservations(){
-    // conn.query('',function(error, data){
-    //
-    // });
+function updateAdminReservations(){
+    conn.query('SELECT * FROM reservations', function(error, data){
+           io.of('/admin').emit('reservationChange', data);
+    });
 }
 function getVehicles(){
     conn.query('SELECT * FROM vehicles',function(error, data){
@@ -167,9 +159,9 @@ function removeVehicle(license){
 }
 
 // USER
-function getMyReservations(currrentUser){
-    conn.query('SELECT * FROM reservations WHERE user = ?', [currrentUser], function(error, data){
-        return data;
+function updateUserReservations(socketID, user){
+    conn.query('SELECT * FROM reservations WHERE user = ?', [user], function(error, data){
+           socket.to(socketID).emit('reservationChange', data);
     });
 }
 
