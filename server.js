@@ -92,7 +92,15 @@ server.listen(8080, function(){
 
 //handles events when an admin user is connected
 io.of('/admin').on('connection', function(socket){
-   
+    // socket.on('', function(){
+    //
+    // });
+    // socket.on('', function(){
+    //
+    // });
+    // socket.on('', function(){
+    //
+    // });
 });
 
 //handles events when a regular user is connnected
@@ -101,16 +109,16 @@ io.of('/user').on('connection', function(socket){
     socket.on('reservation', function(reservationInfo){
         console.log("got a reservation!");
         //console.log(reservationInfo.user);
-        createReservation(reservationInfo.user, reservationInfo.license, 
-            reservationInfo.startTime, reservationInfo.endTime, reservationInfo.startDate, 
-            reservationInfo.endDate, reservationInfo.stops, reservationInfo.override, 
+        createReservation(reservationInfo.user, reservationInfo.license,
+            reservationInfo.startTime, reservationInfo.endTime, reservationInfo.startDate,
+            reservationInfo.endDate, reservationInfo.stops, reservationInfo.override,
             reservationInfo.justification);
-        
+
         updateUserReservations(socketID, user);
         updateAdminReservations();
 
-        
-    }); 
+
+    });
 
     socket.on('edit', function(reservationID, user, license, startTime, endTime, startDate, endDate, stops, override, justification){
         editReservation(reservationID)
@@ -159,12 +167,27 @@ function addVehicle(vehicle){
 
     });
 }
+function editVehicle(id, vehicle){
+    conn.query('REPLACE INTO vehicles VALUES(?, ?, ?, ?, ?, ?)',[id, vehicle.license, vehicle.model, vehicle.color, vehicle.inService, vehicle.miles],function(error, data){
+
+    });
+}
 function removeVehicle(license){
     conn.query('DELETE FROM vehicles WHERE license = ?', [license],function(error, data){
 
     });
 }
 
+function getReports(){
+    conn.query('SELECT * FROM reports', function(error, data){
+
+    });
+}
+function getSpecificReports(reservation){
+    conn.query('SELECT * FROM reports WHERE reservation = ?', [reservation], function(error, data){
+
+    });
+}
 // USER
 function updateUserReservations(socketID, user){
     conn.query('SELECT * FROM reservations WHERE user = ?', [user], function(error, data){
