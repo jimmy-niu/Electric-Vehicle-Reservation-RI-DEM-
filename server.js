@@ -92,15 +92,15 @@ server.listen(8080, function(){
 
 //handles events when an admin user is connected
 io.of('/admin').on('connection', function(socket){
-    // socket.on('', function(){
-    //
-    // });
-    // socket.on('', function(){
-    //
-    // });
-    // socket.on('', function(){
-    //
-    // });
+    socket.on('vehicleAdded', function(vehicle){
+        addVehicle(vehicle);
+    });
+    socket.on('vehicleRemoved', function(license){
+        removeVehicle(license);
+    });
+    socket.on('vehicleEdited', function(id, vehicle){
+        editVehicle(id, vehicle)
+    });
 });
 
 //handles events when a regular user is connnected
@@ -122,7 +122,7 @@ io.of('/user').on('connection', function(socket){
 
     socket.on('edit', function(reservationID, user, license, startTime, endTime, startDate, endDate, stops, override, justification){
         editReservation(reservationID)
-        
+
         updateUserReservations(socketID, user);
         updateAdminReservations();
     });
