@@ -121,6 +121,8 @@ let transporter = nodemailer.createTransport({
 //   }
 // });
 
+// conn.query('DROP TABLE vehicles');
+conn.query('DROP TABLE reservations');
 
 //Resevervations
 conn.query('CREATE TABLE IF NOT EXISTS vehicles(id INTEGER PRIMARY KEY AUTOINCREMENT, license TEXT, model TEXT, color TEXT, inService BOOLEAN, miles DOUBLE PRECISION)');
@@ -128,6 +130,19 @@ conn.query('CREATE TABLE IF NOT EXISTS vehicles(id INTEGER PRIMARY KEY AUTOINCRE
 conn.query('CREATE TABLE IF NOT EXISTS reservations(id INTEGER PRIMARY KEY AUTOINCREMENT, user TEXT, license TEXT, start TEXT, end TEXT, stops JSON, override BOOLEAN, justification TEXT)');
 //Reports
 conn.query('CREATE TABLE IF NOT EXISTS reports(id INTEGER PRIMARY KEY AUTOINCREMENT, reservation INTEGER, report TEXT)');
+
+//test data
+conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?)',["Jenna Tishler", "ABC123", "2018-04-18 11:00", "2018-04-18 15:00", ["home", "work"], false, ""]);
+conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?)',["Jenna Tishler", "DEF456", "2018-04-19 11:00", "2018-04-20 11:00", ["home", "work"], false, ""]);
+conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?)',["Max Luebbers", "GHI789", "2018-04-18 11:00", "2018-04-18 15:00", ["home", "work"], false, ""]);
+conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?)',["Jimmy Niu", "GHI789", "2018-04-19 14:00", "2018-04-18 17:00", ["home", "work"], false, ""]);
+
+// conn.query('INSERT INTO vehicles VALUES(null, ?, ?, ?, ?, ?)', ["ABC123", "Chevy Volt", "Red", true, 100.0]);
+// conn.query('INSERT INTO vehicles VALUES(null, ?, ?, ?, ?, ?)', ["DEF456", "Chevy Volt", "Blue", true, 100.0]);
+// conn.query('INSERT INTO vehicles VALUES(null, ?, ?, ?, ?, ?)', ["GHI789", "Chevy Volt", "Purple", true, 100.0]);
+// conn.query('INSERT INTO vehicles VALUES(null, ?, ?, ?, ?, ?)', ["OLH985", "Chevy Volt", "Silver", true, 100.0]);
+// conn.query('INSERT INTO vehicles VALUES(null, ?, ?, ?, ?, ?)', ["VNG734", "Chevy Volt", "Green", true, 100.0]);
+// conn.query('INSERT INTO vehicles VALUES(null, ?, ?, ?, ?, ?)', ["DOL234", "Chevy Volt", "Red", true, 100.0]);
 
 /*Sets up the server on port 8080.*/
 server.listen(8080, function(){
@@ -156,23 +171,30 @@ io.of('/user').on('connection', function(socket){
         conn.query('SELECT * FROM reservations WHERE user = ?', [user], function(error, data){
            callback(data);
         });
+
+        conn.query('SELECT * FROM vehicles', function(error, data){
+           console.log(data);
+        });
     });
     //emitted when a user makes a new reservation
     socket.on('reservation', function(reservationInfo){
         console.log("got a reservation!");
         
-        conn.query('SELECT model, license FROM vehicles WHERE license NOT IN (SELECT license FROM resrvations WHERE start <= ? AND end >= ?)', [reservationInfo.end, reservationInfo.start], function(error, data){
+        conn.query('SELECT license, model FROM vehicles WHERE license NOT IN (SELECT license FROM reservations WHERE start <= ? AND end >= ?)', [reservationInfo.end, reservationInfo.start], function(error, data){
             console.log(data);
 
             createReservation(reservationInfo.user, data.rows[0].license,
             reservationInfo.start, reservationInfo.end, reservationInfo.stops, reservationInfo.override,
             reservationInfo.justification);
 
-            socket.to(socket.id).emit('alternateVehicles', data);
+            //make sure only emitting to one user
+            //don't send back assigned vehicle
+            socket.emit('alternateVehicles', data);
         });
 
         conn.query('SELECT * FROM reservations WHERE user = ?', [reservationInfo.user], function(error, data){
-            socket.to(socket.id).emit('reservationChange', data);
+             //make sure only emitting to one user
+            socket.emit('reservationChange', data);
             console.log("sending to user");
         });
 
@@ -319,13 +341,13 @@ function updateUserReservations(socketID, user){
 }
 
 function createReservation(user, license, start, end, stops, override, justification){
-    conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?, ?)',[user, license, startTime, endTime, startDate, endDate, stops, override, justification],function(error, data){
+    conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?)',[user, license, start, end, stops, override, justification],function(error, data){
         console.log(data);
     });
 }
 
 function editReservation(id, user, license, start, end, stops, override, justification){
-    conn.query('UPDATE reservations SET license = ?, startTime = ?, endTime = ?, startDate = ?, endDate = ?, stops = ?, override = ?, justification = ? WHERE reservationID = ?', [license, startTime, endTime, startDate, endDate, stops, override, justification, id], function(error, data){
+    conn.query('UPDATE reservations SET license = ?, start = ?, end = ?, stops = ?, override = ?, justification = ? WHERE reservationID = ?', [license, start, end, stops, override, justification, id], function(error, data){
 
     });
 }
