@@ -350,7 +350,7 @@ function getReports(){
         io.of('/admin').emit('reportChange', data);
     });
 }
-function removeVehicle(id){
+function removeReports(id){
     conn.query('DELETE FROM reports WHERE id =?', [id],function(error, data){
         getReports();
     });
@@ -401,7 +401,7 @@ function cancelReservation(id){
 }
 function submitFeeback(reservationID, report){
     conn.query("INSERT INTO reports VALUES(null, ?, ?)", [reservationID, report], function(error, data){
-
+        getReports();
     });
 
     conn.query('SELECT * FROM reservations WHERE id = ?', [reservationID], function(error, data){
