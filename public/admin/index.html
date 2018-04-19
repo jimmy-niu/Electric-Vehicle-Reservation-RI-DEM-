@@ -4,34 +4,37 @@
     <head>
         <title>ADMIN: DEM Vehicle Reservation</title>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-        <link rel="stylesheet" type = "text/css" href = "./styles/main.css">
+        <link rel="stylesheet" type = "text/css" href = "./admin/styles/main.css">
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
         <script src="/socket.io/socket.io.js"></script>
-        <script src="scripts/main.js"></script> 
-        
+        <script src="./admin/scripts/main.js"></script>
+
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     </head>
-    
+
     <div class = "header drop-shadow">
         <div id = "first-part">
-            <img id = "logo" src = "media/ri-dem-logo.png"> 
+            <img id = "logo" src = "./admin/media/ri-dem-logo.png">
             <div id = "title" >
                 <span style = "font-size: 6vh;">V</span>ehicle Reservations
             </div>
         </div>
-        
+
         <div>
             <div id = "user">
-                Welcome, {{user}} <br>
-                <a href = "../index.html" style = "font-size: 2vh; color: #D7A342">Logout</a>
+                Welcome, %user% <br>
+                <a href = "/logout" style = "font-size: 2vh; color: #D7A342">Logout</a>
             </div>
         </div>
     </div>
-    
+
     <div style = "padding: 1vh 2vw 1vh 2vw;">
         <div class = "Nav-Buttons">
             <a href = "fleet.html"><div class = "button drop-shadow">Manage Fleet</div></a>
-<!--            <a href = "data.html"><div class = "button drop-shadow">Data Collection</div></a>-->
+            <a href = "data.html"><div class = "button drop-shadow">Add Admin</div></a>
+            <a href = "data.html"><div class = "button drop-shadow">Remove Admin</div></a>
+            <a href = "data.html"><div class = "button drop-shadow">Add Normal User</div></a>
+            <a href = "data.html"><div class = "button drop-shadow">Remove Normal User</div></a>
         </div>
 
         <div class = "content drop-shadow">
@@ -48,20 +51,20 @@
                 <div class = "col-entry">April 4, 2018 || 11:00pm</div>
                 <div class = "col-entry">67AXL9 Tesla Model S [EV]</div>
                 <div class = "col-entry">DEM Garage</div>
-                
+
                 <div class = "col-entry">Josiah Carberry</div>
                 <div class = "col-entry">January 1, 2018 || 7:00pm</div>
                 <div class = "col-entry">April 1, 2018 || 9:00pm</div>
                 <div class = "col-entry red drop-shadow" style = "cursor: pointer;" onclick = "toggle_hidden('38SG5A-justi', this)">97BD08 Ford Explorer [GAS] ▲</div>
                 <div class = "col-entry">DEM Garage</div>
                 <div id = "38SG5A-justi" class = "col-entry justi hidden"><span style = "font-weight: bold;">Justification: </span>Aut est aut veniam et autem impedit quisquam ea. Ad temporibus commodi enim iusto odio. Quos qui et dolorum aliquid dolorem praesentium assumenda repellendus. Eveniet tempore sequi qui qui consequatur possimus nisi. Autem neque impedit eum eligendi est aliquid. </div>
-                
+
                 <div class = "col-entry">John Smith</div>
                 <div class = "col-entry">April 3, 2018 || 3:00pm</div>
                 <div class = "col-entry">April 4, 2018 || 11:00pm</div>
                 <div class = "col-entry">67AXL9 Tesla Model S [EV]</div>
                 <div class = "col-entry">DEM Garage</div>
-                
+
                 <div class = "col-entry">Josiah Carberry</div>
                 <div class = "col-entry">January 1, 2018 || 7:00pm</div>
                 <div class = "col-entry">April 1, 2018 || 9:00pm</div>
@@ -70,9 +73,9 @@
                 <div id = "15SG5A-justi" class = "col-entry justi hidden"><span style = "font-weight: bold;">Justification: </span>Aut est aut veniam et autem impedit quisquam ea. Ad temporibus commodi enim iusto odio. Quos qui et dolorum aliquid dolorem praesentium assumenda repellendus. Eveniet tempore sequi qui qui consequatur possimus nisi. Autem neque impedit eum eligendi est aliquid. </div>
             </div>
         </div>
-        
+
         <br>
-        
+
         <div class = "content drop-shadow">
             <h2 class = "table-title" onclick = "toggle_hidden('past-table', this)">Past Reservations: ▲</h2>
             <div id = "past-table" class = "table hidden">
@@ -87,7 +90,7 @@
                 <div class = "col-entry">April 4, 2018 || 11:00pm</div>
                 <div class = "col-entry">67AXL9 Tesla Model S [EV]</div>
                 <div class = "col-entry">DEM Garage</div>
-                
+
                 <div class = "col-entry">Josiah Carberry</div>
                 <div class = "col-entry">January 1, 2018 || 7:00pm</div>
                 <div class = "col-entry">April 1, 2018 || 9:00pm</div>
@@ -97,4 +100,4 @@
             </div>
         </div>
     </div>
-</html> 
+</html>
