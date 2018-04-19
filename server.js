@@ -124,9 +124,9 @@ let transporter = nodemailer.createTransport({
 
 //conn.query('DROP TABLE vehicles');
 conn.query('DROP TABLE reservations');
-
+conn.query('DROP TABLE admins');
 //Admins
-conn.query('CREATE TABLE IF NOT EXISTS admins(id INTEGER PRIMARY KEY AUTOINCREMENT, email TEXT)');
+conn.query('CREATE TABLE IF NOT EXISTS users(id INTEGER PRIMARY KEY AUTOINCREMENT, email TEXT, admin BOOLEAN)');
 //Resevervations
 conn.query('CREATE TABLE IF NOT EXISTS vehicles(id INTEGER PRIMARY KEY AUTOINCREMENT, license TEXT, model TEXT, color TEXT, inService BOOLEAN, miles DOUBLE PRECISION)');
 //Vehicles
@@ -169,6 +169,15 @@ io.of('/admin').on('connection', function(socket){
     socket.on('reportRemoved', function(license, status){
         removeReport(license, status);
     });
+    socket.on('userAdded', function(email, admin){
+        addUser(email, admin);
+    });
+    socket.on('userStatusChanged', function(email, admin){
+        changeUserStatus(email, admin);
+    });
+    socket.on('userRemoved', function(email){
+        removeUser(email);
+    });
 });
 
 //handles events when a regular user is connnected
@@ -185,7 +194,7 @@ io.of('/user').on('connection', function(socket){
     //emitted when a user makes a new reservation
     socket.on('reservation', function(reservationInfo){
         console.log("got a reservation!");
-        
+
         conn.query('SELECT license, model FROM vehicles WHERE license NOT IN (SELECT license FROM reservations WHERE start <= ? AND end >= ?)', [reservationInfo.end, reservationInfo.start], function(error, data){
             console.log(data);
 
@@ -241,7 +250,7 @@ io.of('/user').on('connection', function(socket){
            io.of('/admin').emit('reportAdded', data);
         });
     });
-	
+
 	socket.on('modify_user', function(isRemove, email){
 		if(isRemove){
 			removeAdmin(email);
@@ -351,13 +360,18 @@ function getSpecificReports(reservation){
 
     });
 }
-function addAdmin(email){
-    conn.query('INSERT INTO admins VALUES(null, ?)',[email],function(error, data){
-        
+function addUser(email, admin){
+    conn.query('INSERT INTO users VALUES(null, ?, ?)',[email, admin],function(error, data){
+
     });
 }
-function removeAdmin(email){
-    conn.query('DELETE FROM admins WHERE email = ?', [email], function(error, data){
+function changeUserStatus(email, admin){
+    conn.query('UPDATE users SET admin = ? WHERE email = ?',[admin, email],function(error, data){
+
+    });
+}
+function removeUser(email){
+    conn.query('DELETE FROM users WHERE email = ?', [email], function(error, data){
 
     });
 }

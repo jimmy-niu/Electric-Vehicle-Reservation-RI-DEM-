@@ -49,9 +49,12 @@ function removeReport(id){
     adminSocket.emit('reportRemoved', id);
 }
 
-function addAdmin(email){
-    adminSocket.emit('adminAdded', email);
+function addUser(email, admin){
+    adminSocket.emit('userAdded', email, admin);
 }
-function removeAdmin(email){
-    adminSocket.emit('adminRemoved', email);
+function changeUserStatus(email, admin){
+    adminSocket.emit('userStatusChanged', email, admin);
+}
+function removeUser(email){
+    adminSocket.emit('userRemoved', email, admin);
 }
