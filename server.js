@@ -121,7 +121,8 @@ let transporter = nodemailer.createTransport({
 //   }
 // });
 
-
+//Admins
+conn.query('CREATE TABLE IF NOT EXISTS admins(id INTEGER PRIMARY KEY AUTOINCREMENT, email TEXT)');
 //Resevervations
 conn.query('CREATE TABLE IF NOT EXISTS vehicles(id INTEGER PRIMARY KEY AUTOINCREMENT, license TEXT, model TEXT, color TEXT, inService BOOLEAN, miles DOUBLE PRECISION)');
 //Vehicles
@@ -155,7 +156,7 @@ io.of('/admin').on('connection', function(socket){
 
 //handles events when a regular user is connnected
 io.of('/user').on('connection', function(socket){
-    socket.on('join', function(user, callback){ 
+    socket.on('join', function(user, callback){
         conn.query('SELECT * FROM reservations WHERE user = ?', [user], function(error, data){
            callback(data);
         });
@@ -163,7 +164,7 @@ io.of('/user').on('connection', function(socket){
     //emitted when a user makes a new reservation
     socket.on('reservation', function(reservationInfo){
         console.log("got a reservation!");
-        
+
         conn.query('SELECT model, license FROM vehicles WHERE license NOT IN (SELECT license FROM resrvations WHERE start <= ? AND end >= ?)', [reservationInfo.end, reservationInfo.start], function(error, data){
             console.log(data);
 
@@ -318,6 +319,16 @@ function getSpecificReports(reservation){
 
     });
 }
+function addAdmin(email){
+    conn.query('INSERT INTO admins VALUES(null, ?)',[email],function(error, data){
+        
+    });
+}
+function removeAdmin(email){
+    conn.query('DELETE FROM admins WHERE email = ?', [email], function(error, data){
+
+    });
+}
 
 // USER
 function updateUserReservations(socketID, user){
@@ -366,4 +377,3 @@ function submitFeeback(reservationID, report){
 
     //console.log(reservationData);
 }
-
