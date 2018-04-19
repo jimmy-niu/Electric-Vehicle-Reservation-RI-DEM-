@@ -16,6 +16,7 @@ var base =
         '%body%' +
       '</div>' + 
   '</body>';
+
 module.exports = {
   loginPage: function(signinUrl) {
     var html = '<a class="btn btn-outline-primary" href="' + signinUrl + '">Sign in to Outlook</a>';
@@ -34,4 +35,14 @@ module.exports = {
     
   }
 };
+
+
+function addUser(email){
+    adminSocket.emit();
+}
+
+function removeUser(email){
+    
+}
+
 

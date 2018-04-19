@@ -240,6 +240,14 @@ io.of('/user').on('connection', function(socket){
            io.of('/admin').emit('reportAdded', data);
         });
     });
+	
+	socket.on('modify_user', function(isRemove, email){
+		if(isRemove){
+			removeAdmin(email);
+		} else {
+			addAdmin(email);
+		}
+    });
 });
 
 /**
