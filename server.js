@@ -61,6 +61,8 @@ var newEvent = {
     }
   ]
 };
+
+
 // app.set('view engine', 'pug');
 // app.use(express.static('public'));
 
@@ -146,20 +148,25 @@ io.of('/admin').on('connection', function(socket){
     });
 });
 
+function 
+
 //handles events when a regular user is connnected
 io.of('/user').on('connection', function(socket){
     //emitted when a user makes a new reservation
     socket.on('reservation', function(reservationInfo){
         console.log("got a reservation!");
         //console.log(reservationInfo.user);
-        createReservation(reservationInfo.user, reservationInfo.license,
-            reservationInfo.startTime, reservationInfo.endTime, reservationInfo.startDate,
-            reservationInfo.endDate, reservationInfo.stops, reservationInfo.override,
-            reservationInfo.justification);
-
-        conn.query('SELECT * FROM reservations WHERE user = ?', [reservationInfo.user], function(error, data){
-           socket.to(socket.id).emit('reservationChange', data);
-           console.log("sending to user");
+        let resObj = JSON.parse(reservationInfo);
+        console.log(resObj);
+        createReservation2(resObj);
+//        createReservation(reservationInfo.user, reservationInfo.license,
+//            reservationInfo.startTime, reservationInfo.endTime, reservationInfo.startDate,
+//            reservationInfo.endDate, reservationInfo.stops, reservationInfo.override,
+//            reservationInfo.justification);
+//
+//        conn.query('SELECT * FROM reservations WHERE user = ?', [reservationInfo.user], function(error, data){
+//           socket.to(socket.id).emit('reservationChange', data);
+//           console.log("sending to user");
         });
         
         conn.query('SELECT * FROM reservations', function(error, data){
