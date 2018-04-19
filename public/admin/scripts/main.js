@@ -23,6 +23,8 @@ $(document).ready(function() {
     adminSocket.on('reportChange', function(reports){
         console.log(reports);
     });
+    //addUser("blahBlahbalh", true);
+    removeUser("blahBlahbalh");
 });
 
 
@@ -43,7 +45,7 @@ function removeVehicle(license){
 
 function updateVehicleStatus(license, status){
     adminSocket.emit('vehicleStatusUpdated', license, status);
-    console.log(license "updated to " + status);
+    console.log(license + "updated to " + status);
 }
 
 function removeReport(id){
@@ -53,13 +55,13 @@ function removeReport(id){
 
 function addUser(email, admin){
     adminSocket.emit('userAdded', email, admin);
-    console.log(email "added to user list with value " + 1);
+    console.log(email + " added to user list with value " + 1);
 }
 function changeUserStatus(email, admin){
     adminSocket.emit('userStatusChanged', email, admin);
     console.log(email + "set to " + admin);
 }
 function removeUser(email){
-    adminSocket.emit('userRemoved', email, admin);
+    adminSocket.emit('userRemoved', email);
     console.log(email + " removed from user list");
 }

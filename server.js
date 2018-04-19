@@ -123,9 +123,9 @@ let transporter = nodemailer.createTransport({
 // });
 
 //conn.query('DROP TABLE vehicles');
-conn.query('DROP TABLE reservations');
-conn.query('DROP TABLE admins');
-//Admins
+//conn.query('DROP TABLE reservations');
+
+//Users
 conn.query('CREATE TABLE IF NOT EXISTS users(id INTEGER PRIMARY KEY AUTOINCREMENT, email TEXT, admin BOOLEAN)');
 //Resevervations
 conn.query('CREATE TABLE IF NOT EXISTS vehicles(id INTEGER PRIMARY KEY AUTOINCREMENT, license TEXT, model TEXT, color TEXT, inService BOOLEAN, miles DOUBLE PRECISION)');
@@ -362,7 +362,8 @@ function getSpecificReports(reservation){
 }
 function addUser(email, admin){
     conn.query('INSERT INTO users VALUES(null, ?, ?)',[email, admin],function(error, data){
-
+        console.log(error);
+        console.log("done");
     });
 }
 function changeUserStatus(email, admin){
