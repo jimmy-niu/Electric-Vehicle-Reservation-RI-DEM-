@@ -148,6 +148,9 @@ io.of('/admin').on('connection', function(socket){
     socket.on('vehicleStatusUpdated', function(license, status){
         updateVehicleStatus(license, status);
     });
+    socket.on('reportRemoved', function(license, status){
+        removeReport(license, status);
+    });
 });
 
 //handles events when a regular user is connnected
@@ -302,7 +305,12 @@ function updateVehicleStatus(license, status){
 }
 function getReports(){
     conn.query('SELECT * FROM reports', function(error, data){
-
+        io.of('/admin').emit('reportChange', data);
+    });
+}
+function removeVehicle(id){
+    conn.query('DELETE FROM reports WHERE id =?', [id],function(error, data){
+        getReports();
     });
 }
 function getSpecificReports(reservation){
