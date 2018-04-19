@@ -36,21 +36,20 @@ app.use(cookieParser());
 app.use(session(
   { secret: 's3cr3t',
     resave: false,
-    saveUninitialized: false 
+    saveUninitialized: false
   })
 );
 
-// RESERVATION OBJECT FORMAT 
-var newEvent = {
+app.get('/addevent', function(req, res) {
+  var access_token = req.session.access_token;
+  var newEvent = {
   "Subject": "Test event",
   "Body": {
     "ContentType": "HTML",
-    "Content": "wowee this is a test event"
+    "Content": "wowee this is a test event",
   },
   "Start": "2018-04-27T00:00:00.000Z",
   "End": "2018-04-27T00:30:00.000Z",
-  "ReminderMinutesBeforeStart": "15",
-  "IsReminderOn": "true",
   "Attendees": [
     {
       "EmailAddress": {
@@ -61,6 +60,31 @@ var newEvent = {
     }
   ]
 };
+  var userInfo = {
+    email: 'kyle.cui9@gmail.com'
+  };
+
+  var addEventParameters = {
+    token: access_token,
+    event: newEvent,
+    user: userInfo
+  };
+
+  outlook.calendar.createEvent(addEventParameters,
+    function(error, result) {
+      if (error) {
+        console.log(error);
+        res.send(error);
+      }
+      else {
+        res.redirect('/sync');
+      }
+    });
+});
+
+// RESERVATION OBJECT FORMAT
+
+
 // app.set('view engine', 'pug');
 // app.use(express.static('public'));
 
@@ -105,17 +129,6 @@ conn.query('CREATE TABLE IF NOT EXISTS reservations(id INTEGER PRIMARY KEY AUTOI
 //Reports
 conn.query('CREATE TABLE IF NOT EXISTS reports(id INTEGER PRIMARY KEY AUTOINCREMENT, reservation INTEGER, report TEXT)');
 
-app.get('/home/admin', function(request, response){
-	console.log('- Request received:', request.method, request.url);
-
-    //createReservation("Jenna Tishler", "ABC123", "8:20AM", "10:30AM", "04/14/18", "04/14/18", ["1 Johnson Lane, Providence RI", "2 Brown Court, Barrington, RI"], false, "");
-    console.log(getMyReservations("Jenna Tishler"));
-
-
-    submitFeeback(2, "Car is ok");
-    //response.render('home');
-});
-
 /*Sets up the server on port 8080.*/
 server.listen(8080, function(){
 	console.log('- Server listening on port 8080');
@@ -134,15 +147,6 @@ io.of('/admin').on('connection', function(socket){
     });
     socket.on('vehicleStatusUpdated', function(license, status){
         updateVehicleStatus(license, status);
-    });
-    socket.on('requestReports',function(callback){
-        callback(getReports());
-    });
-    socket.on('requestSpecificReports', function(reservation, callback){
-        callback(getSpecificReports(reservation));
-    });
-    socket.on('requestVehicles', function(callback){
-        callback(getVehicles());
     });
 });
 
@@ -171,7 +175,7 @@ io.of('/user').on('connection', function(socket){
             socket.to(socket.id).emit('reservationChange', data);
             console.log("sending to user");
         });
-        
+
         conn.query('SELECT * FROM reservations', function(error, data){
            io.of('/admin').emit('reservationChange', data);
         });
@@ -196,7 +200,7 @@ io.of('/user').on('connection', function(socket){
         conn.query('SELECT * FROM reservations WHERE user = ?', [user], function(error, data){
            socket.to(socket.id).emit('reservationChange', data);
         });
-        
+
         conn.query('SELECT * FROM reservations', function(error, data){
            io.of('/admin').emit('reservationChange', data);
         });
@@ -215,6 +219,7 @@ io.of('/user').on('connection', function(socket){
  * Sets up the landing page to index.html.
  */
 app.get('/', function(req, res) {
+  res.status(200);
   res.send(index.loginPage(auth.getAuthUrl()));
 });
 
@@ -245,10 +250,11 @@ function tokenReceived(req, res, error, token) {
 }
 
 app.get('/logincomplete', function(req, res) {
+  res.status(200);
   var access_token = req.session.access_token;
   var refresh_token = req.session.access_token;
   var email = req.session.email;
-  
+
   if (access_token === undefined || refresh_token === undefined) {
     console.log('/logincomplete called while not logged in');
     res.redirect('/');
@@ -271,39 +277,40 @@ function updateAdminReservations(){
 }
 function getVehicles(){
     conn.query('SELECT * FROM vehicles',function(error, data){
-        return data;
+        io.of('/admin').emit('vehicleChange', data);
     });
 }
 function addVehicle(vehicle){
     conn.query('INSERT INTO vehicles VALUES(null, ?, ?, ?, ?, ?)',[vehicle.license, vehicle.model, vehicle.color, vehicle.inService, vehicle.miles],function(error, data){
-
+        getVehicles();
     });
 }
 function editVehicle(id, vehicle){
     conn.query('REPLACE INTO vehicles VALUES(?, ?, ?, ?, ?, ?)',[id, vehicle.license, vehicle.model, vehicle.color, vehicle.inService, vehicle.miles],function(error, data){
-
+        getVehicles();
     });
 }
 function removeVehicle(license){
     conn.query('DELETE FROM vehicles WHERE license = ?', [license],function(error, data){
-
+        getVehicles();
     });
 }
 function updateVehicleStatus(license, status){
     conn.query('UPDATE vehicles SET inService = ? WHERE license = ?',[status, license],function(error, data){
-
+        getVehicles();
     });
 }
 function getReports(){
     conn.query('SELECT * FROM reports', function(error, data){
-        return data;
+
     });
 }
 function getSpecificReports(reservation){
     conn.query('SELECT * FROM reports WHERE reservation = ?', [reservation], function(error, data){
-        return data;
+
     });
 }
+
 // USER
 function updateUserReservations(socketID, user){
     conn.query('SELECT * FROM reservations WHERE user = ?', [user], function(error, data){
@@ -322,13 +329,11 @@ function editReservation(id, user, license, start, end, stops, override, justifi
 
     });
 }
-
 function cancelReservation(id){
     conn.query('DELETE FROM reservations WHERE id = ?', [id], function(error, data){
         console.log('cancelled');
     });
 }
-
 function submitFeeback(reservationID, report){
     conn.query("INSERT INTO reports VALUES(null, ?, ?)", [reservationID, report], function(error, data){
 
@@ -354,8 +359,3 @@ function submitFeeback(reservationID, report){
     //console.log(reservationData);
 }
 
-
-//helper function for removing duplicates from array
-// function onlyUnique(value, index, self){
-//     return self.indexOf(value) === index;
-// }

@@ -22,11 +22,16 @@ module.exports = {
     return base.replace('%body%', html);
   },
   loginCompletePage: function(userEmail) {
-    var html = fs.readFileSync(path.join(__dirname, './user/index.html'), "utf8");
+    if (userEmail ===  'dem_test_a@outlook.com') {
+      var html = fs.readFileSync(path.join(__dirname, './admin/index.html'), "utf8");
+    } else if (userEmail === 'dem_test_u@outlook.com') {
+      var html = fs.readFileSync(path.join(__dirname, './user/index.html'), "utf8");
+    }
+    return html.replace('%user%', userEmail);
     //var html = './user/index.html';
     //console.log(html);
     //return html;
-    return html.replace('%user%', userEmail);
+    
   }
 };
 
