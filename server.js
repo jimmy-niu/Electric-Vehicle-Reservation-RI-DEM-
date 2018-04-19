@@ -121,9 +121,11 @@ let transporter = nodemailer.createTransport({
 //   }
 // });
 
-// conn.query('DROP TABLE vehicles');
+//conn.query('DROP TABLE vehicles');
 conn.query('DROP TABLE reservations');
 
+//Admins
+conn.query('CREATE TABLE IF NOT EXISTS admins(id INTEGER PRIMARY KEY AUTOINCREMENT, email TEXT)');
 //Resevervations
 conn.query('CREATE TABLE IF NOT EXISTS vehicles(id INTEGER PRIMARY KEY AUTOINCREMENT, license TEXT, model TEXT, color TEXT, inService BOOLEAN, miles DOUBLE PRECISION)');
 //Vehicles
@@ -163,11 +165,14 @@ io.of('/admin').on('connection', function(socket){
     socket.on('vehicleStatusUpdated', function(license, status){
         updateVehicleStatus(license, status);
     });
+    socket.on('reportRemoved', function(license, status){
+        removeReport(license, status);
+    });
 });
 
 //handles events when a regular user is connnected
 io.of('/user').on('connection', function(socket){
-    socket.on('join', function(user, callback){ 
+    socket.on('join', function(user, callback){
         conn.query('SELECT * FROM reservations WHERE user = ?', [user], function(error, data){
            callback(data);
         });
@@ -324,11 +329,26 @@ function updateVehicleStatus(license, status){
 }
 function getReports(){
     conn.query('SELECT * FROM reports', function(error, data){
-
+        io.of('/admin').emit('reportChange', data);
+    });
+}
+function removeVehicle(id){
+    conn.query('DELETE FROM reports WHERE id =?', [id],function(error, data){
+        getReports();
     });
 }
 function getSpecificReports(reservation){
     conn.query('SELECT * FROM reports WHERE reservation = ?', [reservation], function(error, data){
+
+    });
+}
+function addAdmin(email){
+    conn.query('INSERT INTO admins VALUES(null, ?)',[email],function(error, data){
+        
+    });
+}
+function removeAdmin(email){
+    conn.query('DELETE FROM admins WHERE email = ?', [email], function(error, data){
 
     });
 }
@@ -380,4 +400,3 @@ function submitFeeback(reservationID, report){
 
     //console.log(reservationData);
 }
-
