@@ -4,7 +4,7 @@ let userSocket = io.connect('http://localhost:8080/user', {forceNew: true});
 $(document).ready(function() {
     $("#submit-res").click(newReservation)
 
-    userSocket.emit('join', function(reservations){
+    userSocket.emit('join',"Jimmy Niu", function(reservations){
         updateReservations(reservations);
         console.log(reservations);
     });
@@ -14,7 +14,9 @@ $(document).ready(function() {
         console.log(reservations);
     });
 
-    cancelReservation(41, "Jimmy Niu");
+    userSocket.on('alternateVehicles', function(vehicles){
+        console.log(vehicles);
+    });
 });
 
 function newReservation(){

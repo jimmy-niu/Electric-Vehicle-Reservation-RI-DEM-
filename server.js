@@ -101,7 +101,7 @@ let transporter = nodemailer.createTransport({
 //Resevervations
 conn.query('CREATE TABLE IF NOT EXISTS vehicles(id INTEGER PRIMARY KEY AUTOINCREMENT, license TEXT, model TEXT, color TEXT, inService BOOLEAN, miles DOUBLE PRECISION)');
 //Vehicles
-conn.query('CREATE TABLE IF NOT EXISTS reservations(id INTEGER PRIMARY KEY AUTOINCREMENT, user TEXT, license TEXT, startTime TEXT, endTime TEXT, startDate TEXT, endDate TEXT, stops JSON, override BOOLEAN, justification TEXT)');
+conn.query('CREATE TABLE IF NOT EXISTS reservations(id INTEGER PRIMARY KEY AUTOINCREMENT, user TEXT, license TEXT, start TEXT, end TEXT, stops JSON, override BOOLEAN, justification TEXT)');
 //Reports
 conn.query('CREATE TABLE IF NOT EXISTS reports(id INTEGER PRIMARY KEY AUTOINCREMENT, reservation INTEGER, report TEXT)');
 
@@ -148,18 +148,28 @@ io.of('/admin').on('connection', function(socket){
 
 //handles events when a regular user is connnected
 io.of('/user').on('connection', function(socket){
+    socket.on('join', function(user, callback){ 
+        conn.query('SELECT * FROM reservations WHERE user = ?', [user], function(error, data){
+           callback(data);
+        });
+    });
     //emitted when a user makes a new reservation
     socket.on('reservation', function(reservationInfo){
         console.log("got a reservation!");
-        //console.log(reservationInfo.user);
-        createReservation(reservationInfo.user, reservationInfo.license,
-            reservationInfo.startTime, reservationInfo.endTime, reservationInfo.startDate,
-            reservationInfo.endDate, reservationInfo.stops, reservationInfo.override,
+        
+        conn.query('SELECT model, license FROM vehicles WHERE license NOT IN (SELECT license FROM resrvations WHERE start <= ? AND end >= ?)', [reservationInfo.end, reservationInfo.start], function(error, data){
+            console.log(data);
+
+            createReservation(reservationInfo.user, data.rows[0].license,
+            reservationInfo.start, reservationInfo.end, reservationInfo.stops, reservationInfo.override,
             reservationInfo.justification);
 
+            socket.to(socket.id).emit('alternateVehicles', data);
+        });
+
         conn.query('SELECT * FROM reservations WHERE user = ?', [reservationInfo.user], function(error, data){
-           socket.to(socket.id).emit('reservationChange', data);
-           console.log("sending to user");
+            socket.to(socket.id).emit('reservationChange', data);
+            console.log("sending to user");
         });
         
         conn.query('SELECT * FROM reservations', function(error, data){
@@ -168,7 +178,7 @@ io.of('/user').on('connection', function(socket){
 
     });
 
-    socket.on('edit', function(reservationID, user, license, startTime, endTime, startDate, endDate, stops, override, justification){
+    socket.on('edit', function(reservationID, user, license, start, end, stops, override, justification){
         editReservation(reservationID)
 
         conn.query('SELECT * FROM reservations WHERE user = ?', [user], function(error, data){
@@ -301,13 +311,13 @@ function updateUserReservations(socketID, user){
     });
 }
 
-function createReservation(user, license, startTime, endTime, startDate, endDate, stops, override, justification){
+function createReservation(user, license, start, end, stops, override, justification){
     conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?, ?)',[user, license, startTime, endTime, startDate, endDate, stops, override, justification],function(error, data){
         console.log(data);
     });
 }
 
-function editReservation(id, user, license, startTime, endTime, startDate, endDate, stops, override, justification){
+function editReservation(id, user, license, start, end, stops, override, justification){
     conn.query('UPDATE reservations SET license = ?, startTime = ?, endTime = ?, startDate = ?, endDate = ?, stops = ?, override = ?, justification = ? WHERE reservationID = ?', [license, startTime, endTime, startDate, endDate, stops, override, justification, id], function(error, data){
 
     });
@@ -343,3 +353,9 @@ function submitFeeback(reservationID, report){
 
     //console.log(reservationData);
 }
+
+
+//helper function for removing duplicates from array
+// function onlyUnique(value, index, self){
+//     return self.indexOf(value) === index;
+// }
