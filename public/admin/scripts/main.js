@@ -17,45 +17,27 @@ $(document).ready(function() {
     adminSocket.on('reservationChange', function(reservations){
         console.log(reservations);
     });
+    adminSocket.on('vehicleChange', function(vehicles){
+        console.log(vehicles);
+    })
 
-    let newVehicle = {license:'EDU-1324', model:'Honda Civic', color:'Red', inService: 'TRUE', miles: 2.0};
-    addVehicle(newVehicle);
-    requestVehicles();
-    removeVehicle('EDU-1324');
-    requestVehicles();
-    //Syncing issues?
+    let newVehicle = {license:'Blah', model:'Honda Civic', color:'Red', inService: 'TRUE', miles: 2.0};
+    editVehicle(15, newVehicle);
 });
 
 
 function addVehicle(vehicle){
-    adminSocket.emit('addVehicle', vehicle);
+    adminSocket.emit('vehicleAdded', vehicle);
 }
 
 function editVehicle(id, vehicle){
-    adminSocket.emit('editVehicle', id, vehicle);
+    adminSocket.emit('vehicleEdited', id, vehicle);
 }
 
 function removeVehicle(license){
-    adminSocket.emit('removeVehicle', license);
+    adminSocket.emit('vehicleRemoved', license);
 }
 
 function updateVehicleStatus(license, status){
-    adminSocket.emit('updateVehicleStatus', license, status);
-}
-
-function requestReports(){
-    adminSocket.emit('requestReports', function(data){
-        console.log(data);
-    });
-}
-
-function requestSpecificReports(){
-    adminSocket.emit('requestSpecificReports', reservation, function(data){
-        console.log(data);
-    });
-}
-function requestVehicles(){
-    adminSocket.emit('requestVehicles', function(data){
-        console.log(data);
-    });
+    adminSocket.emit('vehicleStatusUpdated', license, status);
 }

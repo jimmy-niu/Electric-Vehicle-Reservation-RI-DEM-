@@ -82,7 +82,7 @@ app.get('/addevent', function(req, res) {
     });
 });
 
-// RESERVATION OBJECT FORMAT 
+// RESERVATION OBJECT FORMAT
 
 
 // app.set('view engine', 'pug');
@@ -148,15 +148,6 @@ io.of('/admin').on('connection', function(socket){
     socket.on('vehicleStatusUpdated', function(license, status){
         updateVehicleStatus(license, status);
     });
-    socket.on('requestReports',function(callback){
-        callback(getReports());
-    });
-    socket.on('requestSpecificReports', function(reservation, callback){
-        callback(getSpecificReports(reservation));
-    });
-    socket.on('requestVehicles', function(callback){
-        callback(getVehicles());
-    });
 });
 
 //handles events when a regular user is connnected
@@ -174,7 +165,7 @@ io.of('/user').on('connection', function(socket){
            socket.to(socket.id).emit('reservationChange', data);
            console.log("sending to user");
         });
-        
+
         conn.query('SELECT * FROM reservations', function(error, data){
            io.of('/admin').emit('reservationChange', data);
         });
@@ -199,7 +190,7 @@ io.of('/user').on('connection', function(socket){
         conn.query('SELECT * FROM reservations WHERE user = ?', [user], function(error, data){
            socket.to(socket.id).emit('reservationChange', data);
         });
-        
+
         conn.query('SELECT * FROM reservations', function(error, data){
            io.of('/admin').emit('reservationChange', data);
         });
@@ -218,6 +209,7 @@ io.of('/user').on('connection', function(socket){
  * Sets up the landing page to index.html.
  */
 app.get('/', function(req, res) {
+  res.status(200);
   res.send(index.loginPage(auth.getAuthUrl()));
 });
 
@@ -248,6 +240,7 @@ function tokenReceived(req, res, error, token) {
 }
 
 app.get('/logincomplete', function(req, res) {
+  res.status(200);
   var access_token = req.session.access_token;
   var refresh_token = req.session.access_token;
   var email = req.session.email;
@@ -274,64 +267,61 @@ function updateAdminReservations(){
 }
 function getVehicles(){
     conn.query('SELECT * FROM vehicles',function(error, data){
-        return data;
+        io.of('/admin').emit('vehicleChange', data);
     });
 }
 function addVehicle(vehicle){
     conn.query('INSERT INTO vehicles VALUES(null, ?, ?, ?, ?, ?)',[vehicle.license, vehicle.model, vehicle.color, vehicle.inService, vehicle.miles],function(error, data){
-
+        getVehicles();
     });
 }
 function editVehicle(id, vehicle){
     conn.query('REPLACE INTO vehicles VALUES(?, ?, ?, ?, ?, ?)',[id, vehicle.license, vehicle.model, vehicle.color, vehicle.inService, vehicle.miles],function(error, data){
-
+        getVehicles();
     });
 }
 function removeVehicle(license){
     conn.query('DELETE FROM vehicles WHERE license = ?', [license],function(error, data){
-
+        getVehicles();
     });
 }
 function updateVehicleStatus(license, status){
     conn.query('UPDATE vehicles SET inService = ? WHERE license = ?',[status, license],function(error, data){
-
+        getVehicles();
     });
 }
 function getReports(){
     conn.query('SELECT * FROM reports', function(error, data){
-        return data;
+
     });
 }
 function getSpecificReports(reservation){
     conn.query('SELECT * FROM reports WHERE reservation = ?', [reservation], function(error, data){
-        return data;
+
     });
 }
+
 // USER
 function updateUserReservations(socketID, user){
     conn.query('SELECT * FROM reservations WHERE user = ?', [user], function(error, data){
            socket.to(socketID).emit('reservationChange', data);
     });
 }
-
 function createReservation(user, license, startTime, endTime, startDate, endDate, stops, override, justification){
     conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?, ?)',[user, license, startTime, endTime, startDate, endDate, stops, override, justification],function(error, data){
         console.log(data);
     });
 }
-
 function editReservation(id, user, license, startTime, endTime, startDate, endDate, stops, override, justification){
     conn.query('UPDATE reservations SET license = ?, startTime = ?, endTime = ?, startDate = ?, endDate = ?, stops = ?, override = ?, justification = ? WHERE reservationID = ?', [license, startTime, endTime, startDate, endDate, stops, override, justification, id], function(error, data){
 
     });
 }
-
 function cancelReservation(id){
     conn.query('DELETE FROM reservations WHERE id = ?', [id], function(error, data){
         console.log('cancelled');
     });
 }
-
 function submitFeeback(reservationID, report){
     conn.query("INSERT INTO reports VALUES(null, ?, ?)", [reservationID, report], function(error, data){
 
