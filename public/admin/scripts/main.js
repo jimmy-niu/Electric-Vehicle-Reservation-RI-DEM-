@@ -1,4 +1,5 @@
 let adminSocket = io.connect('http://localhost:8080/admin', {forceNew: true});
+let user_email = "test@gmail.com";
 
 function toggle_hidden(id, object){
     if(object.innerHTML.includes("▼")){
@@ -23,14 +24,44 @@ $(document).ready(function() {
     adminSocket.on('reportChange', function(reports){
         console.log(reports);
     });
-
-    let newVehicle = {license:'Blah', model:'Honda Civic', color:'Red', inService: 'TRUE', miles: 2.0};
-    editVehicle(15, newVehicle);
+    new Reservation({user:"blah", start:"blah", end:"blah", license:"blah", model:"blah"});
+    new Reservation({user:"hi", start:"blah", end:"blah", license:"blah", model:"blah"});
 });
+
+
+function modifyUser() {
+    let email = $('#emailField').val();
+    let isAdmin = undefined;
+    if($('#adminChoice').is(':checked') || $('#userChoice').is(':checked')) {
+        isAdmin = $('#adminChoice').is(':checked');
+    }
+
+    let isAdd = undefined;
+    if($('#removeChoice').is(':checked') || $('#addChoice').is(':checked')) {
+        isAdd = $('#addChoice').is(':checked');
+    }
+
+    console.log(email + " || " + isAdmin + " || " + isAdd);
+    if(email != undefined && isAdd != undefined && isAdmin != undefined){
+        if(isAdd){
+            adminSocket.emit('userAdded', email, isAdmin);
+        } else {
+            adminSocket.emit('userRemoved', email);
+        }
+    }
+
+    //adminSocket.emit('modify_user', isRemove, email);
+}
+
+function removeUser(){
+    adminSocket.emit(true, email);
+}
 
 
 function addVehicle(vehicle){
     adminSocket.emit('vehicleAdded', vehicle);
+    console.log("add vehicle");
+    console.log(vehicle);
 }
 
 function editVehicle(id, vehicle){
@@ -39,19 +70,45 @@ function editVehicle(id, vehicle){
 
 function removeVehicle(license){
     adminSocket.emit('vehicleRemoved', license);
+    console.log(license + " removed");
 }
 
 function updateVehicleStatus(license, status){
     adminSocket.emit('vehicleStatusUpdated', license, status);
+    console.log(license + "updated to " + status);
 }
 
 function removeReport(id){
     adminSocket.emit('reportRemoved', id);
+    console.log(id + " removed from reports");
 }
 
-function addAdmin(email){
-    adminSocket.emit('adminAdded', email);
+function addUser(email, admin){
+    adminSocket.emit('userAdded', email, admin);
+    console.log(email + " added to user list with value " + 1);
 }
-function removeAdmin(email){
-    adminSocket.emit('adminRemoved', email);
+function changeUserStatus(email, admin){
+    adminSocket.emit('userStatusChanged', email, admin);
+    console.log(email + "set to " + admin);
+}
+function removeUser(email){
+    adminSocket.emit('userRemoved', email);
+    console.log(email + " removed from user list");
+}
+
+// Objects
+class Reservation {
+    constructor(reservationData){
+        this.data = reservationData;
+        this.addToDOM(this.data);
+    }
+    addToDOM(r){
+        let DOMobject = `<div class = "col-entry reservation-user">${r.user}</div>` +
+            `<div class = "col-entry reservation-start">${r.start}</div>` +
+            `<div class = "col-entry reservation-end">${r.start}</div>` +
+            `<div class = "col-entry reservation-license">${r.license}</div>` +
+            `<div class = "col-entry reservation-pickup">${r.model}</div>`;
+            console.log(DOMobject);
+        $('#upcoming').append(DOMobject);
+    }
 }
