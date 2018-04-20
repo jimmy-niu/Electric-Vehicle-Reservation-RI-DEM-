@@ -123,10 +123,10 @@ let transporter = nodemailer.createTransport({
 // });
 
 //conn.query('DROP TABLE vehicles');
-conn.query('DROP TABLE reservations');
+//conn.query('DROP TABLE reservations');
 
-//Admins
-conn.query('CREATE TABLE IF NOT EXISTS admins(id INTEGER PRIMARY KEY AUTOINCREMENT, email TEXT)');
+//Users
+conn.query('CREATE TABLE IF NOT EXISTS users(id INTEGER PRIMARY KEY AUTOINCREMENT, email TEXT, admin BOOLEAN)');
 //Resevervations
 conn.query('CREATE TABLE IF NOT EXISTS vehicles(id INTEGER PRIMARY KEY AUTOINCREMENT, license TEXT, model TEXT, color TEXT, inService BOOLEAN, miles DOUBLE PRECISION)');
 //Vehicles
@@ -168,6 +168,15 @@ io.of('/admin').on('connection', function(socket){
     });
     socket.on('reportRemoved', function(license, status){
         removeReport(license, status);
+    });
+    socket.on('userAdded', function(email, admin){
+        addUser(email, admin);
+    });
+    socket.on('userStatusChanged', function(email, admin){
+        changeUserStatus(email, admin);
+    });
+    socket.on('userRemoved', function(email){
+        removeUser(email);
     });
 });
 
@@ -333,7 +342,7 @@ function getReports(){
         io.of('/admin').emit('reportChange', data);
     });
 }
-function removeVehicle(id){
+function removeReports(id){
     conn.query('DELETE FROM reports WHERE id =?', [id],function(error, data){
         getReports();
     });
@@ -343,13 +352,21 @@ function getSpecificReports(reservation){
 
     });
 }
-function addAdmin(email){
-    conn.query('INSERT INTO admins VALUES(null, ?)',[email],function(error, data){
+
+function addUser(email, admin){
+    conn.query('INSERT INTO users VALUES(null, ?, ?)',[email, admin],function(error, data){
+        console.log(error);
+        console.log("done");
+    });
+}
+
+function changeUserStatus(email, admin){
+    conn.query('UPDATE users SET admin = ? WHERE email = ?',[admin, email],function(error, data){
 
     });
 }
-function removeAdmin(email){
-    conn.query('DELETE FROM admins WHERE email = ?', [email], function(error, data){
+function removeUser(email){
+    conn.query('DELETE FROM users WHERE email = ?', [email], function(error, data){
 
     });
 }
@@ -379,7 +396,7 @@ function cancelReservation(id){
 }
 function submitFeeback(reservationID, report){
     conn.query("INSERT INTO reports VALUES(null, ?, ?)", [reservationID, report], function(error, data){
-
+        getReports();
     });
 
     conn.query('SELECT * FROM reservations WHERE id = ?', [reservationID], function(error, data){
