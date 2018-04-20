@@ -2,7 +2,6 @@ let adminSocket = io.connect('http://localhost:8080/admin', {forceNew: true});
 
 let currentReservation = 0;
 let currentVehicle = 0;
-let user_email = "test@gmail.com";
 
 function toggle_hidden(id, object){
     if(object.innerHTML.includes("▼")){
@@ -12,7 +11,6 @@ function toggle_hidden(id, object){
     }
     document.getElementById(id).classList.toggle('hidden');
 }
-
 
 // Sets up the sockets.
 $(document).ready(function() {
@@ -34,7 +32,6 @@ $(document).ready(function() {
         console.log(reports);
     });
 });
-
 
 function modifyUser() {
     let email = $('#emailField').val();
@@ -68,8 +65,6 @@ function modifyUser() {
 }
 
 function addVehicle(){
-//    license TEXT, model TEXT, color TEXT, inService BOOLEAN, miles DOUBLE PRECISION, isEV BOOLEAN, extraTrunk BOOLEAN, offRoad BOOLEAN, equipRack BOOLEAN;
-    //adminSocket.emit('vehicleAdded', vehicle);
     let license = $('#licenseField').val();
     let model = $('#modelField').val();
     let color = $('#colorField').val();
@@ -79,11 +74,11 @@ function addVehicle(){
     let trunk = $('#extraTrunkChoice').is(':checked');
     let offRoad = $('#offRoadChoice').is(':checked');
     let equipmentRack = $('#equipChoice').is(':checked');
-    
+
     if(license !== '' && model !== '' && color !== ''){
-        let vehicle = {license: license, model: model, color: color, miles: miles, status: status, isEv: carType, trunk: trunk, offRoad: offRoad, equipmentRack: equipmentRack};
-        
-        console.log(vehicle);
+        let vehicle = {license: license, model: model, color: color, miles: miles, status: status, 
+                       isEv: carType, trunk: trunk, offRoad: offRoad, equipmentRack: equipmentRack};
+
         adminSocket.emit("vehicleAdded", vehicle);
     }
 }
@@ -92,43 +87,32 @@ function editVehicle(id, vehicle){
     adminSocket.emit('vehicleEdited', id, vehicle);
 }
 
-function removeVehicle(license){
-    adminSocket.emit('vehicleRemoved', license);
+function deleteVehicle(license){
+    adminSocket.emit("vehicleRemoved", license);
+    // This works on just deleting the vehicle dom obj btw. 
+    $('.'+license).remove();
 }
 
 function updateVehicleStatus(license, status){
     adminSocket.emit('vehicleStatusUpdated', license, status);
-    console.log(license + "updated to " + status);
-}
-
-function removeReport(id){
-    adminSocket.emit('reportRemoved', id);
-    console.log(id + " removed from reports");
-}
-
-function changeUserStatus(email, admin){
-    adminSocket.emit('userStatusChanged', email, admin);
-    console.log(email + "set to " + admin);
 }
 
 function setJustificationModal(text){
     $('#justificationModalText').empty();
     $('#justificationModalText').append(text);
-    
 }
 
-// Objects
+// Classes used to create DOM objects. 
 class Reservation {
     constructor(reservationData){
         this.addToDOM(reservationData);
     }
     addToDOM(r){
-        //onclick = "setJustificationModal('${r.justification}')"
         let justification = r.justification;
         if(justification !== ''){
             justification = `<a href = "#justificationModal" class = "btn btn-large btn-primary drop-shadow" data-toggle="modal" onclick = "setJustificationModal('${r.justification}')">Click To See</a>`
         }     
-        
+
         let DOMobject = `<div class = "col-entry reservation-user">${r.user}</div>` +
             `<div class = "col-entry reservation-start ${r.license}">${r.start}</div>` +
             `<div class = "col-entry reservation-end ${r.license}">${r.start}</div>` +
@@ -137,12 +121,6 @@ class Reservation {
 
         $('#upcoming').append(DOMobject);
     }
-}
-
-function deleteVehicle(license){
-    adminSocket.emit("vehicleRemoved", license);
-    // This works on just deleting the vehicle dom obj btw. 
-    $('.'+license).remove();
 }
 
 class Vehicle {
@@ -158,14 +136,27 @@ class Vehicle {
             `<div class = "col-entry ${v.license}">${v.color} ${v.model}</div>` +
             `<div class = "col-entry ${v.license}">${v.miles} miles</div>` +
             `<div class = "col-entry ${v.license}">${carType}</div>` +
-            `<div class = "col-entry ${v.license}"><span class="dropdown">
-                <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Change Status</button>
-                <ul class="dropdown-menu">
-                    <a href="#editVehicle"><li><i class="fa fa-wrench"></i> Edit Car</li></a>
-                    <div onclick = 'deleteVehicle("${v.license}")'><li><i class="fa fa-archive"></i> Retire</li></div>
-                </ul>
-                </span>
-            </div>`;
+            `<div class = "col-entry ${v.license}"><span class="dropdown">` +
+            `<button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Change Status</button>` +
+            `<ul class="dropdown-menu">` +
+            `<a href="#editVehicle"><li><i class="fa fa-wrench"></i> Edit Car</li></a>` +
+            `<div onclick = 'deleteVehicle("${v.license}")'><li><i class="fa fa-archive"></i> Retire</li></div>` +
+            `</ul></span></div>`;
         $('#current_fleet').append(DOMobject);
     }
 }
+
+/*
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ *  Functions below are not currently wired up.
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ */
+function removeReport(id){
+    adminSocket.emit('reportRemoved', id);
+}
+
+function changeUserStatus(email, admin){
+    adminSocket.emit('userStatusChanged', email, admin);
+}
+
+
