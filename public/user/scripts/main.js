@@ -33,7 +33,7 @@ function newReservation(){
     let res = new Reservation({start: start, end: end});
     console.log(res);
 
-    userSocket.emit('reservation', {user: "Jimmy Niu", start: "2018-04-18 11:00", end: "2018-04-18 16:00", stops: ["home", "work"], override: true, justification: "my oranges fell into the river."});
+    userSocket.emit('reservation', {user: "Jimmy Niu", start: "2018-04-18 11:00", end: "2018-04-18 16:00", stops: ["home", "work"], override: true, justification: "my oranges fell into the river.", needsTrunk: false, needsOffRoad: false, needsRack: false});
 }
 
 function editReservation(){
@@ -63,4 +63,7 @@ class Reservation {
         console.log(DOMobject);
         $('#cardz').append(DOMobject);
     }
+}
+function submitJustification(reservationID, justification){
+    userSocket.emit('justification', reservationID, justification);
 }
