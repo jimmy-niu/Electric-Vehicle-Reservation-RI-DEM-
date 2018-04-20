@@ -424,7 +424,7 @@ app.get('/logout', function(req, res) {
     req.session.destroy();
     res.redirect('/');*/
     req.logout();
-    req.redirect('/');
+    res.redirect('/');
 });
 
 function ensureAuthenticated(req, res, next) {
