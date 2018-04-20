@@ -40,7 +40,7 @@ app.use(session(
      resave: false,
      saveUninitialized: true
     })
-  );
+       );
 
 
 // ADD EVENT EXAMPLE
@@ -158,6 +158,11 @@ io.of('/admin').on('connection', function(socket){
     updateAdminReservations();
     updateVehicles();
 
+    socket.on('updatePage'), function(){
+        updateAdminReservations();
+        updateVehicles();
+    }
+    
     socket.on('vehicleAdded', function(vehicle){
         addVehicle(vehicle);
     });
@@ -300,7 +305,7 @@ passport.use(new OutlookStrategy({
     clientSecret: OUTLOOK_CLIENT_SECRET,
     callbackURL: "http://localhost:8080/authorize"
 },
-    function(accessToken, refreshToken, profile, done) {
+                                 function(accessToken, refreshToken, profile, done) {
     process.nextTick(function () {
         return done(null, profile);
     });
@@ -312,15 +317,15 @@ app.get('/', function(req, res) {
 });
 
 app.get('/authorize',
-  passport.authenticate('windowslive', { failureRedirect: '/' }),
-  function(req, res) {
+        passport.authenticate('windowslive', { failureRedirect: '/' }),
+        function(req, res) {
     var user_email = req.user._json.EmailAddress;
     if (user_email === 'dem_test_a@outlook.com') {
-      app.use("/admin", express.static(__dirname + '/public/admin'));
-      res.redirect('admin/index.html');
-      //res.render('admin/index.html', {user : user_email});
-      //res.redirect('admin/index/?email=' + encodeURIComponent(user_email));
-      io.of('/admin').emit('admin-connected', user_email);
+        app.use("/admin", express.static(__dirname + '/public/admin'));
+        res.redirect('admin/index.html');
+        //res.render('admin/index.html', {user : user_email});
+        //res.redirect('admin/index/?email=' + encodeURIComponent(user_email));
+        io.of('/admin').emit('admin-connected', user_email);
     } else if (user_email === 'dem_test_u@outlook.com' || user_email === 'dem_test_u_2@outlook.com') {
         app.use("/user", express.static(__dirname + '/public/user'));
         io.sockets.emit('user-connected', user_email);
@@ -329,10 +334,10 @@ app.get('/authorize',
 });
 
 app.post('admin/index', 
-  function(req, res) {
+         function(req, res) {
     console.log(decodeURIComponent(req.query.email));
     res.render('admin/index.html', {user : decodeURIComponent(req.query.email)});
-  });
+});
 
 app.get('/auth/outlook',
         passport.authenticate('windowslive', { scope: process.env.CLIENT_SCOPES }),
