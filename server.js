@@ -456,7 +456,7 @@ function updateReports(){
     });
 }
 function removeReports(id){
-    conn.query('DELETE FROM reports WHERE id =?', [id],function(error, data){
+    conn.query('DELETE FROM reports WHERE id =?', [id], function(error, data){
         updateReports();
     });
 }
