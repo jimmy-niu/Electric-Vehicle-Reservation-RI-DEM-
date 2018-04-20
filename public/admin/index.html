@@ -37,10 +37,37 @@
     <div style = "padding: 1vh 2vw 1vh 2vw;">
         <div class = "Nav-Buttons">
             <a href = "fleet.html"><div class = "button drop-shadow">Manage Fleet</div></a>
+            
+            <a href = "#addVehicleModal" class = "btn btn-large btn-primary drop-shadow" data-toggle="modal">Add Vehicle</a>
 
-            <a href = "#addUserModal" class = "btn btn-large btn-primary drop-shadow" data-toggle="modal">Add/Remove User</a>
+            <div id="addVehicleModal" class="modal fade">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h3>Add Vehicle</h3>
+                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                        </div>
 
-            <div id="addUserModal" class="modal fade">
+                        <div class="modal-body">
+
+                            <form>
+                            </form>
+
+                        </div>
+
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+
+                            <button type="button" class="btn btn-primary" data-dismiss="modal" aria-hidden="true" onclick = 'modifyUser(false);'>Submit</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            
+            <a href = "#modifyUserModal" class = "btn btn-large btn-primary drop-shadow" data-toggle="modal">Add/Remove User</a>
+
+            <div id="modifyUserModal" class="modal fade">
                 <div class="modal-dialog">
                     <div class="modal-content">
                         <div class="modal-header">
@@ -77,8 +104,7 @@
                     </div>
                 </div>
             </div>
-
-            <div class = "button drop-shadow" onclick = 'removeUser'>Remove Admin</div>
+    
         </div>
 
         <div class = "content drop-shadow">
