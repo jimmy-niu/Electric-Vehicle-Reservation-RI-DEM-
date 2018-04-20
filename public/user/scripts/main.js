@@ -3,6 +3,7 @@ let userSocket = io.connect('http://localhost:8080/user', {forceNew: true});
 // Sets up the sockets.
 $(document).ready(function() {
     $("#submit-res").click(newReservation);
+    $("#cancel-res").click(cancelReservation);
     $("#add-stop").click(function() {addStop(); return false; });
 
     userSocket.emit('join',"Jimmy Niu", function(reservations){
@@ -17,7 +18,7 @@ $(document).ready(function() {
 
     userSocket.on('newReservation', function(reservations){
         console.log("new reservation added");
-        //console.log(reservations);
+        console.log(reservations);
     });
 
     userSocket.on('reservationOverride', function(reservations){
@@ -56,10 +57,11 @@ function newReservation(){
     let offroad = $("#offroading").prop('checked');
     let rack = $('#kayak').prop('checked');
 
-    let res = new Reservation({start: start, end: end, stops: stops, needsTrunk: trunk, needsOffRoad: offroad, needsRack: rack});
+    let resData = {user: "user", start: start, end: end, stops: stops, override: false, justification: "", needsTrunk: trunk, needsOffRoad: offroad, needsRack: rack};
+    let res = new Reservation(resData);
     console.log(res);
 
-    userSocket.emit('reservation', {user: "Jimmy Niu", start: "2018-04-18 11:00", end: "2018-04-18 16:00", stops: ["home", "work"], override: true, justification: "my oranges fell into the river.", needsTrunk: false, needsOffRoad: false, needsRack: false});
+    userSocket.emit('reservation', resData);
 }
 
 function editReservation(){
@@ -72,7 +74,8 @@ function getReservations(reservations){
 }
 
 function cancelReservation(reservationID, user){
-    userSocket.emit('cancel', reservationID);
+    console.log("cancelled");
+    //userSocket.emit('cancel', reservationID);
 }
 
 function submitFeedback(){
