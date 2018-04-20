@@ -357,7 +357,12 @@ app.get('/logincomplete', function(req, res) {
         res.redirect('/');
         return;
     }
-    res.send(index.loginCompletePage(email));
+    if (email ===  'dem_test_a@outlook.com') {
+      var to_send = path.join(__dirname, './public/admin/index.html');
+    } else if (email === 'dem_test_u@outlook.com') {
+      var to_send = path.join(__dirname, './public/user/index.html');
+    }
+    res.sendFile(to_send);
     //res.sendFile(path.join(__dirname, './public/user/index.html'));
 });
 
