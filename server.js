@@ -54,7 +54,7 @@ app.use(session(
      resave: false,
      saveUninitialized: false
     })
-       );
+);
 
 app.get('/addevent', function(req, res) {
     var access_token = req.session.access_token;
@@ -264,6 +264,7 @@ io.of('/user').on('connection', function(socket){
         //     console.log("sending to admin")
         //    io.of('/admin').emit('reservationChange', data);
         // });
+        });
     });
 
     socket.on('edit', function(reservationID, user, license, start, end, stops, override, justification){
@@ -300,7 +301,7 @@ io.of('/user').on('connection', function(socket){
 
     socket.on('justification', function(reservationID, justification){
         updateJustification(justification, resrevationID);
-    });
+    });  
 });
 
 /**
