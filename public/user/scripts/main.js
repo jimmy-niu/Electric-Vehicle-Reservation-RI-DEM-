@@ -50,8 +50,14 @@ function newReservation(){
     console.log("pressed");
 
     // let user = // ???
-    let start = new Date($('#start-date').val()).toISOString().substr(0, 16).replace('T', ' ');
-    let end = new Date($('#end-date').val()).toISOString().substr(0, 16).replace('T', ' ');
+    let s = new Date($('#start-date').val());
+    let isoStart = new Date(s.getTime() - (s.getTimezoneOffset() * 60000)).toISOString();
+    let start = isoStart.substr(0, 16).replace('T', ' ');
+
+    let e = new Date($('#end-date').val());
+    let isoEnd = new Date(e.getTime() - (e.getTimezoneOffset() * 60000)).toISOString();
+    let end = isoEnd.substr(0, 16).replace('T', ' ');
+
     let stops = [];    
     $('.route-stop').each(function() {
         stops.push($(this).val());
