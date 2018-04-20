@@ -38,19 +38,33 @@
         <div class = "Nav-Buttons">
             <a href = "fleet.html"><div class = "button drop-shadow">Manage Fleet</div></a>
 
-            <a href = "#addUserModal" class = "btn btn-large btn-primary drop-shadow" data-toggle="modal">Add Admin</a>
+            <a href = "#addUserModal" class = "btn btn-large btn-primary drop-shadow" data-toggle="modal">Add/Remove User</a>
 
             <div id="addUserModal" class="modal fade">
                 <div class="modal-dialog">
                     <div class="modal-content">
                         <div class="modal-header">
+                            <h3>Manage Users</h3>
                             <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
                         </div>
 
                         <div class="modal-body">
 
                             <form>
-                                Email of User: <input type = "text" id = "emailField">
+                                <h5>Type of Account:</h5>
+                                Admin: <input type = "radio" name="adminUser" id="adminChoice" value="admin" required>
+                                <br>
+                                User: <input type = "radio" name="adminUser" id="userChoice" value="user" required>
+                                
+                                <hr>
+                                
+                                <h5>Modification:</h5>
+                                Add: <input type = "radio" name="addRemove" id="addChoice" value="add" required>
+                                <br>
+                                Remove: <input type = "radio" name="addRemove" id="removeChoice" value="remove" required>
+                                
+                                <hr> 
+                                Email of User: <input type = "text" id = "emailField" required>
                             </form>
 
                         </div>
@@ -63,7 +77,7 @@
                     </div>
                 </div>
             </div>
-            
+
             <div class = "button drop-shadow" onclick = 'removeUser'>Remove Admin</div>
         </div>
 

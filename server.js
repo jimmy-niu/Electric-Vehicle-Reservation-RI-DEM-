@@ -367,7 +367,7 @@ function changeUserStatus(email, admin){
 }
 function removeUser(email){
     conn.query('DELETE FROM users WHERE email = ?', [email], function(error, data){
-
+        console.log("deleted");
     });
 }
 
