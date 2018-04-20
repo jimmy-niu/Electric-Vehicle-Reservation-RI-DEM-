@@ -380,9 +380,9 @@ app.get('/authorize', //function(req, res) {
       app.use("/admin", express.static(__dirname + '/public/admin'));
       io.of('/admin').emit('admin-connected', user_email);
       res.redirect('admin/index.html');
-    } else if (user_email === 'dem_test_u@outlook.com') {
+    } else if (user_email === 'dem_test_u@outlook.com' || user_email === 'dem_test_u_2@outlook.com') {
       app.use("/user", express.static(__dirname + '/public/user'));
-      io.of('/user').emit('user-connected', user_email);
+      io.sockets.emit('user-connected', user_email);
       res.redirect('user/index.html');
     }
   });
