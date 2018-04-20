@@ -44,8 +44,14 @@ function newReservation(){
     console.log("pressed");
 
     // let user = // ???
-    let start = $('#start-date').val();
-    let end = $('#end-date').val();
+
+    var dateFormat = require('dateformat');
+    let s = new Date($('#start-date').val());
+    let start = s.getfullyear() + "-" + s.getmonth() + "-" + s.getdate() + " " + s.gethours() + ":" + s.getMinutes();
+
+    let e = new Date($('#end-date').val());
+    let end = e.getfullyear() + "-" + e.getmonth() + "-" + e.getdate() + " " + e.gethours() + ":" + e.getinutes();
+
     let stops = [];    
     $('.route-stop').each(function() {
         stops.push($(this).val());
@@ -85,7 +91,7 @@ class Reservation {
         this.addToDom(this.data);
     }
     addToDom(r) {
-        let DOMobject = `;<div class="card border-success mb-3" style="width: 18rem;">
+        let DOMobject = `<div class="card border-success mb-3" style="width: 18rem;">
                     <img class = "card-img-top" src="https://upload.wikimedia.org/wikipedia/commons/5/5f/DCA_Prius_1Gen_12_2011_3592.JPG" alt="prius placeholder image">
                     <div class="card-body">
                         <h5 class="card-title">Toyota Prius 787ZXC</h5>
@@ -96,7 +102,7 @@ class Reservation {
                         <a href="#" class="btn btn-secondary" data-toggle="modal" data-target="#cancelModal">Cancel </a>
                     </div>
                 </div>`;
-        $('#cardz').append(DOMobject);
+        $('.cards').append(DOMobject);
     }
 }
 function submitJustification(reservationID, justification){
