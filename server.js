@@ -251,6 +251,7 @@ io.of('/user').on('connection', function(socket){
             // createReservation(reservationInfo.user, data.rows[0].license,
             // reservationInfo.start, reservationInfo.end, reservationInfo.stops, reservationInfo.override,
             // reservationInfo.justification);
+            socket.emit('alternateVehicles', data);
 
             conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?)',[reservationInfo.user, data.rows[0].license, reservationInfo.start, reservationInfo.end, reservationInfo.stops, reservationInfo.override, reservationInfo.justification],function(error, data){
                 console.log(data);
