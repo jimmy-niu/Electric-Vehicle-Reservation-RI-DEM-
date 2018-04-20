@@ -37,12 +37,3 @@ module.exports = {
 };
 
 
-function addUser(email){
-    adminSocket.emit();
-}
-
-function removeUser(email){
-    
-}
-
-

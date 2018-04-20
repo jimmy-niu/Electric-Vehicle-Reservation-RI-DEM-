@@ -5,24 +5,35 @@ $(document).ready(function() {
     $("#submit-res").click(newReservation)
 
     userSocket.emit('join',"Jimmy Niu", function(reservations){
-        //updateReservations(reservations);
+        getReservations(reservations);
         console.log(reservations);
     });
 
     userSocket.on('reservationChange', function(reservations){
-        //updateReservations(reservations);
-        console.log("hi");
-        console.log(reservations);
+        console.log("reservation change");
+        //console.log(reservations);
+    });
+
+    userSocket.on('newReservation', function(reservations){
+        console.log("new reservation added");
+        //console.log(reservations);
+    });
+
+    userSocket.on('reservationOverride', function(reservations){
+        console.log("reservation vehicle override");
+        //console.log(reservations);
     });
 
     userSocket.on('alternateVehicles', function(vehicles){
         console.log(vehicles);
     });
+
+    updateReservation(1, "JGH456")
 });
 
 function newReservation(){
     console.log("pressed");
-    userSocket.emit('reservation', {user: "Jimmy Niu", start: "2018-04-18 11:00", end: "2018-04-18 16:00", stops: ["home", "work"], override: true, justification: "my oranges fell into the river."});
+    userSocket.emit('reservation', {user: "Jimmy Niu", start: "2018-04-18 11:00", end: "2018-04-18 16:00", stops: ["home", "work"], override: true, justification: "my oranges fell into the river.", needsTrunk: false, needsOffRoad: false, needsRack: false});
 }
 
 function editReservation(){
@@ -30,7 +41,7 @@ function editReservation(){
 }
 
 //need to figure out current and past
-function updateReservations(){
+function getReservations(reservations){
 
 }
 
@@ -40,4 +51,12 @@ function cancelReservation(reservationID, user){
 
 function submitFeedback(){
     userSocket.emit('reportAdded', reservationID, report);
+}
+
+function submitJustification(reservationID, justification){
+    userSocket.emit('justification', reservationID, justification);
+}
+
+function overrideVehicle(reservationID, license){
+    userSocket.emit('vehicleOverride', reservationID, license);
 }

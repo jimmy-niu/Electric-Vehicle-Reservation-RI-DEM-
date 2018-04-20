@@ -1,13 +1,14 @@
 let adminSocket = io.connect('http://localhost:8080/admin', {forceNew: true});
+
 let currentReservation = 0;
+let user_email = "test@gmail.com";
+
 function toggle_hidden(id, object){
     if(object.innerHTML.includes("▼")){
         object.innerHTML = object.innerHTML.replace("▼", "▲");
     } else {
         object.innerHTML = object.innerHTML.replace("▲", "▼");
     }
-    console.log(document.getElementById(id));
-    console.log(object.innerHTML);
     document.getElementById(id).classList.toggle('hidden');
 }
 
@@ -30,6 +31,50 @@ $(document).ready(function() {
     //new Reservation({user:"blah", start:"blah", end:"blah", license:"blah", model:"blah"});
     //new Vehicle({license:"dsf", model:"blah", color:"blah", license:"blah", model:"blah"});
 });
+
+
+function modifyUser() {
+    let email = $('#emailField').val();
+
+    let isAdmin = undefined;
+    if($('#adminChoice').is(':checked') || $('#userChoice').is(':checked')) {
+        isAdmin = $('#adminChoice').is(':checked');
+
+    }
+
+    let isAdd = undefined;
+    if($('#removeChoice').is(':checked') || $('#addChoice').is(':checked')) {
+        isAdd = $('#addChoice').is(':checked');
+
+    }
+
+    console.log(email + " || " + isAdmin + " || " + isAdd);
+    if(email != undefined && isAdd != undefined){
+        if(isAdd  && isAdmin != undefined){
+            adminSocket.emit('userAdded', email, isAdmin);
+        } else {
+            adminSocket.emit('userRemoved', email);
+        }
+    }
+    
+    clearCertainModal();
+
+    //adminSocket.emit('modify_user', isRemove, email);
+}
+
+function clearCertainModal(){
+    console.log("potato");
+    $('#adminChoice').prop('checked', false);
+    $('#userChoice').prop('checked', false);
+    $('#addChoice').prop('checked', false);
+    $('#removeChoice').prop('checked', false);
+    $('#emailField').val('');
+    console.log($('#emailField').val());
+}
+
+function removeUser(){
+    adminSocket.emit(true, email);
+}
 
 
 function addVehicle(vehicle){
@@ -57,17 +102,9 @@ function removeReport(id){
     console.log(id + " removed from reports");
 }
 
-function addUser(email, admin){
-    adminSocket.emit('userAdded', email, admin);
-    console.log(email + " added to user list with value " + 1);
-}
 function changeUserStatus(email, admin){
     adminSocket.emit('userStatusChanged', email, admin);
     console.log(email + "set to " + admin);
-}
-function removeUser(email){
-    adminSocket.emit('userRemoved', email);
-    console.log(email + " removed from user list");
 }
 
 // Objects
@@ -81,6 +118,8 @@ class Reservation {
             `<div class = "col-entry reservation-end">${r.start}</div>` +
             `<div class = "col-entry reservation-license">${r.license}</div>` +
             `<div class = "col-entry reservation-pickup">${r.model}</div>`;
+        console.log(DOMobject);
+
         $('#upcoming').append(DOMobject);
     }
 }

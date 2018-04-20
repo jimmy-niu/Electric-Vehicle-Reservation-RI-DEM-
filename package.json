@@ -28,6 +28,7 @@
     "express-session": "^1.15.6",
     "hogan": "^1.0.2",
     "moment": "^2.22.1",
+    "mysql": "^2.15.0",
     "node-outlook": "^1.1.8",
     "nodemailer": "^4.6.4",
     "pug": "^2.0.3",
