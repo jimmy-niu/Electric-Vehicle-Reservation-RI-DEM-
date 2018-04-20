@@ -19,7 +19,7 @@ let moment = require('moment');
 let querystring = require('querystring');
 let outlook = require('node-outlook');
 let index = require('./public/index');
-let auth = require('./auth');
+// let auth = require('./auth');
 var dotenv = require('dotenv').config();
 var methodOverride = require('method-override')
 var passport = require('passport')
@@ -340,13 +340,9 @@ app.get('/auth/outlook',
 });
 
 app.get('/logout', function(req, res) {
+    let user_email = "";
     if(req.user !== undefined){
-        var user_email = req.user._json.EmailAddress;
-        if (user_email === 'dem_test_a@outlook.com') {
-            socket.emit('admin-disconnected', user_email);
-        } else if (user_email === 'dem_test_u@outlook.com') {
-            socket.emit('user-disconnected', user_email);
-        }
+        user_email = req.user._json.EmailAddress;
     }
     req.logout();
     req.session.destroy(function (err) {
