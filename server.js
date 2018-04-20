@@ -22,7 +22,7 @@ let outlook = require('node-outlook');
 let index = require('./public/index');
 let auth = require('./auth');
 var dotenv = require('dotenv').config();
-var methodOverride = require('method-override')  
+var methodOverride = require('method-override')
 var passport = require('passport')
 var util = require('util')
 var OutlookStrategy = require('passport-outlook').Strategy;
@@ -42,7 +42,7 @@ let conn = anyDB.createConnection('sqlite3://DEM.db');
 // conn.connect(function(err) {
 //   if (err) {
 //     throw err
-//   } 
+//   }
 //   console.log('You are now connected...');
 // });
 
@@ -239,7 +239,7 @@ io.of('/user').on('connection', function(socket){
         } else {
             needsRack = 0;
         }
-        
+
         conn.query('SELECT license, model FROM vehicles WHERE extraTrunk >= ? AND offRoad >= ? AND equipRack >= ? AND license NOT IN (SELECT license FROM reservations WHERE start <= ? AND end >= ?) ORDER BY isEV DESC, (extraTrunk + offRoad + equipRack) ASC', [needsTrunk, needsOffRoad, needsRack, reservationInfo.end, reservationInfo.start], function(error, data){
             //console.log(data);
 
@@ -308,7 +308,7 @@ io.of('/user').on('connection', function(socket){
 
     socket.on('justification', function(reservationID, justification){
         updateJustification(justification, resrevationID);
-    });  
+    });
 
     socket.on('vehicleOverride', function(reservationID, license){
         conn.query('UPDATE reservations SET license = ? WHERE id = ?', [license, reservationID], function(error, data){
@@ -395,12 +395,13 @@ function updateVehicles(){
 
 }
 function addVehicle(vehicle){
-    conn.query('INSERT INTO vehicles VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?, ?)',[vehicle.license, vehicle.model, vehicle.color, vehicle.inService, vehicle.miles],function(error, data){
+    conn.query('INSERT INTO vehicles VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?, ?)',[vehicle.license, vehicle.model, vehicle.color, vehicle.status, vehicle.miles, vehicle.isEv, vehicle.trunk, vehicle.offRoad, vehicle.equipmentRack],function(error, data){
         updateVehicles();
     });
+    console.log(vehicle);
 }
 function editVehicle(id, vehicle){
-    conn.query('REPLACE INTO vehicles VALUES(?, ?, ?, ?, ?, ?)',[id, vehicle.license, vehicle.model, vehicle.color, vehicle.inService, vehicle.miles],function(error, data){
+    conn.query('REPLACE INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',[vehicle.license, vehicle.model, vehicle.color, vehicle.miles, vehicle.status, vehicle.isEv, vehicle.trunk, vehicle.offRoad, vehicle.equipmentRack],function(error, data){
         updateVehicles();
     });
 }

@@ -71,8 +71,8 @@ function addVehicle(){
     let model = $('#modelField').val();
     let color = $('#colorField').val();
     let miles = $('#milesField').val();
-    let status  = ($('#carStatusField').val() === "ev");
-    let carType = $('#evStatusField').val();
+    let status  = ($('#carStatusField').val() === "service");
+    let carType = ($('#evStatusField').val() === 'ev');
     let trunk = $('#extraTrunkChoice').is(':checked');
     let offRoad = $('#offRoadChoice').is(':checked');
     let equipmentRack = $('#equipChoice').is(':checked');
