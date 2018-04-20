@@ -44,14 +44,8 @@ function newReservation(){
     console.log("pressed");
 
     // let user = // ???
-
-    var dateFormat = require('dateformat');
-    let s = new Date($('#start-date').val());
-    let start = s.getfullyear() + "-" + s.getmonth() + "-" + s.getdate() + " " + s.gethours() + ":" + s.getMinutes();
-
-    let e = new Date($('#end-date').val());
-    let end = e.getfullyear() + "-" + e.getmonth() + "-" + e.getdate() + " " + e.gethours() + ":" + e.getinutes();
-
+    let start = new Date($('#start-date').val()).toISOString().substr(0, 16).replace('T', ' ');
+    let end = new Date($('#end-date').val()).toISOString().substr(0, 16).replace('T', ' ');
     let stops = [];    
     $('.route-stop').each(function() {
         stops.push($(this).val());
