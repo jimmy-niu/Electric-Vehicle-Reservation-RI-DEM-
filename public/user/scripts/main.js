@@ -6,19 +6,30 @@ $(document).ready(function() {
     $("#add-stop").click(function() {addStop(); return false; });
 
     userSocket.emit('join',"Jimmy Niu", function(reservations){
-        //updateReservations(reservations);
+        getReservations(reservations);
         console.log(reservations);
     });
 
     userSocket.on('reservationChange', function(reservations){
-        //updateReservations(reservations);
-        console.log("hi");
-        console.log(reservations);
+        console.log("reservation change");
+        //console.log(reservations);
+    });
+
+    userSocket.on('newReservation', function(reservations){
+        console.log("new reservation added");
+        //console.log(reservations);
+    });
+
+    userSocket.on('reservationOverride', function(reservations){
+        console.log("reservation vehicle override");
+        //console.log(reservations);
     });
 
     userSocket.on('alternateVehicles', function(vehicles){
         console.log(vehicles);
     });
+
+    updateReservation(1, "JGH456")
 });
 
 function addStop() {
@@ -53,7 +64,7 @@ function editReservation(){
 }
 
 //need to figure out current and past
-function updateReservations(){
+function getReservations(reservations){
 
 }
 
@@ -78,4 +89,8 @@ class Reservation {
 }
 function submitJustification(reservationID, justification){
     userSocket.emit('justification', reservationID, justification);
+}
+
+function overrideVehicle(reservationID, license){
+    userSocket.emit('vehicleOverride', reservationID, license);
 }

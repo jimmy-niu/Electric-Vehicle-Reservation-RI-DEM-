@@ -155,7 +155,7 @@ conn.query('CREATE TABLE IF NOT EXISTS reports(id INTEGER PRIMARY KEY AUTOINCREM
 conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?)',["Jenna Tishler", "ABC123", "2018-04-18 11:00", "2018-04-18 15:00", ["home", "work"], false, ""]);
 conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?)',["Jenna Tishler", "DEF456", "2018-04-19 11:00", "2018-04-20 11:00", ["home", "work"], false, ""]);
 conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?)',["Max Luebbers", "GHI789", "2018-04-18 11:00", "2018-04-18 15:00", ["home", "work"], false, ""]);
-conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?)',["Emily Kasbohm", "GHI789", "2018-04-19 14:00", "2018-04-18 17:00", ["home", "work"], false, ""]);
+conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?)',["Jimmy Niu", "GHI789", "2018-04-19 14:00", "2018-04-18 17:00", ["home", "work"], false, ""]);
 
 conn.query('INSERT INTO vehicles VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?, ?)', ["ABC123", "Chevy Volt", "Red", true, 100.0, true, true, false, false]);
 conn.query('INSERT INTO vehicles VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?, ?)', ["DEF456", "Chevy Volt", "Blue", true, 100.0, true, true, false, false]);
@@ -200,7 +200,7 @@ io.of('/admin').on('connection', function(socket){
 //handles events when a regular user is connnected
 io.of('/user').on('connection', function(socket){
     socket.on('join', function(user, callback){
-        conn.query('SELECT * FROM reservations WHERE user = ?', [user], function(error, data){
+        conn.query('SELECT * FROM reservations WHERE user = ? ORDER BY start DESC', [user], function(error, data){
             callback(data);
         });
 
@@ -241,10 +241,10 @@ io.of('/user').on('connection', function(socket){
             // reservationInfo.justification);
 
             conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?)',[reservationInfo.user, data.rows[0].license, reservationInfo.start, reservationInfo.end, reservationInfo.stops, reservationInfo.override, reservationInfo.justification],function(error, data){
-                console.log("added to table");
-                conn.query('SELECT * FROM reservations WHERE user = ?', [reservationInfo.user], function(error, data){
+                console.log(data);
+                conn.query('SELECT * FROM reservations WHERE id = ?', [data.lastInsertId], function(error, data){
                      //make sure only emitting to one user
-                    socket.emit('reservationChange', data);
+                    socket.emit('newReservation', data);
                     console.log("sending to user");
                 });
 
@@ -271,7 +271,7 @@ io.of('/user').on('connection', function(socket){
         editReservation(reservationID)
 
         conn.query('SELECT * FROM reservations WHERE user = ?', [user], function(error, data){
-            socket.to(socket.id).emit('reservationChange', data);
+            socket.emit('reservationChange', data);
         });
 
         conn.query('SELECT * FROM reservations', function(error, data){
@@ -283,7 +283,7 @@ io.of('/user').on('connection', function(socket){
         cancelReservation(reservationID);
 
         conn.query('SELECT * FROM reservations WHERE user = ?', [user], function(error, data){
-            socket.to(socket.id).emit('reservationChange', data);
+            socket.emit('reservationChange', data);
         });
 
         conn.query('SELECT * FROM reservations', function(error, data){
@@ -302,6 +302,14 @@ io.of('/user').on('connection', function(socket){
     socket.on('justification', function(reservationID, justification){
         updateJustification(justification, resrevationID);
     });  
+
+    socket.on('vehicleOverride', function(reservationID, license){
+        conn.query('UPDATE reservations SET license = ? WHERE id = ?', [license, reservationID], function(error, data){
+            conn.query('SELECT * FROM reservations WHERE id = ?', [reservationID], function(error, data){
+                socket.emit('reservationOverride', data);
+            });
+        });
+    });
 });
 
 /**
@@ -349,7 +357,12 @@ app.get('/logincomplete', function(req, res) {
         res.redirect('/');
         return;
     }
-    res.send(index.loginCompletePage(email));
+    if (email ===  'dem_test_a@outlook.com') {
+      var to_send = path.join(__dirname, './public/admin/index.html');
+    } else if (email === 'dem_test_u@outlook.com') {
+      var to_send = path.join(__dirname, './public/user/index.html');
+    }
+    res.sendFile(to_send);
     //res.sendFile(path.join(__dirname, './public/user/index.html'));
 });
 

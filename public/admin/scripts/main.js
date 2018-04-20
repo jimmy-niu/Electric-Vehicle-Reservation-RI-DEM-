@@ -7,8 +7,6 @@ function toggle_hidden(id, object){
     } else {
         object.innerHTML = object.innerHTML.replace("▲", "▼");
     }
-    console.log(document.getElementById(id));
-    console.log(object.innerHTML);
     document.getElementById(id).classList.toggle('hidden');
 }
 
@@ -31,26 +29,41 @@ $(document).ready(function() {
 
 function modifyUser() {
     let email = $('#emailField').val();
+
     let isAdmin = undefined;
     if($('#adminChoice').is(':checked') || $('#userChoice').is(':checked')) {
         isAdmin = $('#adminChoice').is(':checked');
+
     }
 
     let isAdd = undefined;
     if($('#removeChoice').is(':checked') || $('#addChoice').is(':checked')) {
         isAdd = $('#addChoice').is(':checked');
+
     }
 
     console.log(email + " || " + isAdmin + " || " + isAdd);
-    if(email != undefined && isAdd != undefined && isAdmin != undefined){
-        if(isAdd){
+    if(email != undefined && isAdd != undefined){
+        if(isAdd  && isAdmin != undefined){
             adminSocket.emit('userAdded', email, isAdmin);
         } else {
             adminSocket.emit('userRemoved', email);
         }
     }
+    
+    clearCertainModal();
 
     //adminSocket.emit('modify_user', isRemove, email);
+}
+
+function clearCertainModal(){
+    console.log("potato");
+    $('#adminChoice').prop('checked', false);
+    $('#userChoice').prop('checked', false);
+    $('#addChoice').prop('checked', false);
+    $('#removeChoice').prop('checked', false);
+    $('#emailField').val('');
+    console.log($('#emailField').val());
 }
 
 function removeUser(){
@@ -83,17 +96,9 @@ function removeReport(id){
     console.log(id + " removed from reports");
 }
 
-function addUser(email, admin){
-    adminSocket.emit('userAdded', email, admin);
-    console.log(email + " added to user list with value " + 1);
-}
 function changeUserStatus(email, admin){
     adminSocket.emit('userStatusChanged', email, admin);
     console.log(email + "set to " + admin);
-}
-function removeUser(email){
-    adminSocket.emit('userRemoved', email);
-    console.log(email + " removed from user list");
 }
 
 // Objects
@@ -108,7 +113,7 @@ class Reservation {
             `<div class = "col-entry reservation-end">${r.start}</div>` +
             `<div class = "col-entry reservation-license">${r.license}</div>` +
             `<div class = "col-entry reservation-pickup">${r.model}</div>`;
-            console.log(DOMobject);
+        console.log(DOMobject);
         $('#upcoming').append(DOMobject);
     }
 }
