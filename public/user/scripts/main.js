@@ -2,7 +2,8 @@ let userSocket = io.connect('http://localhost:8080/user', {forceNew: true});
 
 // Sets up the sockets.
 $(document).ready(function() {
-    $("#submit-res").click(newReservation)
+    $("#submit-res").click(newReservation);
+    $("#add-stop").click(function() {addStop(); return false; });
 
     userSocket.emit('join',"Jimmy Niu", function(reservations){
         //updateReservations(reservations);
@@ -20,17 +21,28 @@ $(document).ready(function() {
     });
 });
 
+function addStop() {
+    let newStop = ` <div class="form-group">
+        <label>Destination</label>
+        <input type=text class="form-control route-stop">
+    </div>`
+    $('#stops').append(newStop);
+}
+
 function newReservation(){
     console.log("pressed");
 
     // let user = // ???
     let start = $('#start-date').val();
     let end = $('#end-date').val();
-    // let stops =      // not yet implemented
-    // let override =   // ditto
-    // let justification =      // yikes
+    let stops = [];    
+    $('.route-stop').each(function() {
+        stops.push($(this).val());
+    })
+    // let override =   // not yet implemented
+    // let justification =      // ditto
 
-    let res = new Reservation({start: start, end: end});
+    let res = new Reservation({start: start, end: end, stops: stops});
     console.log(res);
 
     userSocket.emit('reservation', {user: "Jimmy Niu", start: "2018-04-18 11:00", end: "2018-04-18 16:00", stops: ["home", "work"], override: true, justification: "my oranges fell into the river.", needsTrunk: false, needsOffRoad: false, needsRack: false});
