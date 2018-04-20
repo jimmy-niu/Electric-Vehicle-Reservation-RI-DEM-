@@ -17,7 +17,7 @@ $(document).ready(function() {
 
     userSocket.on('newReservation', function(reservations){
         console.log("new reservation added");
-        //console.log(reservations);
+        console.log(reservations);
     });
 
     userSocket.on('reservationOverride', function(reservations){
