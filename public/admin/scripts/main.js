@@ -1,4 +1,5 @@
 let adminSocket = io.connect('http://localhost:8080/admin', {forceNew: true});
+let user_email = "test@gmail.com";
 
 function toggle_hidden(id, object){
     if(object.innerHTML.includes("▼")){
@@ -27,6 +28,16 @@ $(document).ready(function() {
     let newVehicle = {license:'Blah', model:'Honda Civic', color:'Red', inService: 'TRUE', miles: 2.0};
     editVehicle(15, newVehicle);
 });
+
+
+function modifyUser(isRemove){
+    let email = $('#emailField').val());
+    adminSocket.emit('modify_user', isRemove, email);
+}
+
+function removeUser(){
+    adminSocket.emit(true, email);
+}
 
 
 function addVehicle(vehicle){

@@ -34,52 +34,52 @@ app.use(express.static(__dirname + '/public'));
 
 app.use(cookieParser());
 app.use(session(
-  { secret: 's3cr3t',
-    resave: false,
-    saveUninitialized: false
-  })
-);
+    { secret: 's3cr3t',
+     resave: false,
+     saveUninitialized: false
+    })
+       );
 
 app.get('/addevent', function(req, res) {
-  var access_token = req.session.access_token;
-  var newEvent = {
-  "Subject": "Test event",
-  "Body": {
-    "ContentType": "HTML",
-    "Content": "wowee this is a test event",
-  },
-  "Start": "2018-04-27T00:00:00.000Z",
-  "End": "2018-04-27T00:30:00.000Z",
-  "Attendees": [
-    {
-      "EmailAddress": {
-        "Address": "kyle.cui9@gmail.com",
-        "Name": "Kyle Cui"
-      },
-      "Type": "Required"
-    }
-  ]
-};
+    var access_token = req.session.access_token;
+    var newEvent = {
+        "Subject": "Test event",
+        "Body": {
+            "ContentType": "HTML",
+            "Content": "wowee this is a test event",
+        },
+        "Start": "2018-04-27T00:00:00.000Z",
+        "End": "2018-04-27T00:30:00.000Z",
+        "Attendees": [
+            {
+                "EmailAddress": {
+                    "Address": "kyle.cui9@gmail.com",
+                    "Name": "Kyle Cui"
+                },
+                "Type": "Required"
+            }
+        ]
+    };
 
-  var userInfo = {
-    email: 'kyle.cui9@gmail.com'
-  };
+    var userInfo = {
+        email: 'kyle.cui9@gmail.com'
+    };
 
-  var addEventParameters = {
-    token: access_token,
-    event: newEvent,
-    user: userInfo
-  };
+    var addEventParameters = {
+        token: access_token,
+        event: newEvent,
+        user: userInfo
+    };
 
-  outlook.calendar.createEvent(addEventParameters,
-    function(error, result) {
-      if (error) {
-        console.log(error);
-        res.send(error);
-      }
-      else {
-        res.redirect('/sync');
-      }
+    outlook.calendar.createEvent(addEventParameters,
+                                 function(error, result) {
+        if (error) {
+            console.log(error);
+            res.send(error);
+        }
+        else {
+            res.redirect('/sync');
+        }
     });
 });
 
@@ -99,11 +99,11 @@ app.get('/addevent', function(req, res) {
 //   }
 // });
 let transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    user: 'jenna_tishler@brown.edu',
-    pass: ''
-  }
+    service: 'gmail',
+    auth: {
+        user: 'jenna_tishler@brown.edu',
+        pass: ''
+    }
 });
 
 //example of how to send email
@@ -149,7 +149,7 @@ conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?)',["Jimmy 
 
 /*Sets up the server on port 8080.*/
 server.listen(8080, function(){
-	console.log('- Server listening on port 8080');
+    console.log('- Server listening on port 8080');
 });
 
 //handles events when an admin user is connected
@@ -175,23 +175,23 @@ io.of('/admin').on('connection', function(socket){
 io.of('/user').on('connection', function(socket){
     socket.on('join', function(user, callback){
         conn.query('SELECT * FROM reservations WHERE user = ?', [user], function(error, data){
-           callback(data);
+            callback(data);
         });
 
         conn.query('SELECT * FROM vehicles', function(error, data){
-           console.log(data);
+            console.log(data);
         });
     });
     //emitted when a user makes a new reservation
     socket.on('reservation', function(reservationInfo){
         console.log("got a reservation!");
-        
+
         conn.query('SELECT license, model FROM vehicles WHERE license NOT IN (SELECT license FROM reservations WHERE start <= ? AND end >= ?)', [reservationInfo.end, reservationInfo.start], function(error, data){
             console.log(data);
 
             createReservation(reservationInfo.user, data.rows[0].license,
-            reservationInfo.start, reservationInfo.end, reservationInfo.stops, reservationInfo.override,
-            reservationInfo.justification);
+                              reservationInfo.start, reservationInfo.end, reservationInfo.stops, reservationInfo.override,
+                              reservationInfo.justification);
 
             //make sure only emitting to one user
             //don't send back assigned vehicle
@@ -199,13 +199,13 @@ io.of('/user').on('connection', function(socket){
         });
 
         conn.query('SELECT * FROM reservations WHERE user = ?', [reservationInfo.user], function(error, data){
-             //make sure only emitting to one user
+            //make sure only emitting to one user
             socket.emit('reservationChange', data);
             console.log("sending to user");
         });
 
         conn.query('SELECT * FROM reservations', function(error, data){
-           io.of('/admin').emit('reservationChange', data);
+            io.of('/admin').emit('reservationChange', data);
         });
 
     });
@@ -214,11 +214,11 @@ io.of('/user').on('connection', function(socket){
         editReservation(reservationID)
 
         conn.query('SELECT * FROM reservations WHERE user = ?', [user], function(error, data){
-           socket.to(socket.id).emit('reservationChange', data);
+            socket.to(socket.id).emit('reservationChange', data);
         });
 
         conn.query('SELECT * FROM reservations', function(error, data){
-           io.of('/admin').emit('reservationChange', data);
+            io.of('/admin').emit('reservationChange', data);
         });
     });
 
@@ -226,11 +226,11 @@ io.of('/user').on('connection', function(socket){
         cancelReservation(reservationID);
 
         conn.query('SELECT * FROM reservations WHERE user = ?', [user], function(error, data){
-           socket.to(socket.id).emit('reservationChange', data);
+            socket.to(socket.id).emit('reservationChange', data);
         });
 
         conn.query('SELECT * FROM reservations', function(error, data){
-           io.of('/admin').emit('reservationChange', data);
+            io.of('/admin').emit('reservationChange', data);
         });
     });
 
@@ -238,16 +238,8 @@ io.of('/user').on('connection', function(socket){
         submitFeeback(resrevationID, resport);
 
         conn.query('SELECT * FROM reports', function(error, data){
-           io.of('/admin').emit('reportAdded', data);
+            io.of('/admin').emit('reportAdded', data);
         });
-    });
-	
-	socket.on('modify_user', function(isRemove, email){
-		if(isRemove){
-			removeAdmin(email);
-		} else {
-			addAdmin(email);
-		}
     });
 });
 
@@ -255,60 +247,60 @@ io.of('/user').on('connection', function(socket){
  * Sets up the landing page to index.html.
  */
 app.get('/', function(req, res) {
-  res.status(200);
-  res.send(index.loginPage(auth.getAuthUrl()));
+    res.status(200);
+    res.send(index.loginPage(auth.getAuthUrl()));
 });
 
 app.get('/authorize', function(req, res) {
-  var authCode = req.query.code;
-  if (authCode) {
-    console.log('');
-    console.log('Retrieved auth code in /authorize: ' + authCode);
-    auth.getTokenFromCode(authCode, tokenReceived, req, res);
-  }
-  else {
-    console.log('/authorize called without a code parameter, redirecting to login');
-    res.redirect('/');
-  }
+    var authCode = req.query.code;
+    if (authCode) {
+        console.log('');
+        console.log('Retrieved auth code in /authorize: ' + authCode);
+        auth.getTokenFromCode(authCode, tokenReceived, req, res);
+    }
+    else {
+        console.log('/authorize called without a code parameter, redirecting to login');
+        res.redirect('/');
+    }
 });
 
 function tokenReceived(req, res, error, token) {
-  if (error) {
-    console.log(error);
-    res.send(error);
-  }
-  else {
-    req.session.access_token = token.token.access_token;
-    req.session.refresh_token = token.token.refresh_token;
-    req.session.email = auth.getEmailFromToken(token.token.id_token);
-    res.redirect('/logincomplete');
-  }
+    if (error) {
+        console.log(error);
+        res.send(error);
+    }
+    else {
+        req.session.access_token = token.token.access_token;
+        req.session.refresh_token = token.token.refresh_token;
+        req.session.email = auth.getEmailFromToken(token.token.id_token);
+        res.redirect('/logincomplete');
+    }
 }
 
 app.get('/logincomplete', function(req, res) {
-  res.status(200);
-  var access_token = req.session.access_token;
-  var refresh_token = req.session.access_token;
-  var email = req.session.email;
+    res.status(200);
+    var access_token = req.session.access_token;
+    var refresh_token = req.session.access_token;
+    var email = req.session.email;
 
-  if (access_token === undefined || refresh_token === undefined) {
-    console.log('/logincomplete called while not logged in');
-    res.redirect('/');
-    return;
-  }
-  res.send(index.loginCompletePage(email));
-  //res.sendFile(path.join(__dirname, './public/user/index.html'));
+    if (access_token === undefined || refresh_token === undefined) {
+        console.log('/logincomplete called while not logged in');
+        res.redirect('/');
+        return;
+    }
+    res.send(index.loginCompletePage(email));
+    //res.sendFile(path.join(__dirname, './public/user/index.html'));
 });
 
 app.get('/logout', function(req, res) {
-  req.session.destroy();
-  res.redirect('/');
+    req.session.destroy();
+    res.redirect('/');
 });
 
 // ADMIN
 function updateAdminReservations(){
     conn.query('SELECT * FROM reservations', function(error, data){
-           io.of('/admin').emit('reservationChange', data);
+        io.of('/admin').emit('reservationChange', data);
     });
 }
 function getVehicles(){
@@ -353,7 +345,7 @@ function getSpecificReports(reservation){
 }
 function addAdmin(email){
     conn.query('INSERT INTO admins VALUES(null, ?)',[email],function(error, data){
-        
+
     });
 }
 function removeAdmin(email){
@@ -365,7 +357,7 @@ function removeAdmin(email){
 // USER
 function updateUserReservations(socketID, user){
     conn.query('SELECT * FROM reservations WHERE user = ?', [user], function(error, data){
-           socket.to(socketID).emit('reservationChange', data);
+        socket.to(socketID).emit('reservationChange', data);
     });
 }
 
@@ -391,11 +383,11 @@ function submitFeeback(reservationID, report){
     });
 
     conn.query('SELECT * FROM reservations WHERE id = ?', [reservationID], function(error, data){
-         let mailOptions = {
-          from: 'jenna_tishler@brown.edu',
-          to: 'jenna.tishler@gmail.com',
-          subject: 'Sending Email using Node.js',
-          html: '<h1>Reservation: ' + data.rows[0].id + '</h1>' + '<h2>Name: ' + data.rows[0].user + '</h2>' + '<h2>License Plate: ' + data.rows[0].license + '</h2>' + '<p>Report: ' + report + '<p>'
+        let mailOptions = {
+            from: 'jenna_tishler@brown.edu',
+            to: 'jenna.tishler@gmail.com',
+            subject: 'Sending Email using Node.js',
+            html: '<h1>Reservation: ' + data.rows[0].id + '</h1>' + '<h2>Name: ' + data.rows[0].user + '</h2>' + '<h2>License Plate: ' + data.rows[0].license + '</h2>' + '<p>Report: ' + report + '<p>'
         };
 
         // transporter.sendMail(mailOptions, function(error, info){
