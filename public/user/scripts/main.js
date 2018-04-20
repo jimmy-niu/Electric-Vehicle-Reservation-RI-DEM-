@@ -85,8 +85,17 @@ class Reservation {
         this.addToDom(this.data);
     }
     addToDom(r) {
-        let DOMobject = `hi`;
-        console.log(DOMobject);
+        let DOMobject = `;<div class="card border-success mb-3" style="width: 18rem;">
+                    <img class = "card-img-top" src="https://upload.wikimedia.org/wikipedia/commons/5/5f/DCA_Prius_1Gen_12_2011_3592.JPG" alt="prius placeholder image">
+                    <div class="card-body">
+                        <h5 class="card-title">Toyota Prius 787ZXC</h5>
+                        <p class="card-text"><b>Start</b>: ${r.start} <br>
+                            <b>End</b>: ${r.end} <br>
+                            <b>Route</b>: ${r.stops} </p>
+                        <a href="#" class="btn btn-primary edit">Edit reservation</a>
+                        <a href="#" class="btn btn-secondary" data-toggle="modal" data-target="#cancelModal">Cancel </a>
+                    </div>
+                </div>`;
         $('#cardz').append(DOMobject);
     }
 }
