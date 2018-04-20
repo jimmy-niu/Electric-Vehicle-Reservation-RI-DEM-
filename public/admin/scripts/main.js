@@ -51,30 +51,26 @@ function modifyUser() {
         }
     }
     
-    clearCertainModal();
-
-    //adminSocket.emit('modify_user', isRemove, email);
-}
-
-function clearCertainModal(){
-    console.log("potato");
     $('#adminChoice').prop('checked', false);
     $('#userChoice').prop('checked', false);
     $('#addChoice').prop('checked', false);
     $('#removeChoice').prop('checked', false);
     $('#emailField').val('');
-    console.log($('#emailField').val());
 }
 
-function removeUser(){
-    adminSocket.emit(true, email);
-}
-
-
-function addVehicle(vehicle){
-    adminSocket.emit('vehicleAdded', vehicle);
-    console.log("add vehicle");
-    console.log(vehicle);
+function addVehicle(){
+//    license TEXT, model TEXT, color TEXT, inService BOOLEAN, miles DOUBLE PRECISION, isEV BOOLEAN, extraTrunk BOOLEAN, offRoad BOOLEAN, equipRack BOOLEAN;
+    //adminSocket.emit('vehicleAdded', vehicle);
+    
+    let license = $('#licenseField').val();
+    let model = $('#modelField').val();
+    let color = $('#colorField').val();
+    let miles = $('#milesField').val();
+    let status  = $('#carStatusField').val();
+    let carType = $('#evStatusField').val();
+    let trunk = $('#extraTrunkChoice').val();
+    let offRoad = $('#modelField').val();
+    let model = $('#modelField').val();
 }
 
 function editVehicle(id, vehicle){
