@@ -28,7 +28,7 @@ $(document).ready(function() {
         console.log(vehicles);
     });
 
-    updateReservation(1, "JGH456")
+    //updateReservation(1, "JGH456")
 });
 
 function newReservation(){
