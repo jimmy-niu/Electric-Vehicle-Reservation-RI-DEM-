@@ -312,39 +312,39 @@ function updateAdminReservations(){
         io.of('/admin').emit('reservationChange', data);
     });
 }
-function getVehicles(){
+function updateVehicles(){
     conn.query('SELECT * FROM vehicles',function(error, data){
         io.of('/admin').emit('vehicleChange', data);
     });
 }
 function addVehicle(vehicle){
     conn.query('INSERT INTO vehicles VALUES(null, ?, ?, ?, ?, ?)',[vehicle.license, vehicle.model, vehicle.color, vehicle.inService, vehicle.miles],function(error, data){
-        getVehicles();
+        updateVehicles();
     });
 }
 function editVehicle(id, vehicle){
     conn.query('REPLACE INTO vehicles VALUES(?, ?, ?, ?, ?, ?)',[id, vehicle.license, vehicle.model, vehicle.color, vehicle.inService, vehicle.miles],function(error, data){
-        getVehicles();
+        updateVehicles();
     });
 }
 function removeVehicle(license){
     conn.query('DELETE FROM vehicles WHERE license = ?', [license],function(error, data){
-        getVehicles();
+        updateVehicles();
     });
 }
 function updateVehicleStatus(license, status){
     conn.query('UPDATE vehicles SET inService = ? WHERE license = ?',[status, license],function(error, data){
-        getVehicles();
+        updateVehicles();
     });
 }
-function getReports(){
+function updateReports(){
     conn.query('SELECT * FROM reports', function(error, data){
         io.of('/admin').emit('reportChange', data);
     });
 }
 function removeReports(id){
     conn.query('DELETE FROM reports WHERE id =?', [id],function(error, data){
-        getReports();
+        updateReports();
     });
 }
 function getSpecificReports(reservation){
@@ -396,7 +396,7 @@ function cancelReservation(id){
 }
 function submitFeeback(reservationID, report){
     conn.query("INSERT INTO reports VALUES(null, ?, ?)", [reservationID, report], function(error, data){
-        getReports();
+        updateReports();
     });
 
     conn.query('SELECT * FROM reservations WHERE id = ?', [reservationID], function(error, data){
