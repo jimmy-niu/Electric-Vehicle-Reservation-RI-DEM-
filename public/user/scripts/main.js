@@ -3,6 +3,7 @@ let userSocket = io.connect('http://localhost:8080/user', {forceNew: true});
 // Sets up the sockets.
 $(document).ready(function() {
     $("#submit-res").click(newReservation);
+    $("#cancel-res").click(cancelReservation);
     $("#add-stop").click(function() {addStop(); return false; });
 
     userSocket.emit('join',"Jimmy Niu", function(reservations){
@@ -29,6 +30,11 @@ $(document).ready(function() {
         console.log(vehicles);
     });
 
+    userSocket.on('user-connected', function(email){
+        console.log("ji")
+        console.log(email)
+    })
+
     //updateReservation(1, "JGH456")
 });
 
@@ -44,8 +50,14 @@ function newReservation(){
     console.log("pressed");
 
     // let user = // ???
-    let start = new Date($('#start-date').val()).toISOString().substr(0, 16).replace('T', ' ');
-    let end = new Date($('#end-date').val()).toISOString().substr(0, 16).replace('T', ' ');
+    let s = new Date($('#start-date').val());
+    let isoStart = new Date(s.getTime() - (s.getTimezoneOffset() * 60000)).toISOString();
+    let start = isoStart.substr(0, 16).replace('T', ' ');
+
+    let e = new Date($('#end-date').val());
+    let isoEnd = new Date(e.getTime() - (e.getTimezoneOffset() * 60000)).toISOString();
+    let end = isoEnd.substr(0, 16).replace('T', ' ');
+
     let stops = [];    
     $('.route-stop').each(function() {
         stops.push($(this).val());
@@ -56,10 +68,11 @@ function newReservation(){
     let offroad = $("#offroading").prop('checked');
     let rack = $('#kayak').prop('checked');
 
-    let res = new Reservation({start: start, end: end, stops: stops, needsTrunk: trunk, needsOffRoad: offroad, needsRack: rack});
+    let resData = {user: "user", start: start, end: end, stops: stops, override: false, justification: "", needsTrunk: trunk, needsOffRoad: offroad, needsRack: rack};
+    let res = new Reservation(resData);
     console.log(res);
 
-    userSocket.emit('reservation', {user: "Jimmy Niu", start: "2018-04-18 11:00", end: "2018-04-18 16:00", stops: ["home", "work"], override: true, justification: "my oranges fell into the river.", needsTrunk: false, needsOffRoad: false, needsRack: false});
+    userSocket.emit('reservation', resData);
 }
 
 function editReservation(){
@@ -72,7 +85,8 @@ function getReservations(reservations){
 }
 
 function cancelReservation(reservationID, user){
-    userSocket.emit('cancel', reservationID);
+    console.log("cancelled");
+    //userSocket.emit('cancel', reservationID);
 }
 
 function submitFeedback(){
