@@ -22,6 +22,10 @@ module.exports = {
     var html = '<a class="btn btn-outline-primary" href="' + signinUrl + '">Sign in to Outlook</a>';
     return base.replace('%body%', html);
   },
+  loginPagePassport: function() {
+    var html = '<a class="btn btn-outline-primary" href="/auth/outlook">Sign in to Outlook</a>';
+    return base.replace('%body%', html);
+  },
   loginCompletePage: function(userEmail) {
     if (userEmail ===  'dem_test_a@outlook.com') {
       var html = fs.readFileSync(path.join(__dirname, './admin/index.html'), "utf8");

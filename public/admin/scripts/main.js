@@ -1,6 +1,7 @@
 let adminSocket = io.connect('http://localhost:8080/admin', {forceNew: true});
 
 let currentReservation = 0;
+let currentVehicle = 0;
 let user_email = "test@gmail.com";
 
 function toggle_hidden(id, object){
@@ -24,12 +25,14 @@ $(document).ready(function() {
     });
     adminSocket.on('vehicleChange', function(vehicles){
         console.log(vehicles);
+        for(let i = currentVehicle; i < vehicles.rowCount; i ++){
+            new Vehicle(vehicles.rows[i]);
+            currentVehicle ++;
+        }
     });
     adminSocket.on('reportChange', function(reports){
         console.log(reports);
     });
-    //new Reservation({user:"blah", start:"blah", end:"blah", license:"blah", model:"blah"});
-    //new Vehicle({license:"dsf", model:"blah", color:"blah", license:"blah", model:"blah"});
 });
 
 
@@ -56,31 +59,33 @@ function modifyUser() {
             adminSocket.emit('userRemoved', email);
         }
     }
-    
-    clearCertainModal();
 
-    //adminSocket.emit('modify_user', isRemove, email);
-}
-
-function clearCertainModal(){
-    console.log("potato");
     $('#adminChoice').prop('checked', false);
     $('#userChoice').prop('checked', false);
     $('#addChoice').prop('checked', false);
     $('#removeChoice').prop('checked', false);
     $('#emailField').val('');
-    console.log($('#emailField').val());
 }
 
-function removeUser(){
-    adminSocket.emit(true, email);
-}
-
-
-function addVehicle(vehicle){
-    adminSocket.emit('vehicleAdded', vehicle);
-    console.log("add vehicle");
-    console.log(vehicle);
+function addVehicle(){
+//    license TEXT, model TEXT, color TEXT, inService BOOLEAN, miles DOUBLE PRECISION, isEV BOOLEAN, extraTrunk BOOLEAN, offRoad BOOLEAN, equipRack BOOLEAN;
+    //adminSocket.emit('vehicleAdded', vehicle);
+    let license = $('#licenseField').val();
+    let model = $('#modelField').val();
+    let color = $('#colorField').val();
+    let miles = $('#milesField').val();
+    let status  = ($('#carStatusField').val() === "service");
+    let carType = ($('#evStatusField').val() === 'ev');
+    let trunk = $('#extraTrunkChoice').is(':checked');
+    let offRoad = $('#offRoadChoice').is(':checked');
+    let equipmentRack = $('#equipChoice').is(':checked');
+    
+    if(license !== '' && model !== '' && color !== ''){
+        let vehicle = {license: license, model: model, color: color, miles: miles, status: status, isEv: carType, trunk: trunk, offRoad: offRoad, equipmentRack: equipmentRack};
+        
+        console.log(vehicle);
+        adminSocket.emit("vehicleAdded", vehicle);
+    }
 }
 
 function editVehicle(id, vehicle){
@@ -89,7 +94,6 @@ function editVehicle(id, vehicle){
 
 function removeVehicle(license){
     adminSocket.emit('vehicleRemoved', license);
-    console.log(license + " removed");
 }
 
 function updateVehicleStatus(license, status){

@@ -22,7 +22,7 @@ let outlook = require('node-outlook');
 let index = require('./public/index');
 let auth = require('./auth');
 var dotenv = require('dotenv').config();
-var methodOverride = require('method-override')  
+var methodOverride = require('method-override')
 var passport = require('passport')
 var util = require('util')
 var OutlookStrategy = require('passport-outlook').Strategy;
@@ -42,16 +42,15 @@ let conn = anyDB.createConnection('sqlite3://DEM.db');
 // conn.connect(function(err) {
 //   if (err) {
 //     throw err
-//   } 
+//   }
 //   console.log('You are now connected...');
 // });
 
 let engines = require('consolidate');
 app.engine('html', engines.hogan);
 app.set('views', __dirname + '/public'); // tell Express where to find templates, in this case the '/public' directory
-app.set('view engine', 'html'); //register .html extension as template engine so we can render .html pages
-app.use(express.static('public'));
-
+//app.set('view engine', 'html'); //register .html extension as template engine so we can render .html pages
+//
 app.use(cookieParser());
 app.use(session(
     { secret: 's3cr3t',
@@ -239,7 +238,7 @@ io.of('/user').on('connection', function(socket){
         } else {
             needsRack = 0;
         }
-        
+
         conn.query('SELECT license, model FROM vehicles WHERE extraTrunk >= ? AND offRoad >= ? AND equipRack >= ? AND license NOT IN (SELECT license FROM reservations WHERE start <= ? AND end >= ?) ORDER BY isEV DESC, (extraTrunk + offRoad + equipRack) ASC', [needsTrunk, needsOffRoad, needsRack, reservationInfo.end, reservationInfo.start], function(error, data){
             //console.log(data);
 
@@ -308,7 +307,7 @@ io.of('/user').on('connection', function(socket){
 
     socket.on('justification', function(reservationID, justification){
         updateJustification(justification, resrevationID);
-    });  
+    });
 
     socket.on('vehicleOverride', function(reservationID, license){
         conn.query('UPDATE reservations SET license = ? WHERE id = ?', [license, reservationID], function(error, data){
@@ -325,13 +324,40 @@ io.of('/user').on('connection', function(socket){
 
 var token = undefined;
 
-app.get('/', function(req, res) {
-    //res.status(200);
-    res.send(index.loginPage(auth.getAuthUrl()));
+app.use(passport.initialize());
+app.use(passport.session());
+
+var OUTLOOK_CLIENT_ID = "5689926f-c6a0-4d4e-82f4-19760907d166";
+var OUTLOOK_CLIENT_SECRET = "uqlACP41#%sinnKKRW495!|";
+
+passport.serializeUser(function(user, done) {
+  done(null, user);
 });
 
-app.get('/authorize', function(req, res) {
-    var authCode = req.query.code;
+passport.deserializeUser(function(obj, done) {
+  done(null, obj);
+});
+
+passport.use(new OutlookStrategy({
+    clientID: OUTLOOK_CLIENT_ID,
+    clientSecret: OUTLOOK_CLIENT_SECRET,
+    callbackURL: "http://localhost:8080/authorize"
+  },
+  function(accessToken, refreshToken, profile, done) {
+    process.nextTick(function () {
+      return done(null, profile);
+    });
+  }
+));
+
+app.get('/', function(req, res) {
+    res.send(index.loginPagePassport());
+    /*res.status(200);
+    res.send(index.loginPage(auth.getAuthUrl()));*/
+});
+
+app.get('/authorize', //function(req, res) {
+    /*var authCode = req.query.code;
     if (authCode) {
         console.log('');
         console.log('Retrieved auth code in /authorize: ' + authCode);
@@ -340,10 +366,27 @@ app.get('/authorize', function(req, res) {
     else {
         console.log('/authorize called without a code parameter, redirecting to login');
         res.redirect('/');
+    }*/
+  passport.authenticate('windowslive', { failureRedirect: '/' }),
+  function(req, res) {
+    var user_email = req.user._json.EmailAddress;
+    if (user_email === 'dem_test_a@outlook.com') {
+      app.use("/admin", express.static(__dirname + '/public/admin'));
+      res.redirect('admin/index.html');
+    } else if (user_email === 'dem_test_u@outlook.com') {
+      app.use("/user", express.static(__dirname + '/public/user'));
+      res.redirect('user/index.html');
     }
-});
+  });
 
-function tokenReceived(req, res, error, token) {
+app.get('/auth/outlook',
+  passport.authenticate('windowslive', { scope: process.env.CLIENT_SCOPES }),
+  function(req, res){
+    // The request will be redirected to Outlook for authentication, so
+    // this function will not be called.
+  });
+
+/*function tokenReceived(req, res, error, token) {
     if (error) {
         console.log(error);
         res.send(error);
@@ -354,9 +397,9 @@ function tokenReceived(req, res, error, token) {
         req.session.email = auth.getEmailFromToken(token.token.id_token);
         res.redirect('/logincomplete');
     }
-}
+}*/
 
-app.get('/logincomplete', function(req, res) {
+/*app.get('/logincomplete', function(req, res) {
     res.status(200);
     var access_token = req.session.access_token;
     var refresh_token = req.session.access_token;
@@ -367,20 +410,39 @@ app.get('/logincomplete', function(req, res) {
         return;
     }
     token = req.session.access_token;
-    if (email ===  'dem_test_a@outlook.com') {
+    if (email === 'dem_test_a@outlook.com') {
       var to_send = 'admin/index.html';
     } else if (email === 'dem_test_u@outlook.com') {
       var to_send = 'user/index.html';
     }
     res.redirect(to_send);
     //res.sendFile(path.join(__dirname, './public/user/index.html'));
-});
+});*/
 
 app.get('/logout', function(req, res) {
-    token = undefined;
+    /*token = undefined;
     req.session.destroy();
+    res.redirect('/');*/
+    req.logout();
     res.redirect('/');
 });
+
+function ensureAuthenticated(req, res, next) {
+  if (req.isAuthenticated()) { return next(); }
+  res.redirect('/');
+}
+
+app.all('*', function(req,res,next) {
+  if (req.path === '/')
+    next();
+  else
+    ensureAuthenticated(req,res,next);  
+});
+
+
+app.get('/admin/index', function (req, res) {
+  res.sendFile(path.join(__dirname + "/public/admin/index.html"));
+})
 
 // ADMIN
 function updateAdminReservations(){
@@ -395,12 +457,13 @@ function updateVehicles(){
 
 }
 function addVehicle(vehicle){
-    conn.query('INSERT INTO vehicles VALUES(null, ?, ?, ?, ?, ?)',[vehicle.license, vehicle.model, vehicle.color, vehicle.inService, vehicle.miles],function(error, data){
+    conn.query('INSERT INTO vehicles VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?, ?)',[vehicle.license, vehicle.model, vehicle.color, vehicle.status, vehicle.miles, vehicle.isEv, vehicle.trunk, vehicle.offRoad, vehicle.equipmentRack],function(error, data){
         updateVehicles();
     });
+    console.log(vehicle);
 }
 function editVehicle(id, vehicle){
-    conn.query('REPLACE INTO vehicles VALUES(?, ?, ?, ?, ?, ?)',[id, vehicle.license, vehicle.model, vehicle.color, vehicle.inService, vehicle.miles],function(error, data){
+    conn.query('REPLACE INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',[vehicle.license, vehicle.model, vehicle.color, vehicle.miles, vehicle.status, vehicle.isEv, vehicle.trunk, vehicle.offRoad, vehicle.equipmentRack],function(error, data){
         updateVehicles();
     });
 }
