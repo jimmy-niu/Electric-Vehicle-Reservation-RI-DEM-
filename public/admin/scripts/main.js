@@ -111,20 +111,38 @@ function changeUserStatus(email, admin){
     console.log(email + "set to " + admin);
 }
 
+function setJustificationModal(text){
+    $('#justificationModalText').empty();
+    $('#justificationModalText').append(text);
+    
+}
+
 // Objects
 class Reservation {
     constructor(reservationData){
         this.addToDOM(reservationData);
     }
     addToDOM(r){
+        //onclick = "setJustificationModal('${r.justification}')"
+        let justification = r.justification;
+        if(justification !== ''){
+            justification = `<a href = "#justificationModal" class = "btn btn-large btn-primary drop-shadow" data-toggle="modal" onclick = "setJustificationModal('${r.justification}')">Click To See</a>`
+        }     
+        
         let DOMobject = `<div class = "col-entry reservation-user">${r.user}</div>` +
-            `<div class = "col-entry reservation-start">${r.start}</div>` +
-            `<div class = "col-entry reservation-end">${r.start}</div>` +
-            `<div class = "col-entry reservation-license">${r.license}</div>` +
-            `<div class = "col-entry reservation-pickup">${r.model}</div>`;
+            `<div class = "col-entry reservation-start ${r.license}">${r.start}</div>` +
+            `<div class = "col-entry reservation-end ${r.license}">${r.start}</div>` +
+            `<div class = "col-entry reservation-license ${r.license}">${r.license}</div>` +
+            `<div class = "col-entry reservation-pickup ${r.license}">${justification}</div>`;
 
         $('#upcoming').append(DOMobject);
     }
+}
+
+function deleteVehicle(license){
+    adminSocket.emit("vehicleRemoved", license);
+    // This works on just deleting the vehicle dom obj btw. 
+    $('.'+license).remove();
 }
 
 class Vehicle {
@@ -136,15 +154,15 @@ class Vehicle {
         if(v.isEV){
             carType = "Electric Vehicle";
         }
-        let DOMobject = `<div class = "col-entry vehicle-license">${v.license}</div>` +
-            `<div class = "col-entry vehicle-model">${v.color} ${v.model}</div>` +
-            `<div class = "col-entry vehicle-mileage">${v.miles} miles</div>` +
-            `<div class = "col-entry vehicle-cartype">${carType}</div>` +
-            `<div class = "col-entry"><span class="dropdown">
+        let DOMobject = `<div class = "col-entry ${v.license}">${v.license}</div>` +
+            `<div class = "col-entry ${v.license}">${v.color} ${v.model}</div>` +
+            `<div class = "col-entry ${v.license}">${v.miles} miles</div>` +
+            `<div class = "col-entry ${v.license}">${carType}</div>` +
+            `<div class = "col-entry ${v.license}"><span class="dropdown">
                 <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Change Status</button>
                 <ul class="dropdown-menu">
                     <a href="#editVehicle"><li><i class="fa fa-wrench"></i> Edit Car</li></a>
-                    <a href="#"><li><i class="fa fa-archive"></i> Retire</li></a>
+                    <div onclick = 'deleteVehicle("${v.license}")'><li><i class="fa fa-archive"></i> Retire</li></div>
                 </ul>
                 </span>
             </div>`;
