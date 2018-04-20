@@ -122,8 +122,8 @@ let transporter = nodemailer.createTransport({
 //   }
 // });
 
-//conn.query('DROP TABLE vehicles');
-//conn.query('DROP TABLE reservations');
+conn.query('DROP TABLE vehicles');
+conn.query('DROP TABLE reservations');
 
 //Users
 conn.query('CREATE TABLE IF NOT EXISTS users(id INTEGER PRIMARY KEY AUTOINCREMENT, email TEXT, admin BOOLEAN)');
@@ -140,12 +140,12 @@ conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?)',["Jenna 
 conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?)',["Max Luebbers", "GHI789", "2018-04-18 11:00", "2018-04-18 15:00", ["home", "work"], false, ""]);
 conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?)',["Jimmy Niu", "GHI789", "2018-04-19 14:00", "2018-04-18 17:00", ["home", "work"], false, ""]);
 
-// conn.query('INSERT INTO vehicles VALUES(null, ?, ?, ?, ?, ?)', ["ABC123", "Chevy Volt", "Red", true, 100.0]);
-// conn.query('INSERT INTO vehicles VALUES(null, ?, ?, ?, ?, ?)', ["DEF456", "Chevy Volt", "Blue", true, 100.0]);
-// conn.query('INSERT INTO vehicles VALUES(null, ?, ?, ?, ?, ?)', ["GHI789", "Chevy Volt", "Purple", true, 100.0]);
-// conn.query('INSERT INTO vehicles VALUES(null, ?, ?, ?, ?, ?)', ["OLH985", "Chevy Volt", "Silver", true, 100.0]);
-// conn.query('INSERT INTO vehicles VALUES(null, ?, ?, ?, ?, ?)', ["VNG734", "Chevy Volt", "Green", true, 100.0]);
-// conn.query('INSERT INTO vehicles VALUES(null, ?, ?, ?, ?, ?)', ["DOL234", "Chevy Volt", "Red", true, 100.0]);
+conn.query('INSERT INTO vehicles VALUES(null, ?, ?, ?, ?, ?)', ["ABC123", "Chevy Volt", "Red", true, 100.0]);
+conn.query('INSERT INTO vehicles VALUES(null, ?, ?, ?, ?, ?)', ["DEF456", "Chevy Volt", "Blue", true, 100.0]);
+conn.query('INSERT INTO vehicles VALUES(null, ?, ?, ?, ?, ?)', ["GHI789", "Chevy Volt", "Purple", true, 100.0]);
+conn.query('INSERT INTO vehicles VALUES(null, ?, ?, ?, ?, ?)', ["OLH985", "Chevy Volt", "Silver", true, 100.0]);
+conn.query('INSERT INTO vehicles VALUES(null, ?, ?, ?, ?, ?)', ["VNG734", "Chevy Volt", "Green", true, 100.0]);
+conn.query('INSERT INTO vehicles VALUES(null, ?, ?, ?, ?, ?)', ["DOL234", "Chevy Volt", "Red", true, 100.0]);
 
 /*Sets up the server on port 8080.*/
 server.listen(8080, function(){
@@ -154,6 +154,7 @@ server.listen(8080, function(){
 
 //handles events when an admin user is connected
 io.of('/admin').on('connection', function(socket){
+    updateAdminReservations();
     socket.on('vehicleAdded', function(vehicle){
         addVehicle(vehicle);
     });
@@ -324,6 +325,7 @@ function updateVehicles(){
     conn.query('SELECT * FROM vehicles',function(error, data){
         io.of('/admin').emit('vehicleChange', data);
     });
+
 }
 function addVehicle(vehicle){
     conn.query('INSERT INTO vehicles VALUES(null, ?, ?, ?, ?, ?)',[vehicle.license, vehicle.model, vehicle.color, vehicle.inService, vehicle.miles],function(error, data){
