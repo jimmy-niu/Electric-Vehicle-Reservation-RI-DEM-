@@ -50,10 +50,13 @@ function newReservation(){
     $('.route-stop').each(function() {
         stops.push($(this).val());
     })
-    // let override =   // not yet implemented
-    // let justification =      // ditto
+    // let override =
+    // let justification =
+    let trunk = $("#trunk").prop('checked');
+    let offroad = $("#offroading").prop('checked');
+    let rack = $('#kayak').prop('checked');
 
-    let res = new Reservation({start: start, end: end, stops: stops});
+    let res = new Reservation({start: start, end: end, stops: stops, needsTrunk: trunk, needsOffRoad: offroad, needsRack: rack});
     console.log(res);
 
     userSocket.emit('reservation', {user: "Jimmy Niu", start: "2018-04-18 11:00", end: "2018-04-18 16:00", stops: ["home", "work"], override: true, justification: "my oranges fell into the river.", needsTrunk: false, needsOffRoad: false, needsRack: false});
