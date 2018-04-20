@@ -177,6 +177,7 @@ server.listen(8080, function(){
 //handles events when an admin user is connected
 io.of('/admin').on('connection', function(socket){
     updateAdminReservations();
+    updateVehicles();
     socket.on('vehicleAdded', function(vehicle){
         addVehicle(vehicle);
     });

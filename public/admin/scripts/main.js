@@ -122,7 +122,6 @@ class Reservation {
             `<div class = "col-entry reservation-end">${r.start}</div>` +
             `<div class = "col-entry reservation-license">${r.license}</div>` +
             `<div class = "col-entry reservation-pickup">${r.model}</div>`;
-        console.log(DOMobject);
 
         $('#upcoming').append(DOMobject);
     }
@@ -133,14 +132,18 @@ class Vehicle {
         this.addToDOM(vehicleData);
     }
     addToDOM(v){
+        let carType = "Gas";
+        if(v.isEV){
+            carType = "Electric Vehicle";
+        }
         let DOMobject = `<div class = "col-entry vehicle-license">${v.license}</div>` +
             `<div class = "col-entry vehicle-model">${v.color} ${v.model}</div>` +
-            `<div class = "col-entry vehicle-mileage">${v.mileage}</div>` +
-            `<div class = "col-entry vehicle-service">${v.inService}</div>` +
+            `<div class = "col-entry vehicle-mileage">${v.miles} miles</div>` +
+            `<div class = "col-entry vehicle-cartype">${carType}</div>` +
             `<div class = "col-entry"><span class="dropdown">
                 <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Change Status</button>
                 <ul class="dropdown-menu">
-                    <a href="#"><li><i class="fa fa-wrench"></i> Service</li></a>
+                    <a href="#editVehicle"><li><i class="fa fa-wrench"></i> Edit Car</li></a>
                     <a href="#"><li><i class="fa fa-archive"></i> Retire</li></a>
                 </ul>
                 </span>

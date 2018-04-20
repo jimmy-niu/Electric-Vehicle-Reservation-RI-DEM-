@@ -37,56 +37,6 @@
     <div style = "padding: 1vh 2vw 1vh 2vw;">
         <div class = "Nav-Buttons">
             <a href = "./fleet.html"><div class = "button drop-shadow">Manage Fleet</div></a>
-            <a href = "#addVehicleModal" class = "btn btn-large btn-primary drop-shadow" data-toggle="modal">Add Vehicle</a>
-
-            <div id="addVehicleModal" class="modal fade">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h3>Add Vehicle</h3>
-                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                        </div>
-                        <div class="modal-body">
-
-                            <form>
-                                <h5>Car Specifications:</h5>
-                                License: <input type = "text" id = "licenseField"> <br> <br>
-                                Model: <input type = "text" id = "modelField"> <br> <br>
-                                Color: <input type = "text" id = "colorField"> 
-                                <br> <br>
-                                Miles on Car: <input type = "number" id = "milesField" value = 0>
-                                <hr>
-                                
-                                
-                                <h5>Car Capabilities:</h5>
-                                Car Status:  <select id="carStatusField">
-                                <option value="ready">Ready</option>
-                                <option value="service">Service</option>
-                                </select> 
-                                <br> <br>
-                                Car Type: <select id="evStatusField">
-                                <option value="ev">Electric / Hybrid</option>
-                                <option value="gas">Gas</option>
-                                </select> 
-                                <br> <br>
-                                Extra Trunk Space: <input type = "checkbox" id="extraTrunkChoice">
-                                <br> <br>
-                                Off Road Capable: <input type = "checkbox" id="offRoadChoice">
-                                <br> <br>
-                                Equipment Rack: <input type = "checkbox" id="equipChoice">
-                            </form>
-
-                        </div>
-
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-
-                            <button type="button" class="btn btn-primary" data-dismiss="modal" aria-hidden="true" onclick = 'addVehicle();'>Submit</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
 
             <a href = "#modifyUserModal" class = "btn btn-large btn-primary drop-shadow" data-toggle="modal">Add/Remove User</a>
 
