@@ -30,6 +30,11 @@ $(document).ready(function() {
         console.log(vehicles);
     });
 
+    userSocket.on('user-connected', function(email){
+        console.log("ji")
+        console.log(email)
+    })
+
     //updateReservation(1, "JGH456")
 });
 
