@@ -157,11 +157,6 @@ server.listen(8080, function(){
 io.of('/admin').on('connection', function(socket){
     updateAdminReservations();
     updateVehicles();
-
-    socket.on('updatePage'), function(){
-        updateAdminReservations();
-        updateVehicles();
-    }
     
     socket.on('vehicleAdded', function(vehicle){
         addVehicle(vehicle);
