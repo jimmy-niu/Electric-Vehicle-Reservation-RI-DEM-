@@ -23,8 +23,8 @@ $(document).ready(function() {
     adminSocket.on('reportChange', function(reports){
         console.log(reports);
     });
-    //addUser("blahBlahbalh", true);
-    removeUser("blahBlahbalh");
+    new Reservation({user:"blah", start:"blah", end:"blah", license:"blah", model:"blah"});
+    new Reservation({user:"hi", start:"blah", end:"blah", license:"blah", model:"blah"});
 });
 
 
@@ -64,4 +64,21 @@ function changeUserStatus(email, admin){
 function removeUser(email){
     adminSocket.emit('userRemoved', email);
     console.log(email + " removed from user list");
+}
+
+// Objects
+class Reservation {
+    constructor(reservationData){
+        this.data = reservationData;
+        this.addToDOM(this.data);
+    }
+    addToDOM(r){
+        let DOMobject = `<div class = "col-entry reservation-user">${r.user}</div>` +
+            `<div class = "col-entry reservation-start">${r.start}</div>` +
+            `<div class = "col-entry reservation-end">${r.start}</div>` +
+            `<div class = "col-entry reservation-license">${r.license}</div>` +
+            `<div class = "col-entry reservation-pickup">${r.model}</div>`;
+            console.log(DOMobject);
+        $('#upcoming').append(DOMobject);
+    }
 }
