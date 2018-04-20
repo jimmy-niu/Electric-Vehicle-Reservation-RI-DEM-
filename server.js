@@ -176,7 +176,9 @@ server.listen(8080, function(){
 
 //handles events when an admin user is connected
 io.of('/admin').on('connection', function(socket){
-    updateAdminReservations();
+    socket.on('admin-connected', function(user_email) {
+      console.log('Admin ' + user_email + ' connected.');
+    });
     socket.on('vehicleAdded', function(vehicle){
         addVehicle(vehicle);
     });
@@ -372,9 +374,11 @@ app.get('/authorize', //function(req, res) {
     var user_email = req.user._json.EmailAddress;
     if (user_email === 'dem_test_a@outlook.com') {
       app.use("/admin", express.static(__dirname + '/public/admin'));
+      io.of('/admin').emit('admin-connected', user_email);
       res.redirect('admin/index.html');
     } else if (user_email === 'dem_test_u@outlook.com') {
       app.use("/user", express.static(__dirname + '/public/user'));
+      io.of('/user').emit('user-connected', user_email);
       res.redirect('user/index.html');
     }
   });
@@ -382,10 +386,13 @@ app.get('/authorize', //function(req, res) {
 app.get('/auth/outlook',
   passport.authenticate('windowslive', { scope: process.env.CLIENT_SCOPES }),
   function(req, res){
-    // The request will be redirected to Outlook for authentication, so
-    // this function will not be called.
   });
 
+app.get('admin/index', function(req, res) {
+    res.send(index.loginPagePassport());
+    /*res.status(200);
+    res.send(index.loginPage(auth.getAuthUrl()));*/
+});
 /*function tokenReceived(req, res, error, token) {
     if (error) {
         console.log(error);
@@ -423,8 +430,16 @@ app.get('/logout', function(req, res) {
     /*token = undefined;
     req.session.destroy();
     res.redirect('/');*/
+    var user_email = req.user._json.EmailAddress;
+    if (user_email === 'dem_test_a@outlook.com') {
+      socket.emit('admin-disconnected', user_email);
+    } else if (user_email === 'dem_test_u@outlook.com') {
+      socket.emit('user-disconnected', user_email);
+    }
     req.logout();
-    res.redirect('/');
+    req.session.destroy(function (err) {
+      res.redirect('/');
+    });
 });
 
 function ensureAuthenticated(req, res, next) {
