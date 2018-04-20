@@ -338,7 +338,6 @@ app.get('/authorize', //function(req, res) {
       //res.render('admin/index.html', {user : user_email});
       //res.redirect('admin/index/?email=' + encodeURIComponent(user_email));
       io.of('/admin').emit('admin-connected', user_email);
->>>>>>> 815c0e2f3c2a944a532002701dee7d7c82531cb4
     } else if (user_email === 'dem_test_u@outlook.com' || user_email === 'dem_test_u_2@outlook.com') {
         app.use("/user", express.static(__dirname + '/public/user'));
         io.sockets.emit('user-connected', user_email);
