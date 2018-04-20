@@ -31,15 +31,15 @@ let anyDB = require('any-db');
 let conn = anyDB.createConnection('sqlite3://DEM.db');
 
 let engines = require('consolidate');
-app.engine('html', engines.hogan);
+app.engine('html', require('hogan-express'));
 app.set('views', __dirname + '/public'); // tell Express where to find templates, in this case the '/public' directory
-//app.set('view engine', 'html'); //register .html extension as template engine so we can render .html pages
+app.set('view engine', 'html'); //register .html extension as template engine so we can render .html pages
 //
 app.use(cookieParser());
 app.use(session(
     { secret: 's3cr3t',
      resave: false,
-     saveUninitialized: false
+     saveUninitialized: true
     })
 );
 
@@ -160,9 +160,9 @@ server.listen(8080, function(){
 
 //handles events when an admin user is connected
 io.of('/admin').on('connection', function(socket){
-    socket.on('admin-connected', function(user_email) {
-      console.log('Admin ' + user_email + ' connected.');
-    });
+    updateAdminReservations();
+    updateVehicles();
+
     socket.on('vehicleAdded', function(vehicle){
         addVehicle(vehicle);
     });
@@ -334,8 +334,10 @@ app.get('/authorize', //function(req, res) {
     var user_email = req.user._json.EmailAddress;
     if (user_email === 'dem_test_a@outlook.com') {
       app.use("/admin", express.static(__dirname + '/public/admin'));
-      io.of('/admin').emit('admin-connected', user_email);
       res.redirect('admin/index.html');
+      //res.render('admin/index.html', {user : user_email});
+      //res.redirect('admin/index/?email=' + encodeURIComponent(user_email));
+      io.of('/admin').emit('admin-connected', user_email);
     } else if (user_email === 'dem_test_u@outlook.com' || user_email === 'dem_test_u_2@outlook.com') {
       app.use("/user", express.static(__dirname + '/public/user'));
       io.sockets.emit('user-connected', user_email);
@@ -343,16 +345,17 @@ app.get('/authorize', //function(req, res) {
     }
   });
 
+app.post('admin/index', 
+  function(req, res) {
+    console.log(decodeURIComponent(req.query.email));
+    res.render('admin/index.html', {user : decodeURIComponent(req.query.email)});
+  });
+
 app.get('/auth/outlook',
   passport.authenticate('windowslive', { scope: process.env.CLIENT_SCOPES }),
   function(req, res){
   });
 
-app.get('admin/index', function(req, res) {
-    res.send(index.loginPagePassport());
-    /*res.status(200);
-    res.send(index.loginPage(auth.getAuthUrl()));*/
-});
 /*function tokenReceived(req, res, error, token) {
     if (error) {
         console.log(error);
@@ -391,11 +394,6 @@ app.get('/logout', function(req, res) {
     req.session.destroy();
     res.redirect('/');*/
     var user_email = req.user._json.EmailAddress;
-    if (user_email === 'dem_test_a@outlook.com') {
-      socket.emit('admin-disconnected', user_email);
-    } else if (user_email === 'dem_test_u@outlook.com') {
-      socket.emit('user-disconnected', user_email);
-    }
     req.logout();
     req.session.destroy(function (err) {
       res.redirect('/');
