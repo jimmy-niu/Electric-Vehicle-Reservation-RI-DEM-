@@ -107,10 +107,7 @@ class Reservation {
         $('.cards').append(DOMobject);
     }
 }
-function submitJustification(reservationID, justification){
-    userSocket.emit('justification', reservationID, justification);
-}
 
-function overrideVehicle(reservationID, license){
-    userSocket.emit('vehicleOverride', reservationID, license);
+function overrideVehicle(reservationID, license, justification){
+    userSocket.emit('vehicleOverride', reservationID, license, justification);
 }
