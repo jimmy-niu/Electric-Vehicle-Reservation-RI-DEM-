@@ -22,7 +22,7 @@ $(document).ready(function() {
 
 function newReservation(){
     console.log("pressed");
-    userSocket.emit('reservation', {user: "Jimmy Niu", start: "2018-04-18 11:00", end: "2018-04-18 16:00", stops: ["home", "work"], override: true, justification: "my oranges fell into the river."});
+    userSocket.emit('reservation', {user: "Jimmy Niu", start: "2018-04-18 11:00", end: "2018-04-18 16:00", stops: ["home", "work"], override: true, justification: "my oranges fell into the river.", needsTrunk: false, needsOffRoad: false, needsRack: false});
 }
 
 function editReservation(){
@@ -40,4 +40,8 @@ function cancelReservation(reservationID, user){
 
 function submitFeedback(){
     userSocket.emit('reportAdded', reservationID, report);
+}
+
+function submitJustification(reservationID, justification){
+    userSocket.emit('justification', reservationID, justification);
 }
