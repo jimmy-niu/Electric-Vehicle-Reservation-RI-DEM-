@@ -367,7 +367,7 @@ app.get('/logincomplete', function(req, res) {
         return;
     }
     token = req.session.access_token;
-    if (email ===  'dem_test_a@outlook.com') {
+    if (email === 'dem_test_a@outlook.com') {
       var to_send = 'admin/index.html';
     } else if (email === 'dem_test_u@outlook.com') {
       var to_send = 'user/index.html';
