@@ -6,7 +6,6 @@ let nodemailer = require('nodemailer');
 let server = http.createServer(app);
 
 let io = require('socket.io')(server, {wsEngine: 'ws'}); //fix Windows10 issue
-//TO-DO change before handin!
 io.listen(server);
 
 let bodyParser = require('body-parser');
@@ -41,11 +40,12 @@ app.use(session(
      resave: false,
      saveUninitialized: true
     })
-       );
+  );
 
-/*app.get('/addevent', function(req, res) {
-    var access_token = req.session.access_token;
-    var newEvent = {
+
+// ADD EVENT EXAMPLE
+// 
+/*  var newEvent = {
         "Subject": "Test event",
         "Body": {
             "ContentType": "HTML",
@@ -86,21 +86,16 @@ app.use(session(
     });
 });*/
 
-// RESERVATION OBJECT FORMAT
+/*email sender (will eventually change to a different email)
+you can use your email and password to test
+var transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: 'jenna_tishler@brown.edu',
+    pass: ''
+  }
+}); */
 
-
-// app.set('view engine', 'pug');
-// app.use(express.static('public'));
-
-//email sender (will eventually change to a different email)
-//you can use your email and password to test
-// var transporter = nodemailer.createTransport({
-//   service: 'gmail',
-//   auth: {
-//     user: 'jenna_tishler@brown.edu',
-//     pass: ''
-//   }
-// });
 let transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
@@ -109,21 +104,21 @@ let transporter = nodemailer.createTransport({
     }
 });
 
-//example of how to send email
-// let mailOptions = {
-//   from: 'jenna_tishler@brown.edu',
-//   to: 'jenna.tishler@gmail.com',
-//   subject: 'Sending Email using Node.js',
-//   text: 'That was easy!'
-// };
+/* example of how to send email
+let mailOptions = {
+  from: 'jenna_tishler@brown.edu',
+  to: 'jenna.tishler@gmail.com',
+  subject: 'Sending Email using Node.js',
+  text: 'That was easy!'
+};
 
-// transporter.sendMail(mailOptions, function(error, info){
-//   if (error) {
-//     console.log(error);
-//   } else {
-//     console.log('Email sent: ' + info.response);
-//   }
-// });
+transporter.sendMail(mailOptions, function(error, info){
+  if (error) {
+    console.log(error);
+  } else {
+    console.log('Email sent: ' + info.response);
+  }
+}); */
 
 
 //conn.query('DROP TABLE vehicles');
@@ -314,23 +309,11 @@ passport.use(new OutlookStrategy({
 
 app.get('/', function(req, res) {
     res.send(index.loginPagePassport());
-    /*res.status(200);
-    res.send(index.loginPage(auth.getAuthUrl()));*/
 });
 
-app.get('/authorize', //function(req, res) {
-        /*var authCode = req.query.code;
-    if (authCode) {
-        console.log('');
-        console.log('Retrieved auth code in /authorize: ' + authCode);
-        auth.getTokenFromCode(authCode, tokenReceived, req, res);
-    }
-    else {
-        console.log('/authorize called without a code parameter, redirecting to login');
-        res.redirect('/');
-    }*/
-        passport.authenticate('windowslive', { failureRedirect: '/' }),
-        function(req, res) {
+app.get('/authorize',
+  passport.authenticate('windowslive', { failureRedirect: '/' }),
+  function(req, res) {
     var user_email = req.user._json.EmailAddress;
     if (user_email === 'dem_test_a@outlook.com') {
       app.use("/admin", express.static(__dirname + '/public/admin'));
@@ -356,43 +339,7 @@ app.get('/auth/outlook',
         function(req, res){
 });
 
-/*function tokenReceived(req, res, error, token) {
-    if (error) {
-        console.log(error);
-        res.send(error);
-    }
-    else {
-        req.session.access_token = token.token.access_token;
-        req.session.refresh_token = token.token.refresh_token;
-        req.session.email = auth.getEmailFromToken(token.token.id_token);
-        res.redirect('/logincomplete');
-    }
-}*/
-
-/*app.get('/logincomplete', function(req, res) {
-    res.status(200);
-    var access_token = req.session.access_token;
-    var refresh_token = req.session.access_token;
-    var email = req.session.email;
-    if (access_token === undefined || refresh_token === undefined) {
-        console.log('/logincomplete called while not logged in');
-        res.redirect('/');
-        return;
-    }
-    token = req.session.access_token;
-    if (email === 'dem_test_a@outlook.com') {
-      var to_send = 'admin/index.html';
-    } else if (email === 'dem_test_u@outlook.com') {
-      var to_send = 'user/index.html';
-    }
-    res.redirect(to_send);
-    //res.sendFile(path.join(__dirname, './public/user/index.html'));
-});*/
-
 app.get('/logout', function(req, res) {
-    /*token = undefined;
-    req.session.destroy();
-    res.redirect('/');*/
     if(req.user !== undefined){
         var user_email = req.user._json.EmailAddress;
         if (user_email === 'dem_test_a@outlook.com') {
@@ -463,7 +410,7 @@ function updateReports(){
     });
 }
 function removeReports(id){
-    conn.query('DELETE FROM reports WHERE id =?', [id],function(error, data){
+    conn.query('DELETE FROM reports WHERE id =?', [id], function(error, data){
         updateReports();
     });
 }
@@ -514,13 +461,5 @@ function submitFeedback(reservationID, report){
             subject: 'Sending Email using Node.js',
             html: '<h1>Reservation: ' + data.rows[0].id + '</h1>' + '<h2>Name: ' + data.rows[0].user + '</h2>' + '<h2>License Plate: ' + data.rows[0].license + '</h2>' + '<p>Report: ' + report + '<p>'
         };
-
-        // transporter.sendMail(mailOptions, function(error, info){
-        //   if (error) {
-        //     console.log(error);
-        //   } else {
-        //     console.log('Email sent: ' + info.response);
-        //   }
-        // });
     });
 }
