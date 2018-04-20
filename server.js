@@ -22,6 +22,10 @@ let outlook = require('node-outlook');
 let index = require('./public/index');
 let auth = require('./auth');
 var dotenv = require('dotenv').config();
+var methodOverride = require('method-override')  
+var passport = require('passport')
+var util = require('util')
+var OutlookStrategy = require('passport-outlook').Strategy;
 
 let anyDB = require('any-db');
 let conn = anyDB.createConnection('sqlite3://DEM.db');
@@ -46,7 +50,7 @@ let engines = require('consolidate');
 app.engine('html', engines.hogan);
 app.set('views', __dirname + '/public'); // tell Express where to find templates, in this case the '/public' directory
 app.set('view engine', 'html'); //register .html extension as template engine so we can render .html pages
-app.use(express.static(__dirname + '/public'));
+app.use(express.static('public'));
 
 app.use(cookieParser());
 app.use(session(
@@ -56,7 +60,7 @@ app.use(session(
     })
 );
 
-app.get('/addevent', function(req, res) {
+/*app.get('/addevent', function(req, res) {
     var access_token = req.session.access_token;
     var newEvent = {
         "Subject": "Test event",
@@ -97,7 +101,7 @@ app.get('/addevent', function(req, res) {
             res.redirect('/sync');
         }
     });
-});
+});*/
 
 // RESERVATION OBJECT FORMAT
 
@@ -318,8 +322,11 @@ io.of('/user').on('connection', function(socket){
 /**
  * Sets up the landing page to index.html.
  */
+
+var token = undefined;
+
 app.get('/', function(req, res) {
-    res.status(200);
+    //res.status(200);
     res.send(index.loginPage(auth.getAuthUrl()));
 });
 
@@ -354,22 +361,23 @@ app.get('/logincomplete', function(req, res) {
     var access_token = req.session.access_token;
     var refresh_token = req.session.access_token;
     var email = req.session.email;
-
     if (access_token === undefined || refresh_token === undefined) {
         console.log('/logincomplete called while not logged in');
         res.redirect('/');
         return;
     }
+    token = req.session.access_token;
     if (email ===  'dem_test_a@outlook.com') {
-      var to_send = path.join(__dirname, './public/admin/index.html');
+      var to_send = 'admin/index.html';
     } else if (email === 'dem_test_u@outlook.com') {
-      var to_send = path.join(__dirname, './public/user/index.html');
+      var to_send = 'user/index.html';
     }
-    res.sendFile(to_send);
+    res.redirect(to_send);
     //res.sendFile(path.join(__dirname, './public/user/index.html'));
 });
 
 app.get('/logout', function(req, res) {
+    token = undefined;
     req.session.destroy();
     res.redirect('/');
 });
