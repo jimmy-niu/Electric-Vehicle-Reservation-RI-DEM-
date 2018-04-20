@@ -155,7 +155,7 @@ conn.query('CREATE TABLE IF NOT EXISTS reports(id INTEGER PRIMARY KEY AUTOINCREM
 conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?)',["Jenna Tishler", "ABC123", "2018-04-18 11:00", "2018-04-18 15:00", ["home", "work"], false, ""]);
 conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?)',["Jenna Tishler", "DEF456", "2018-04-19 11:00", "2018-04-20 11:00", ["home", "work"], false, ""]);
 conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?)',["Max Luebbers", "GHI789", "2018-04-18 11:00", "2018-04-18 15:00", ["home", "work"], false, ""]);
-conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?)',["Emily Kasbohm", "GHI789", "2018-04-19 14:00", "2018-04-18 17:00", ["home", "work"], false, ""]);
+conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?)',["Jimmy Niu", "GHI789", "2018-04-19 14:00", "2018-04-18 17:00", ["home", "work"], false, ""]);
 
 conn.query('INSERT INTO vehicles VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?, ?)', ["ABC123", "Chevy Volt", "Red", true, 100.0, true, true, false, false]);
 conn.query('INSERT INTO vehicles VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?, ?)', ["DEF456", "Chevy Volt", "Blue", true, 100.0, true, true, false, false]);
@@ -242,7 +242,7 @@ io.of('/user').on('connection', function(socket){
 
             conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?)',[reservationInfo.user, data.rows[0].license, reservationInfo.start, reservationInfo.end, reservationInfo.stops, reservationInfo.override, reservationInfo.justification],function(error, data){
                 console.log("added to table");
-                conn.query('SELECT * FROM reservations WHERE user = ?', [reservationInfo.user], function(error, data){
+                conn.query('SELECT * FROM reservations WHERE user = ? ORDER BY start', [reservationInfo.user], function(error, data){
                      //make sure only emitting to one user
                     socket.emit('reservationChange', data);
                     console.log("sending to user");
