@@ -30,22 +30,6 @@ var OutlookStrategy = require('passport-outlook').Strategy;
 let anyDB = require('any-db');
 let conn = anyDB.createConnection('sqlite3://DEM.db');
 
-// var mysql = require('mysql');
-// var conn = mysql.createConnection({
-//   host: 'localhost',
-//   user: 'root',
-//   password: 'password',
-//   database: 'dem',
-//   port: '8080'
-// });
-
-// conn.connect(function(err) {
-//   if (err) {
-//     throw err
-//   }
-//   console.log('You are now connected...');
-// });
-
 let engines = require('consolidate');
 app.engine('html', engines.hogan);
 app.set('views', __dirname + '/public'); // tell Express where to find templates, in this case the '/public' directory
@@ -152,15 +136,15 @@ conn.query('CREATE TABLE IF NOT EXISTS users(id INTEGER PRIMARY KEY AUTOINCREMEN
 //Resevervations
 conn.query('CREATE TABLE IF NOT EXISTS vehicles(id INTEGER PRIMARY KEY AUTOINCREMENT, license TEXT, model TEXT, color TEXT, inService BOOLEAN, miles DOUBLE PRECISION, isEV BOOLEAN, extraTrunk BOOLEAN, offRoad BOOLEAN, equipRack BOOLEAN)');
 //Vehicles
-conn.query('CREATE TABLE IF NOT EXISTS reservations(id INTEGER PRIMARY KEY AUTOINCREMENT, user TEXT, license TEXT, start TEXT, end TEXT, stops TEXT, override BOOLEAN, justification TEXT)');
+conn.query('CREATE TABLE IF NOT EXISTS reservations(id INTEGER PRIMARY KEY AUTOINCREMENT, user TEXT, license TEXT, model TEXT, start TEXT, end TEXT, stops TEXT, override BOOLEAN, justification TEXT)');
 //Reports
 conn.query('CREATE TABLE IF NOT EXISTS reports(id INTEGER PRIMARY KEY AUTOINCREMENT, reservation INTEGER, report TEXT)');
 
 //test data
-conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?)',["Jenna Tishler", "ABC123", "2018-04-18 11:00", "2018-04-18 15:00", ["home", "work"], false, ""]);
-conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?)',["Jenna Tishler", "DEF456", "2018-04-19 11:00", "2018-04-20 11:00", ["home", "work"], false, ""]);
-conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?)',["Max Luebbers", "GHI789", "2018-04-18 11:00", "2018-04-18 15:00", ["home", "work"], false, ""]);
-conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?)',["Jimmy Niu", "GHI789", "2018-04-19 14:00", "2018-04-18 17:00", ["home", "work"], false, ""]);
+conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?)',["Jenna Tishler", "ABC123", "Chevy Volt", "2018-04-18 11:00", "2018-04-18 15:00", ["home", "work"], false, ""]);
+conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?)',["Jenna Tishler", "DEF456", "Chevy Volt", "2018-04-19 11:00", "2018-04-20 11:00", ["home", "work"], false, ""]);
+conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?)',["Max Luebbers", "GHI789", "Chevy Volt", "2018-04-18 11:00", "2018-04-18 15:00", ["home", "work"], false, ""]);
+conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?)',["Jimmy Niu", "GHI789", "Chevy Volt", "2018-04-19 14:00", "2018-04-18 17:00", ["home", "work"], false, ""]);
 
 conn.query('INSERT INTO vehicles VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?, ?)', ["ABC123", "Chevy Volt", "Red", true, 100.0, true, true, false, false]);
 conn.query('INSERT INTO vehicles VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?, ?)', ["DEF456", "Chevy Volt", "Blue", true, 100.0, true, true, false, false]);
@@ -211,10 +195,6 @@ io.of('/user').on('connection', function(socket){
         conn.query('SELECT * FROM reservations WHERE user = ? ORDER BY start DESC', [user], function(error, data){
             callback(data);
         });
-
-        conn.query('SELECT * FROM vehicles', function(error, data){
-            console.log(data);
-        });
     });
     //emitted when a user makes a new reservation
     socket.on('reservation', function(reservationInfo){
@@ -242,43 +222,23 @@ io.of('/user').on('connection', function(socket){
         }
 
         conn.query('SELECT license, model FROM vehicles WHERE extraTrunk >= ? AND offRoad >= ? AND equipRack >= ? AND license NOT IN (SELECT license FROM reservations WHERE start <= ? AND end >= ?) ORDER BY isEV DESC, (extraTrunk + offRoad + equipRack) ASC', [needsTrunk, needsOffRoad, needsRack, reservationInfo.end, reservationInfo.start], function(error, data){
-            //console.log(data);
+            socket.emit('alternateVehicles', data);
 
-            // createReservation(reservationInfo.user, data.rows[0].license,
-            // reservationInfo.start, reservationInfo.end, reservationInfo.stops, reservationInfo.override,
-            // reservationInfo.justification);
-
-            conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?)',[reservationInfo.user, data.rows[0].license, reservationInfo.start, reservationInfo.end, reservationInfo.stops, reservationInfo.override, reservationInfo.justification],function(error, data){
+            conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?)',[reservationInfo.user, data.rows[0].license, data.rows[0].model, reservationInfo.start, reservationInfo.end, reservationInfo.stops, reservationInfo.override, reservationInfo.justification],function(error, data){
                 console.log(data);
                 conn.query('SELECT * FROM reservations WHERE id = ?', [data.lastInsertId], function(error, data){
-                     //make sure only emitting to one user
                     socket.emit('newReservation', data);
+                    io.of('/admin').emit('reservationChange', data);
                     console.log("sending to user");
                 });
-
-                conn.query('SELECT * FROM reservations', function(error, data){
-                    console.log("sending to admin")
-                   io.of('/admin').emit('reservationChange', data);
-                });
             });
-
-        // conn.query('SELECT * FROM reservations WHERE user = ?', [reservationInfo.user], function(error, data){
-        //      //make sure only emitting to one user
-        //     socket.emit('reservationChange', data);
-        //     console.log("sending to user");
-        // });
-
-        // conn.query('SELECT * FROM reservations', function(error, data){
-        //     console.log("sending to admin")
-        //    io.of('/admin').emit('reservationChange', data);
-        // });
         });
     });
 
-    socket.on('edit', function(reservationID, user, license, start, end, stops, override, justification){
-        editReservation(reservationID)
+    socket.on('edit', function(reservationID, reservationInfo){
+        editReservation(reservationID, reservationInfo.user, reservationInfo.start, reservationInfo.end, reservationInfo.stops, reservationInfo.justification)
 
-        conn.query('SELECT * FROM reservations WHERE user = ?', [user], function(error, data){
+        conn.query('SELECT * FROM reservations WHERE user = ?', [reservationInfo.user], function(error, data){
             socket.emit('reservationChange', data);
         });
 
@@ -300,21 +260,21 @@ io.of('/user').on('connection', function(socket){
     });
 
     socket.on('feedback', function(reservationID, report){
-        submitFeeback(resrevationID, resport);
+        submitFeedback(reservationID, resport);
 
         conn.query('SELECT * FROM reports', function(error, data){
             io.of('/admin').emit('reportAdded', data);
         });
     });
 
-    socket.on('justification', function(reservationID, justification){
-        updateJustification(justification, resrevationID);
-    });
-
-    socket.on('vehicleOverride', function(reservationID, license){
-        conn.query('UPDATE reservations SET license = ? WHERE id = ?', [license, reservationID], function(error, data){
+    socket.on('vehicleOverride', function(reservationID, license, model, justification){
+        conn.query('UPDATE reservations SET license = ?, model = ?, override = ?, justification = ? WHERE id = ?', [license, model, true, justification, reservationID], function(error, data){
             conn.query('SELECT * FROM reservations WHERE id = ?', [reservationID], function(error, data){
                 socket.emit('reservationOverride', data);
+            });
+
+            conn.query('SELECT * FROM reservations', function(error, data){
+                io.of('/admin').emit('reservationChange', data);
             });
         });
     });
@@ -527,20 +487,8 @@ function removeUser(email){
 }
 
 // USER
-function updateUserReservations(socketID, user){
-    conn.query('SELECT * FROM reservations WHERE user = ?', [user], function(error, data){
-        socket.to(socketID).emit('reservationChange', data);
-    });
-}
-
-// function createReservation(user, license, start, end, stops, override, justification){
-//     conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?)',[user, license, start, end, stops, override, justification],function(error, data){
-//         console.log("added to table");
-//     });
-// }
-
-function editReservation(id, user, license, start, end, stops, override, justification){
-    conn.query('UPDATE reservations SET license = ?, start = ?, end = ?, stops = ?, override = ?, justification = ? WHERE reservationID = ?', [license, start, end, stops, override, justification, id], function(error, data){
+function editReservation(id, start, end, stops, justification){
+    conn.query('UPDATE reservations SET start = ?, end = ?, stops = ?, justification = ? WHERE reservationID = ?', [license, start, end, stops, override, justification, id], function(error, data){
 
     });
 }
@@ -549,7 +497,7 @@ function cancelReservation(id){
         console.log('cancelled');
     });
 }
-function submitFeeback(reservationID, report){
+function submitFeedback(reservationID, report){
     conn.query("INSERT INTO reports VALUES(null, ?, ?)", [reservationID, report], function(error, data){
         updateReports();
     });
@@ -569,13 +517,5 @@ function submitFeeback(reservationID, report){
         //     console.log('Email sent: ' + info.response);
         //   }
         // });
-    });
-
-    //console.log(reservationData);
-}
-
-function updateJustification(text, id){
-    conn.query('UPDATE reservations SET justification = ?, override = ? WHERE id = ?', [text, true, id], function(error, data){
-
     });
 }
