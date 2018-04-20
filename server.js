@@ -200,7 +200,7 @@ io.of('/admin').on('connection', function(socket){
 //handles events when a regular user is connnected
 io.of('/user').on('connection', function(socket){
     socket.on('join', function(user, callback){
-        conn.query('SELECT * FROM reservations WHERE user = ?', [user], function(error, data){
+        conn.query('SELECT * FROM reservations WHERE user = ? ORDER BY start DESC', [user], function(error, data){
             callback(data);
         });
 
@@ -241,10 +241,10 @@ io.of('/user').on('connection', function(socket){
             // reservationInfo.justification);
 
             conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?)',[reservationInfo.user, data.rows[0].license, reservationInfo.start, reservationInfo.end, reservationInfo.stops, reservationInfo.override, reservationInfo.justification],function(error, data){
-                console.log("added to table");
-                conn.query('SELECT * FROM reservations WHERE user = ? ORDER BY start', [reservationInfo.user], function(error, data){
+                console.log(data);
+                conn.query('SELECT * FROM reservations WHERE id = ?', [data.lastInsertId], function(error, data){
                      //make sure only emitting to one user
-                    socket.emit('reservationChange', data);
+                    socket.emit('newReservation', data);
                     console.log("sending to user");
                 });
 
@@ -271,7 +271,7 @@ io.of('/user').on('connection', function(socket){
         editReservation(reservationID)
 
         conn.query('SELECT * FROM reservations WHERE user = ?', [user], function(error, data){
-            socket.to(socket.id).emit('reservationChange', data);
+            socket.emit('reservationChange', data);
         });
 
         conn.query('SELECT * FROM reservations', function(error, data){
@@ -283,7 +283,7 @@ io.of('/user').on('connection', function(socket){
         cancelReservation(reservationID);
 
         conn.query('SELECT * FROM reservations WHERE user = ?', [user], function(error, data){
-            socket.to(socket.id).emit('reservationChange', data);
+            socket.emit('reservationChange', data);
         });
 
         conn.query('SELECT * FROM reservations', function(error, data){
@@ -302,6 +302,14 @@ io.of('/user').on('connection', function(socket){
     socket.on('justification', function(reservationID, justification){
         updateJustification(justification, resrevationID);
     });  
+
+    socket.on('vehicleOverride', function(reservationID, license){
+        conn.query('UPDATE reservations SET license = ? WHERE id = ?', [license, reservationID], function(error, data){
+            conn.query('SELECT * FROM reservations WHERE id = ?', [reservationID], function(error, data){
+                socket.emit('reservationOverride', data);
+            });
+        });
+    });
 });
 
 /**
