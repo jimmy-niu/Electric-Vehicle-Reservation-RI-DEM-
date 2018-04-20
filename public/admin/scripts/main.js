@@ -67,16 +67,22 @@ function modifyUser() {
 function addVehicle(){
 //    license TEXT, model TEXT, color TEXT, inService BOOLEAN, miles DOUBLE PRECISION, isEV BOOLEAN, extraTrunk BOOLEAN, offRoad BOOLEAN, equipRack BOOLEAN;
     //adminSocket.emit('vehicleAdded', vehicle);
-    
     let license = $('#licenseField').val();
     let model = $('#modelField').val();
     let color = $('#colorField').val();
     let miles = $('#milesField').val();
-    let status  = $('#carStatusField').val();
+    let status  = ($('#carStatusField').val() === "ev");
     let carType = $('#evStatusField').val();
-    let trunk = $('#extraTrunkChoice').val();
-    let offRoad = $('#modelField').val();
-    let model = $('#modelField').val();
+    let trunk = $('#extraTrunkChoice').is(':checked');
+    let offRoad = $('#offRoadChoice').is(':checked');
+    let equipmentRack = $('#equipChoice').is(':checked');
+    
+    if(license !== '' && model !== '' && color !== ''){
+        let vehicle = {license: license, model: model, color: color, miles: miles, status: status, isEv: carType, trunk: trunk, offRoad: offRoad, equipmentRack: equipmentRack};
+        
+        console.log(vehicle);
+        adminSocket.emit("vehicleAdded", vehicle);
+    }
 }
 
 function editVehicle(id, vehicle){
