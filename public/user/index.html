@@ -57,12 +57,15 @@
                                 </div>
                                 <div class="form-group">
                                     <label>Pickup Location</label>
-                                    <input type=text class="form-control">
+                                    <input type=text class="form-control route-stop">
                                 </div>
+                                <div id="stops">
                                 <div class="form-group">
                                     <label>Destination</label>
-                                    <input type=text class="form-control">
+                                    <input type=text class="form-control route-stop">
                                 </div>
+                                </div>
+                                <p><a href="#" id="add-stop"><small>Add a destination</small></a></p>
                                 <div class="form-group">
                                     <label>Extra Features</label>
                                     <div class="form-check">
@@ -107,14 +110,14 @@
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                            <button type="button" class="btn btn-primary" id="submit-res">Make reservation</button>
+                            <button type="button" class="btn btn-primary" id="submit-res" data-dismiss="modal">Make reservation</button>
                         </div>
                     </div>
                 </div>
             </div>
 
             <h3>Upcoming Reservations</h3>
-            <div class="row">
+            <div class="cards row">
                 <div class="card border-success mb-3" style="width: 18rem;">
                     <img class = "card-img-top" src="https://upload.wikimedia.org/wikipedia/commons/5/5f/DCA_Prius_1Gen_12_2011_3592.JPG" alt="prius placeholder image">
                     <div class="card-body">

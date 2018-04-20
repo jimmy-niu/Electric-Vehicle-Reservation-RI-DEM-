@@ -2,7 +2,8 @@ let userSocket = io.connect('http://localhost:8080/user', {forceNew: true});
 
 // Sets up the sockets.
 $(document).ready(function() {
-    $("#submit-res").click(newReservation)
+    $("#submit-res").click(newReservation);
+    $("#add-stop").click(function() {addStop(); return false; });
 
     userSocket.emit('join',"Jimmy Niu", function(reservations){
         getReservations(reservations);
@@ -31,8 +32,33 @@ $(document).ready(function() {
     //updateReservation(1, "JGH456")
 });
 
+function addStop() {
+    let newStop = ` <div class="form-group">
+        <label>Destination</label>
+        <input type=text class="form-control route-stop">
+    </div>`
+    $('#stops').append(newStop);
+}
+
 function newReservation(){
     console.log("pressed");
+
+    // let user = // ???
+    let start = new Date($('#start-date').val()).toISOString().substr(0, 16).replace('T', ' ');
+    let end = new Date($('#end-date').val()).toISOString().substr(0, 16).replace('T', ' ');
+    let stops = [];    
+    $('.route-stop').each(function() {
+        stops.push($(this).val());
+    })
+    // let override =
+    // let justification =
+    let trunk = $("#trunk").prop('checked');
+    let offroad = $("#offroading").prop('checked');
+    let rack = $('#kayak').prop('checked');
+
+    let res = new Reservation({start: start, end: end, stops: stops, needsTrunk: trunk, needsOffRoad: offroad, needsRack: rack});
+    console.log(res);
+
     userSocket.emit('reservation', {user: "Jimmy Niu", start: "2018-04-18 11:00", end: "2018-04-18 16:00", stops: ["home", "work"], override: true, justification: "my oranges fell into the river.", needsTrunk: false, needsOffRoad: false, needsRack: false});
 }
 
@@ -53,6 +79,26 @@ function submitFeedback(){
     userSocket.emit('reportAdded', reservationID, report);
 }
 
+class Reservation {
+    constructor(reservationData) {
+        this.data = reservationData;
+        this.addToDom(this.data);
+    }
+    addToDom(r) {
+        let DOMobject = `<div class="card border-success mb-3" style="width: 18rem;">
+                    <img class = "card-img-top" src="https://upload.wikimedia.org/wikipedia/commons/5/5f/DCA_Prius_1Gen_12_2011_3592.JPG" alt="prius placeholder image">
+                    <div class="card-body">
+                        <h5 class="card-title">Toyota Prius 787ZXC</h5>
+                        <p class="card-text"><b>Start</b>: ${r.start} <br>
+                            <b>End</b>: ${r.end} <br>
+                            <b>Route</b>: ${r.stops} </p>
+                        <a href="#" class="btn btn-primary edit">Edit reservation</a>
+                        <a href="#" class="btn btn-secondary" data-toggle="modal" data-target="#cancelModal">Cancel </a>
+                    </div>
+                </div>`;
+        $('.cards').append(DOMobject);
+    }
+}
 function submitJustification(reservationID, justification){
     userSocket.emit('justification', reservationID, justification);
 }
