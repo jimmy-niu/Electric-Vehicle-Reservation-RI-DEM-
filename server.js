@@ -57,7 +57,7 @@ app.use(session(
      resave: false,
      saveUninitialized: false
     })
-);
+       );
 
 /*app.get('/addevent', function(req, res) {
     var access_token = req.session.access_token;
@@ -178,11 +178,11 @@ server.listen(8080, function(){
 io.of('/admin').on('connection', function(socket){
     updateAdminReservations();
     updateVehicles();
-//    
-//    socket.on('admin-connected', function(user_email) {
-//      console.log('Admin ' + user_email + ' connected.');
-//    });
-    
+    //    
+    //    socket.on('admin-connected', function(user_email) {
+    //      console.log('Admin ' + user_email + ' connected.');
+    //    });
+
     socket.on('vehicleAdded', function(vehicle){
         addVehicle(vehicle);
     });
@@ -255,27 +255,27 @@ io.of('/user').on('connection', function(socket){
             conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?)',[reservationInfo.user, data.rows[0].license, reservationInfo.start, reservationInfo.end, reservationInfo.stops, reservationInfo.override, reservationInfo.justification],function(error, data){
                 console.log(data);
                 conn.query('SELECT * FROM reservations WHERE id = ?', [data.lastInsertId], function(error, data){
-                     //make sure only emitting to one user
+                    //make sure only emitting to one user
                     socket.emit('newReservation', data);
                     console.log("sending to user");
                 });
 
                 conn.query('SELECT * FROM reservations', function(error, data){
                     console.log("sending to admin")
-                   io.of('/admin').emit('reservationChange', data);
+                    io.of('/admin').emit('reservationChange', data);
                 });
             });
 
-        // conn.query('SELECT * FROM reservations WHERE user = ?', [reservationInfo.user], function(error, data){
-        //      //make sure only emitting to one user
-        //     socket.emit('reservationChange', data);
-        //     console.log("sending to user");
-        // });
+            // conn.query('SELECT * FROM reservations WHERE user = ?', [reservationInfo.user], function(error, data){
+            //      //make sure only emitting to one user
+            //     socket.emit('reservationChange', data);
+            //     console.log("sending to user");
+            // });
 
-        // conn.query('SELECT * FROM reservations', function(error, data){
-        //     console.log("sending to admin")
-        //    io.of('/admin').emit('reservationChange', data);
-        // });
+            // conn.query('SELECT * FROM reservations', function(error, data){
+            //     console.log("sending to admin")
+            //    io.of('/admin').emit('reservationChange', data);
+            // });
         });
     });
 
@@ -337,24 +337,24 @@ var OUTLOOK_CLIENT_ID = "5689926f-c6a0-4d4e-82f4-19760907d166";
 var OUTLOOK_CLIENT_SECRET = "uqlACP41#%sinnKKRW495!|";
 
 passport.serializeUser(function(user, done) {
-  done(null, user);
+    done(null, user);
 });
 
 passport.deserializeUser(function(obj, done) {
-  done(null, obj);
+    done(null, obj);
 });
 
 passport.use(new OutlookStrategy({
     clientID: OUTLOOK_CLIENT_ID,
     clientSecret: OUTLOOK_CLIENT_SECRET,
     callbackURL: "http://localhost:8080/authorize"
-  },
-  function(accessToken, refreshToken, profile, done) {
+},
+                                 function(accessToken, refreshToken, profile, done) {
     process.nextTick(function () {
-      return done(null, profile);
+        return done(null, profile);
     });
-  }
-));
+}
+                                ));
 
 app.get('/', function(req, res) {
     res.send(index.loginPagePassport());
@@ -363,7 +363,7 @@ app.get('/', function(req, res) {
 });
 
 app.get('/authorize', //function(req, res) {
-    /*var authCode = req.query.code;
+        /*var authCode = req.query.code;
     if (authCode) {
         console.log('');
         console.log('Retrieved auth code in /authorize: ' + authCode);
@@ -373,24 +373,24 @@ app.get('/authorize', //function(req, res) {
         console.log('/authorize called without a code parameter, redirecting to login');
         res.redirect('/');
     }*/
-  passport.authenticate('windowslive', { failureRedirect: '/' }),
-  function(req, res) {
+        passport.authenticate('windowslive', { failureRedirect: '/' }),
+        function(req, res) {
     var user_email = req.user._json.EmailAddress;
     if (user_email === 'dem_test_a@outlook.com') {
-      app.use("/admin", express.static(__dirname + '/public/admin'));
-      io.of('/admin').emit('admin-connected', user_email);
-      res.redirect('admin/index.html');
+        app.use("/admin", express.static(__dirname + '/public/admin'));
+        io.of('/admin').emit('admin-connected', user_email);
+        res.redirect('admin/index.html');
     } else if (user_email === 'dem_test_u@outlook.com' || user_email === 'dem_test_u_2@outlook.com') {
-      app.use("/user", express.static(__dirname + '/public/user'));
-      io.sockets.emit('user-connected', user_email);
-      res.redirect('user/index.html');
+        app.use("/user", express.static(__dirname + '/public/user'));
+        io.sockets.emit('user-connected', user_email);
+        res.redirect('user/index.html');
     }
-  });
+});
 
 app.get('/auth/outlook',
-  passport.authenticate('windowslive', { scope: process.env.CLIENT_SCOPES }),
-  function(req, res){
-  });
+        passport.authenticate('windowslive', { scope: process.env.CLIENT_SCOPES }),
+        function(req, res){
+});
 
 app.get('admin/index', function(req, res) {
     res.send(index.loginPagePassport());
@@ -434,33 +434,36 @@ app.get('/logout', function(req, res) {
     /*token = undefined;
     req.session.destroy();
     res.redirect('/');*/
-    var user_email = req.user._json.EmailAddress;
-    if (user_email === 'dem_test_a@outlook.com') {
-      socket.emit('admin-disconnected', user_email);
-    } else if (user_email === 'dem_test_u@outlook.com') {
-      socket.emit('user-disconnected', user_email);
+    if(req.user !== undefined){
+        var user_email = req.user._json.EmailAddress;
+        if (user_email === 'dem_test_a@outlook.com') {
+            socket.emit('admin-disconnected', user_email);
+        } else if (user_email === 'dem_test_u@outlook.com') {
+            socket.emit('user-disconnected', user_email);
+        }
     }
+
     req.logout();
     req.session.destroy(function (err) {
-      res.redirect('/');
+        res.redirect('/');
     });
 });
 
 function ensureAuthenticated(req, res, next) {
-  if (req.isAuthenticated()) { return next(); }
-  res.redirect('/');
+    if (req.isAuthenticated()) { return next(); }
+    res.redirect('/');
 }
 
 app.all('*', function(req,res,next) {
-  if (req.path === '/')
-    next();
-  else
-    ensureAuthenticated(req,res,next);  
+    if (req.path === '/')
+        next();
+    else
+        ensureAuthenticated(req,res,next);  
 });
 
 
 app.get('/admin/index', function (req, res) {
-  res.sendFile(path.join(__dirname + "/public/admin/index.html"));
+    res.sendFile(path.join(__dirname + "/public/admin/index.html"));
 })
 
 // ADMIN
