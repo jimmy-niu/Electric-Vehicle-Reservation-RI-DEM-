@@ -138,9 +138,11 @@ let transporter = nodemailer.createTransport({
 //   }
 // });
 
+
 //conn.query('DROP TABLE vehicles');
 conn.query('DROP TABLE IF EXISTS reservations');
 conn.query('DROP TABLE IF EXISTS vehicles');
+
 
 //Users
 conn.query('CREATE TABLE IF NOT EXISTS users(id INTEGER PRIMARY KEY AUTOINCREMENT, email TEXT, admin BOOLEAN)');
@@ -171,6 +173,7 @@ server.listen(8080, function(){
 
 //handles events when an admin user is connected
 io.of('/admin').on('connection', function(socket){
+    updateAdminReservations();
     socket.on('vehicleAdded', function(vehicle){
         addVehicle(vehicle);
     });
@@ -315,8 +318,11 @@ io.of('/user').on('connection', function(socket){
 /**
  * Sets up the landing page to index.html.
  */
+
+var token = undefined;
+
 app.get('/', function(req, res) {
-    res.status(200);
+    //res.status(200);
     res.send(index.loginPage(auth.getAuthUrl()));
 });
 
@@ -351,12 +357,12 @@ app.get('/logincomplete', function(req, res) {
     var access_token = req.session.access_token;
     var refresh_token = req.session.access_token;
     var email = req.session.email;
-
     if (access_token === undefined || refresh_token === undefined) {
         console.log('/logincomplete called while not logged in');
         res.redirect('/');
         return;
     }
+    token = req.session.access_token;
     if (email ===  'dem_test_a@outlook.com') {
       var to_send = path.join(__dirname, './public/admin/index.html');
     } else if (email === 'dem_test_u@outlook.com') {
@@ -367,6 +373,7 @@ app.get('/logincomplete', function(req, res) {
 });
 
 app.get('/logout', function(req, res) {
+    token = undefined;
     req.session.destroy();
     res.redirect('/');
 });
@@ -381,6 +388,7 @@ function updateVehicles(){
     conn.query('SELECT * FROM vehicles',function(error, data){
         io.of('/admin').emit('vehicleChange', data);
     });
+
 }
 function addVehicle(vehicle){
     conn.query('INSERT INTO vehicles VALUES(null, ?, ?, ?, ?, ?)',[vehicle.license, vehicle.model, vehicle.color, vehicle.inService, vehicle.miles],function(error, data){
