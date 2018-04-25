@@ -224,6 +224,8 @@ io.of('/user').on('connection', function(socket){
                     socket.emit('newReservation', data);
                     var start = new Date(reservationInfo.start);
                     var end = new Date(reservationInfo.end);
+                    console.log(reservationInfo.start);
+                    console.log(reservationInfo.end);
                     addEvent(reservationInfo.user + "'s upcoming DEM trip", data.rows[0].model + " " + data.rows[0].license + "\n" + reservationInfo.stops, start.toISOString(), end.toISOString());
                     io.of('/admin').emit('reservationChange', data);
                     //console.log("sending to user");
