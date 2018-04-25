@@ -1,16 +1,24 @@
 let userSocket = io.connect('http://localhost:8080/user', {forceNew: true});
 // import flatpickr from "flatpickr";
 
+let userEmail = "";
+
+let currentCar = undefined;
+let alternateVehicles = [];
+
 // Sets up the sockets.
 $(document).ready(function() {
-    $("#confirm-res").click(newReservation);
+    $("#confirm-res").click(renderCar());
     $("#cancel-res").click(cancelReservation);
     $("#add-stop").click(function() {addStop(); return false; });
     $("#submit-report").click(submitFeedback);
-
+    
+    userEmail = $("#user_email").html().replace("Welcome, ", "").replace(" <br>", "").replace("\n", "").trim();
+    console.log(userEmail);
+    
     userSocket.emit('join',"Jimmy Niu", function(reservations){
-        getReservations(reservations);
-        console.log(reservations);
+        // getReservations(reservations);
+        // console.log(reservations);
     });
 
     userSocket.on('reservationChange', function(reservations){
@@ -18,11 +26,14 @@ $(document).ready(function() {
         //console.log(reservations);
     });
 
-    userSocket.on('newReservation', function(reservations){
-        console.log("new reservation added");
-        console.log(reservations);
-
-        new Reservation(reservations);
+    userSocket.on('newReservation', function(reservation){
+        currentCar = reservation;
+        $("#carMakeMText").html($("#carMakeMText").html() + reservation.rows[0].model);
+        $("#plateNumberMText").html($("#plateNumberMText").html() + reservation.rows[0].license);
+        $("#startMText").html($("#startMText").html() + reservation.rows[0].model);
+        $("#carMakeMText").html($("#carMakeMText").html() + reservation.rows[0].model);
+        $("#carMakeMText").html($("#carMakeMText").html() + reservation.rows[0].model);
+        
     });
 
     userSocket.on('reservationOverride', function(reservations){
@@ -30,19 +41,19 @@ $(document).ready(function() {
     });
 
     userSocket.on('alternateVehicles', function(vehicles){
-        console.log(vehicles);
+        alternateVehicles = vehicles;
     });
     
     flatpickr(".datePicker", {enableTime: true, dateFormat: "Y-m-d H:i",});
 
 });
 
-function resres(event){
-    console.log("we in reresrs");
-    event.preventDefault();
-    return false;
+function renderCar(){
+    console.log("drawing car!");
+    if(currentCar !== undefined){
+        new Reservation(currentCar);
+    }
 }
-
 
 function addStop() {
     let newStop = ` <div class="form-group">
@@ -53,8 +64,6 @@ function addStop() {
 }
 
 function newReservation(){
-    console.log("pressed");
-
     // let user = // ???
     let start = $("#start-date").val();
     let end = $("#end-date").val();
@@ -62,23 +71,18 @@ function newReservation(){
     let stops = [];    
     $('.route-stop').each(function() {
         stops.push($(this).val());
-    })
+    });
 
     let trunk = $("#trunk").prop('checked');
     let offroad = $("#offroading").prop('checked');
     let rack = $('#kayak').prop('checked');
 
-    let resData = {user: "user", start: start, end: end, stops: JSON.stringify(stops).split('},{').join('}, {'), override: false, justification: "", needsTrunk: trunk, needsOffRoad: offroad, needsRack: rack};
-    console.log("test", resData)
+    let resData = {user: userEmail, start: start, end: end, stops: JSON.stringify(stops).split('},{').join('}, {'), override: false, justification: "", needsTrunk: trunk, needsOffRoad: offroad, needsRack: rack};
     userSocket.emit('reservation', resData);
 }
 
 function editReservation(){
     userSocket.emit('edit', {user: "Jimmy Niu", license: "19087", start: "6932", end: "6361", stops: ["home", "work"], override: false, justification: ""});
-}
-
-function getReservations(reservations){
-
 }
 
 function cancelReservation(){
@@ -88,7 +92,7 @@ function cancelReservation(){
 
 function submitFeedback(reservationID){
     let report = $('#report-area').val();
-    console.log(report);
+    // console.log(report);
     userSocket.emit('reportAdded', reservationID, report);
 }
 
@@ -97,8 +101,8 @@ class Reservation {
         this.addToDom(reservationData.rows[0]);
     }
     addToDom(r) {
-        console.log("r");
-        console.log(r);
+        // console.log("r");
+        // console.log(r);
         let DOMobject = `<div class="card border-success mb-3" style="width: 18rem;">
                     <img class = "card-img-top" src="https://upload.wikimedia.org/wikipedia/commons/5/5f/DCA_Prius_1Gen_12_2011_3592.JPG" alt="prius placeholder image">
                     <div class="card-body">

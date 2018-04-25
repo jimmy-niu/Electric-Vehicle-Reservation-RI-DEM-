@@ -111,13 +111,16 @@ server.listen(8080, function(){
 });
 
 //handles events when an admin user is connected
-io.of('/admin').on('connection', function(socket){
-    updateAdminReservations();
-    updateVehicles();
-    
+io.of('/admin').on('connection', function(socket){    
     socket.on('vehicleAdded', function(vehicle){
         addVehicle(vehicle);
     });
+    
+    socket.on('updatePage', function(){
+        updateAdminReservations();
+        updateVehicles();
+    });
+    
     socket.on('vehicleRemoved', function(license){
         removeVehicle(license);
     });
