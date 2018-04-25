@@ -137,20 +137,20 @@
                             <p id = "stopsMText">Stops: </p>
                         </div>
                         <div class="modal-footer">
-                            <div style = "cursor: pointer; font-size: 1vw; color: red; float:left !important;" data-toggle="modal" data-target="#appealModal">Decline Vehicle</div>
+                            <div style = "cursor: pointer; font-size: 1vw; color: red; float:left !important;" data-toggle="modal" data-target="#appealModal" data-dismiss="modal">Decline Vehicle</div>
                             <button type="button" id="confirm-res" class="btn btn-success" data-dismiss="modal" onclick = "renderCar();">Confirm and Finish Reservation</button>
                         </div>
                     </div>
                 </div>
             </div>
 
-                <div class="modal fade" id="appealModal" tabindex="-2" role="dialog" aria-labelledby="appealModalLabel" aria-hidden="true">
-                    <div class="modal-dialog" role="document">
-                        <div class="modal-content">
+            <div class="modal fade" id="appealModal" tabindex="-2" role="dialog" aria-labelledby="appealModalLabel" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
                         <div class="modal-header">
                             <h5 class="modal-title" id="appealModalLabel">Appeal Reservation</h5>
                             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
+                                <span aria-hidden="true">&times;</span>
                             </button>
                         </div>
                         <div class="modal-body">
@@ -158,20 +158,21 @@
                             <textarea class="form-control" id="report-area" rows="6"></textarea>
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-toggle="modal" data-dismiss="modal">Cancel</button>
-                            <button type="button" id="confirm-res" class="btn btn-danger" data-toggle="modal" data-target="#altModal" onclick = "altVehicles();">Show Alternative Vehicles</button>
-                        </div>
+                            <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#resModal" data-dismiss="modal">Cancel</button>
+                            
+                            <button type="button" id="confirm-res" class="btn btn-danger" data-toggle="modal" data-target="#altModal" data-dismiss="modal" onclick = "altVehicles();">Show Alternative Vehicles</button>
                         </div>
                     </div>
                 </div>
+            </div>
 
-                <div class="modal fade" id="altModal" tabindex="-2" role="dialog" aria-labelledby="altModalLabel" aria-hidden="true">
-                    <div class="modal-dialog" role="document">
-                        <div class="modal-content">
+            <div class="modal fade" id="altModal" tabindex="-2" role="dialog" aria-labelledby="altModalLabel" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
                         <div class="modal-header">
                             <h5 class="modal-title" id="altModalLabel">Alternative Vehicles</h5>
                             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
+                                <span aria-hidden="true">&times;</span>
                             </button>
                         </div>
                         <div class="modal-body">
@@ -180,12 +181,12 @@
                             </form>
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-toggle="modal" data-dismiss="modal">Cancel</button>
+                            <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#appealModal" data-dismiss="modal">Cancel</button>
                             <button type="button" id="confirm-res" class="btn btn-danger" data-toggle="modal" data-dismiss="modal">Confirm Alternative Vehicle</button>
-                        </div>
                         </div>
                     </div>
                 </div>
+            </div>
 
             <h3>Upcoming Reservations</h3>
             <div class="cards row">                

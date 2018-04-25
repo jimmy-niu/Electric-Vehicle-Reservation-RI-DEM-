@@ -77,9 +77,9 @@ function altVehicles(){
 
         function addStop() {
             let newStop = ` <div class="form-group">
-<label>Destination</label>
-<input type=text class="form-control route-stop">
-</div>`
+                                <label>Destination</label>
+                                <input type=text class="form-control route-stop">
+                            </div>`
             $('#stops').append(newStop);
         }
 
