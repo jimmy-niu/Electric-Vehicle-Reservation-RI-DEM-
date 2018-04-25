@@ -3,9 +3,10 @@ let userSocket = io.connect('http://localhost:8080/user', {forceNew: true});
 
 // Sets up the sockets.
 $(document).ready(function() {
-    $("#submit-res").click(newReservation);
+    $("#confirm-res").click(newReservation);
     $("#cancel-res").click(cancelReservation);
     $("#add-stop").click(function() {addStop(); return false; });
+    $("#submit-report").click(submitFeedback);
 
     userSocket.emit('join',"Jimmy Niu", function(reservations){
         getReservations(reservations);
@@ -80,11 +81,14 @@ function getReservations(reservations){
 
 }
 
-function cancelReservation(reservationID, user){
+function cancelReservation(){
+    // let reservationID = 
     console.log("cancelled");
 }
 
-function submitFeedback(){
+function submitFeedback(reservationID){
+    let report = $('#report-area').val();
+    console.log(report);
     userSocket.emit('reportAdded', reservationID, report);
 }
 
@@ -93,6 +97,8 @@ class Reservation {
         this.addToDom(reservationData.rows[0]);
     }
     addToDom(r) {
+        console.log("r");
+        console.log(r);
         let DOMobject = `<div class="card border-success mb-3" style="width: 18rem;">
                     <img class = "card-img-top" src="https://upload.wikimedia.org/wikipedia/commons/5/5f/DCA_Prius_1Gen_12_2011_3592.JPG" alt="prius placeholder image">
                     <div class="card-body">
@@ -101,7 +107,7 @@ class Reservation {
                             <b>End</b>: ${r.end} <br>
                             <b>Route</b>: ${JSON.parse(r.stops)} </p>
                         <a href="#" class="btn btn-primary edit">Edit reservation</a>
-                        <a href="#" class="btn btn-secondary" data-toggle="modal" data-target="#cancelModal">Cancel </a>
+                        <a href="#" class="btn btn-secondary" data-toggle="modal" data-target="#cancelModal">Cancel</a>
                     </div>
                 </div>`;
         $('.cards').append(DOMobject);

@@ -43,50 +43,6 @@ app.use(session(
     })
        );
 
-
-// ADD EVENT EXAMPLE
-// 
-/*  var newEvent = {
-        "Subject": "Test event",
-        "Body": {
-            "ContentType": "HTML",
-            "Content": "wowee this is a test event",
-        },
-        "Start": "2018-04-27T00:00:00.000Z",
-        "End": "2018-04-27T00:30:00.000Z",
-        "Attendees": [
-            {
-                "EmailAddress": {
-                    "Address": "kyle.cui9@gmail.com",
-                    "Name": "Kyle Cui"
-                },
-                "Type": "Required"
-            }
-        ]
-    };
-
-    var userInfo = {
-        email: 'kyle.cui9@gmail.com'
-    };
-
-    var addEventParameters = {
-        token: access_token,
-        event: newEvent,
-        user: userInfo
-    };
-
-    outlook.calendar.createEvent(addEventParameters,
-                                 function(error, result) {
-        if (error) {
-            console.log(error);
-            res.send(error);
-        }
-        else {
-            res.redirect('/sync');
-        }
-    });
-});*/
-
 /*email sender (will eventually change to a different email)
 you can use your email and password to test
 var transporter = nodemailer.createTransport({
@@ -185,6 +141,48 @@ io.of('/admin').on('connection', function(socket){
     });
 });
 
+function addEvent(title, bodytext, start, end) {
+    var newEvent = {
+        "Subject": title,
+        "Body": {
+            "ContentType": "HTML",
+            "Content": bodytext,
+        },
+        "Start": start, //"2018-04-28T00:00:00.000Z",
+        "End": end, //"2018-04-28T00:30:00.000Z"
+        /*,
+        "Attendees": [
+            {
+                "EmailAddress": {
+                    "Address": email,
+                    "Name": name
+                },
+                "Type": "Required"
+            }
+        ]*/
+    };
+
+    var userInfo = {
+        email: "dem_test_u@outlook.com"
+    };
+
+    var addEventParameters = {
+        token: token,
+        event: newEvent,
+        user: userInfo
+    };
+
+    outlook.calendar.createEvent(addEventParameters,
+        function(error, result) {
+        if (error) {
+            console.log(error);
+        }
+        else {
+            console.log("success adding event");
+        }
+    });
+}
+
 //handles events when a regular user is connnected
 io.of('/user').on('connection', function(socket){
     socket.on('join', function(user, callback){
@@ -224,6 +222,11 @@ io.of('/user').on('connection', function(socket){
                 //console.log(data);
                 conn.query('SELECT * FROM reservations WHERE id = ?', [data.lastInsertId], function(error, data){
                     socket.emit('newReservation', data);
+                    var start = new Date(reservationInfo.start);
+                    var end = new Date(reservationInfo.end);
+                    console.log(reservationInfo.start);
+                    console.log(reservationInfo.end);
+                    addEvent(reservationInfo.user + "'s upcoming DEM trip", data.rows[0].model + " " + data.rows[0].license + "\n" + reservationInfo.stops, start.toISOString(), end.toISOString());
                     io.of('/admin').emit('reservationChange', data);
                     //console.log("sending to user");
                 });
@@ -297,16 +300,17 @@ passport.deserializeUser(function(obj, done) {
 });
 
 passport.use(new OutlookStrategy({
-    clientID: OUTLOOK_CLIENT_ID,
-    clientSecret: OUTLOOK_CLIENT_SECRET,
-    callbackURL: "http://localhost:8080/authorize"
-},
-                                 function(accessToken, refreshToken, profile, done) {
-    process.nextTick(function () {
-        return done(null, profile);
-    });
-}
-                                ));
+        clientID: OUTLOOK_CLIENT_ID,
+        clientSecret: OUTLOOK_CLIENT_SECRET,
+        callbackURL: "http://localhost:8080/authorize"
+    },
+    function(accessToken, refreshToken, profile, done) {
+        process.nextTick(function () {
+            token = accessToken;
+            return done(null, profile);
+        });
+    }
+));
 
 app.get('/', function(req, res) {
     res.send(index.loginPagePassport());
@@ -316,6 +320,7 @@ app.get('/authorize',
         passport.authenticate('windowslive', { failureRedirect: '/' }),
         function(req, res) {
     var user_email = req.user._json.EmailAddress;
+    var name = req.user._json.DisplayName;
     if (user_email === 'dem_test_a@outlook.com') {
         app.use("/admin", express.static(__dirname + '/public/admin'));
         replace({
@@ -331,7 +336,6 @@ app.get('/authorize',
     } else if (user_email === 'dem_test_u@outlook.com' || user_email === 'dem_test_u_2@outlook.com') {
         app.use("/user", express.static(__dirname + '/public/user'));
         io.sockets.emit('user-connected', user_email);
-        console.log(__dirname);
         replace({
             regex: "Welcome,(.+)<br>",
             replacement: "Welcome, " + user_email + " <br>",
@@ -343,8 +347,8 @@ app.get('/authorize',
 });
 
 app.get('/auth/outlook',
-        passport.authenticate('windowslive', { scope: process.env.CLIENT_SCOPES }),
-        function(req, res){
+    passport.authenticate('windowslive', { scope: process.env.CLIENT_SCOPES }),
+    function(req, res) {
 });
 
 app.get('/logout', function(req, res) {
@@ -358,6 +362,7 @@ app.get('/logout', function(req, res) {
         paths: ['./public/user/index.html', './public/admin/data.html', './public/admin/fleet.html', './public/admin/index.html'],
         silent: true
     });
+    token = undefined;
     req.logout();
     req.session.destroy(function (err) {
         res.redirect('/');
@@ -375,11 +380,6 @@ app.all('*', function(req,res,next) {
     else
         ensureAuthenticated(req,res,next);  
 });
-
-
-app.get('/admin/index', function (req, res) {
-    res.sendFile(path.join(__dirname + "/public/admin/index.html"));
-})
 
 // ADMIN helper functions
 function updateAdminReservations(){
