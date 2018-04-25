@@ -17,12 +17,15 @@ $(document).ready(function() {
     adminSocket.emit('updatePage');
     
     adminSocket.on('reservationChange', function(reservations){
+        console.log("entering reservation change");
         console.log(reservations);
-        console.log("reservation change");
+        
         for(let i = currentReservation; i < reservations.rowCount; i ++){
             new Reservation(reservations.rows[i]);
             currentReservation ++;
         }
+        
+        console.log("reservation changed");
     });
     adminSocket.on('vehicleChange', function(vehicles){
         console.log(vehicles);

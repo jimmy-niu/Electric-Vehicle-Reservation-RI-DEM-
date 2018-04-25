@@ -138,12 +138,6 @@ function editReservation(){
     userSocket.emit('edit', {user: "Jimmy Niu", license: "19087", start: "6932", end: "6361", stops: ["home", "work"], override: false, justification: ""});
 }
 
-function cancelReservation(){
-    // let reservationID = 
-    console.log("cancelled");
-    cleanFields();
-}
-
 
 function submitFeedback(reservationID){
     let report = $('#report-area').val();
