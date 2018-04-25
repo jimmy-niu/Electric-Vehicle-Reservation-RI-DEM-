@@ -8,7 +8,6 @@ let alternateVehicles = [];
 
 // Sets up the sockets.
 $(document).ready(function() {
-    $("#confirm-res").click(renderCar());
     $("#cancel-res").click(cancelReservation);
     $("#add-stop").click(function() {addStop(); return false; });
     $("#submit-report").click(submitFeedback);
@@ -30,10 +29,9 @@ $(document).ready(function() {
         currentCar = reservation;
         $("#carMakeMText").html($("#carMakeMText").html() + reservation.rows[0].model);
         $("#plateNumberMText").html($("#plateNumberMText").html() + reservation.rows[0].license);
-        $("#startMText").html($("#startMText").html() + reservation.rows[0].model);
-        $("#carMakeMText").html($("#carMakeMText").html() + reservation.rows[0].model);
-        $("#carMakeMText").html($("#carMakeMText").html() + reservation.rows[0].model);
-        
+        $("#startMText").html($("#startMText").html() + reservation.rows[0].start);
+        $("#endMText").html($("#endMText").html() + reservation.rows[0].end);
+        $("#stopsMText").html($("#stopsMText").html() + reservation.rows[0].stops);
     });
 
     userSocket.on('reservationOverride', function(reservations){
