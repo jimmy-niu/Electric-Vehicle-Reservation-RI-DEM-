@@ -4,6 +4,7 @@ let userSocket = io.connect('http://localhost:8080/user', {forceNew: true});
 let userEmail = "";
 
 let currentCar = undefined;
+let firstReturnedCar = undefined;
 let alternateVehicles = [];
 
 // Sets up the sockets.
@@ -27,6 +28,7 @@ $(document).ready(function() {
 
     userSocket.on('newReservation', function(reservation){
         currentCar = reservation;
+        firstReturnedCar = reservation;
         $("#carMakeMText").html($("#carMakeMText").html() + reservation.rows[0].model);
         $("#plateNumberMText").html($("#plateNumberMText").html() + reservation.rows[0].license);
         $("#startMText").html($("#startMText").html() + reservation.rows[0].start);
@@ -54,6 +56,7 @@ function cleanFields(){
     $("#endMText").html("End Time: ");
     $("#stopsMText").html("Stops: ");
 }
+
 function renderCar(){
     console.log("drawing car!");
     if(currentCar !== undefined){
@@ -62,85 +65,126 @@ function renderCar(){
     cleanFields();
 }
 
+function combineCards(){
+    let newCar = firstReturnedCar;
+    newCar.rows[0].license = currentCar.license;
+    newCar.rows[0].model = currentCar.model;
+    new Reservation(newCar);
+    
+    firstReturnedCar = undefined;
+    currentCar = undefined;
+    cleanFields();
+}
+
 function setVehicle(index){
     console.log(index);
-    currentCar = alternateVehicles[index];
+    currentCar = alternateVehicles.rows[index];
+    console.log(currentCar);
 }
 
 function altVehicles(){
+    console.log("whoooaaaa!");
+    console.log(alternateVehicles);
     $("#altVehiclesForm").empty();
-    for(let i = 0; i < alternateVehicles.length; i++){
-        let command = alternateVehicles.row[i].model + `<input type = "radio" name="altVehiclesGroup" onclick = "setVehicle('${i}')"><br>`
+    for(let i = 0; i < alternateVehicles.rowCount; i++){
+        console.log(i);
+        let command = alternateVehicles.rows[i].model + `<input type = "radio" name="altVehiclesGroup" onclick = "setVehicle(${i})"><br>`
+        console.log(command);
         $("#altVehiclesForm").append(command);
     }
+    cleanFields();
 }
 
-        function addStop() {
-            let newStop = ` <div class="form-group">
-                                <label>Destination</label>
-                                <input type=text class="form-control route-stop">
-                            </div>`
-            $('#stops').append(newStop);
-        }
+function addStop() {
+    let newStop = ` <div class="form-group">
+<label>Destination</label>
+<input type=text class="form-control route-stop">
+</div>`
+    $('#stops').append(newStop);
+}
 
-    function newReservation(){
-        // let user = // ???
-        let start = $("#start-date").val();
-        let end = $("#end-date").val();
+function newReservation(){
+    // let user = // ???
+    let start = $("#start-date").val();
+    let end = $("#end-date").val();
 
-        let stops = [];    
-        $('.route-stop').each(function() {
-            stops.push($(this).val());
-        });
+    let stops = [];    
+    $('.route-stop').each(function() {
+        stops.push($(this).val());
+    });
 
-        let trunk = $("#trunk").prop('checked');
-        let offroad = $("#offroading").prop('checked');
-        let rack = $('#kayak').prop('checked');
+    let trunk = $("#trunk").prop('checked');
+    let offroad = $("#offroading").prop('checked');
+    let rack = $('#kayak').prop('checked');
 
-        let resData = {user: userEmail, start: start, end: end, stops: JSON.stringify(stops).split('},{').join('}, {'), override: false, justification: "", needsTrunk: trunk, needsOffRoad: offroad, needsRack: rack};
-        userSocket.emit('reservation', resData);
+    let resData = {user: userEmail, start: start, end: end, stops: JSON.stringify(stops).split('},{').join('}, {'), override: false, justification: "", needsTrunk: trunk, needsOffRoad: offroad, needsRack: rack};
+    userSocket.emit('reservation', resData);
+}
+
+function editReservation(){
+    userSocket.emit('edit', {user: "Jimmy Niu", license: "19087", start: "6932", end: "6361", stops: ["home", "work"], override: false, justification: ""});
+}
+
+function cancelReservation(){
+    // let reservationID = 
+    console.log("cancelled");
+    cleanFields();
+}
+
+
+function submitFeedback(reservationID){
+    let report = $('#report-area').val();
+    // console.log(report);
+    userSocket.emit('reportAdded', reservationID, report);
+}
+
+class Reservation {
+    constructor(reservationData) {
+        this.addToDom(reservationData.rows[0]);
     }
-
-    function editReservation(){
-        userSocket.emit('edit', {user: "Jimmy Niu", license: "19087", start: "6932", end: "6361", stops: ["home", "work"], override: false, justification: ""});
-    }
-
-    function cancelReservation(){
-        // let reservationID = 
-        console.log("cancelled");
-        cleanFields();
-    }
-
-
-    function submitFeedback(reservationID){
-        let report = $('#report-area').val();
-        // console.log(report);
-        userSocket.emit('reportAdded', reservationID, report);
-    }
-
-    class Reservation {
-        constructor(reservationData) {
-            this.addToDom(reservationData.rows[0]);
-        }
-        addToDom(r) {
-            // console.log("r");
-            // console.log(r);
-            let DOMobject = `<div class="card border-success mb-3" style="width: 18rem;">
+    addToDom(r) {
+        // console.log("r");
+        // console.log(r);
+        let DOMobject = `<div class="card border-success mb-3" style="width: 18rem;">
 <img class = "card-img-top" src="https://upload.wikimedia.org/wikipedia/commons/5/5f/DCA_Prius_1Gen_12_2011_3592.JPG" alt="prius placeholder image">
 <div class="card-body">
 <h5 class="card-title">${r.model} ${r.license}</h5>
 <p class="card-text"><b>Start</b>: ${r.start} <br>
 <b>End</b>: ${r.end} <br>
 <b>Route</b>: ${JSON.parse(r.stops)} </p>
-<span = "display: hidden;>" ${r.id} </span>
+<span style = "display: none;" id = "res-id"> ${r.id} </span>
 <a href="#" class="btn btn-primary edit">Edit reservation</a>
 <a href="#" class="btn btn-secondary" data-toggle="modal" data-target="#cancelModal">Cancel</a>
 </div>
 </div>`;
-            $('.cards').append(DOMobject);
-        }
+        $('.cards').append(DOMobject);
     }
+}
 
-    function overrideVehicle(reservationID, license, justification){
-        userSocket.emit('vehicleOverride', reservationID, license, justification);
+class Reservation2 {
+    constructor(reservationData) {
+        this.addToDom(reservationData);
     }
+    addToDom(r) {
+        // console.log("r");
+        // console.log(r);
+        let DOMobject = `<div class="card border-success mb-3" style="width: 18rem;">
+<img class = "card-img-top" src="https://upload.wikimedia.org/wikipedia/commons/5/5f/DCA_Prius_1Gen_12_2011_3592.JPG" alt="prius placeholder image">
+<div class="card-body">
+<h5 class="card-title">${r.model} ${r.license}</h5>
+<p class="card-text"><b>Start</b>: ${r.start} <br>
+<b>End</b>: ${r.end} <br>
+<b>Route</b>: ${JSON.parse(r.stops)} </p>
+<span style = "display: none;" id = "res-id"> ${r.id} </span>
+<a href="#" class="btn btn-primary edit">Edit reservation</a>
+<a href="#" class="btn btn-secondary" data-toggle="modal" data-target="#cancelModal">Cancel</a>
+</div>
+</div>`;
+        $('.cards').append(DOMobject);
+    }
+}
+
+
+function overrideVehicle(reservationID, license, justification){
+    userSocket.emit('vehicleOverride', reservationID, license, justification);
+}
