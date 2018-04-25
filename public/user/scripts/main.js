@@ -1,4 +1,5 @@
 let userSocket = io.connect('http://localhost:8080/user', {forceNew: true});
+// import flatpickr from "flatpickr";
 
 // Sets up the sockets.
 $(document).ready(function() {
@@ -30,8 +31,17 @@ $(document).ready(function() {
     userSocket.on('alternateVehicles', function(vehicles){
         console.log(vehicles);
     });
+    
+    flatpickr(".datePicker", {enableTime: true, dateFormat: "Y-m-d H:i",});
 
 });
+
+function resres(event){
+    console.log("we in reresrs");
+    event.preventDefault();
+    return false;
+}
+
 
 function addStop() {
     let newStop = ` <div class="form-group">
@@ -45,15 +55,10 @@ function newReservation(){
     console.log("pressed");
 
     // let user = // ???
-    let s = new Date($('#start-date').val());
-    let isoStart = new Date(s.getTime() - (s.getTimezoneOffset() * 60000)).toISOString();
-    let start = isoStart.substr(0, 16).replace('T', ' ');
+    let start = $("#start-date").val();
+    let end = $("#end-date").val();
 
-    let e = new Date($('#end-date').val());
-    let isoEnd = new Date(e.getTime() - (e.getTimezoneOffset() * 60000)).toISOString();
-    let end = isoEnd.substr(0, 16).replace('T', ' ');
-
-    var stops = [];    
+    let stops = [];    
     $('.route-stop').each(function() {
         stops.push($(this).val());
     })
