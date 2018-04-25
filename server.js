@@ -25,6 +25,7 @@ var methodOverride = require('method-override')
 var passport = require('passport')
 var util = require('util')
 var OutlookStrategy = require('passport-outlook').Strategy;
+var replace = require("replace");
 
 let anyDB = require('any-db');
 let conn = anyDB.createConnection('sqlite3://DEM.db');
@@ -317,6 +318,12 @@ app.get('/authorize',
     var user_email = req.user._json.EmailAddress;
     if (user_email === 'dem_test_a@outlook.com') {
         app.use("/admin", express.static(__dirname + '/public/admin'));
+        replace({
+            regex: "Welcome,(.+)<br>",
+            replacement: "Welcome, " + user_email + " <br>",
+            paths: ['./public/admin/data.html', './public/admin/fleet.html', './public/admin/index.html'],
+            silent: true
+        })
         res.redirect('admin/index.html');
         //res.render('admin/index.html', {user : user_email});
         //res.redirect('admin/index/?email=' + encodeURIComponent(user_email));
@@ -324,14 +331,15 @@ app.get('/authorize',
     } else if (user_email === 'dem_test_u@outlook.com' || user_email === 'dem_test_u_2@outlook.com') {
         app.use("/user", express.static(__dirname + '/public/user'));
         io.sockets.emit('user-connected', user_email);
+        console.log(__dirname);
+        replace({
+            regex: "Welcome,(.+)<br>",
+            replacement: "Welcome, " + user_email + " <br>",
+            paths: ['./public/user/index.html'],
+            silent: true
+        })
         res.redirect('user/index.html');
     }
-});
-
-app.post('admin/index', 
-         function(req, res) {
-    console.log(decodeURIComponent(req.query.email));
-    res.render('admin/index.html', {user : decodeURIComponent(req.query.email)});
 });
 
 app.get('/auth/outlook',
@@ -344,6 +352,12 @@ app.get('/logout', function(req, res) {
     if(req.user !== undefined){
         user_email = req.user._json.EmailAddress;
     }
+    replace({
+        regex: "Welcome,(.+)<br>",
+        replacement: "Welcome, %user% <br>",
+        paths: ['./public/user/index.html', './public/admin/data.html', './public/admin/fleet.html', './public/admin/index.html'],
+        silent: true
+    });
     req.logout();
     req.session.destroy(function (err) {
         res.redirect('/');

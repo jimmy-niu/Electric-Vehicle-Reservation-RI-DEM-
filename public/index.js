@@ -64,7 +64,7 @@ module.exports = {
     } else if (userEmail === 'dem_test_u@outlook.com') {
       let html = fs.readFileSync(path.join(__dirname, './user/index.html'), "utf8");
     }
-    return html.replace('%user%', userEmail);
+    return html.replace('dem_test_u@outlook.com', userEmail);
     //let html = './user/index.html';
     //console.log(html);
     //return html;
