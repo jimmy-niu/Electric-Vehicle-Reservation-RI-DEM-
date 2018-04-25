@@ -3,9 +3,10 @@ let userSocket = io.connect('http://localhost:8080/user', {forceNew: true});
 
 // Sets up the sockets.
 $(document).ready(function() {
-    $("#submit-res").click(newReservation);
+    $("#confirm-res").click(newReservation);
     $("#cancel-res").click(cancelReservation);
     $("#add-stop").click(function() {addStop(); return false; });
+    $("#submit-report").click(submitFeedback);
 
     userSocket.emit('join',"Jimmy Niu", function(reservations){
         getReservations(reservations);
@@ -84,7 +85,9 @@ function cancelReservation(reservationID, user){
     console.log("cancelled");
 }
 
-function submitFeedback(){
+function submitFeedback(reservationID){
+    let report = $('#report-area').val();
+    console.log(report);
     userSocket.emit('reportAdded', reservationID, report);
 }
 
