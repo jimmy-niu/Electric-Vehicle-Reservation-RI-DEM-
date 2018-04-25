@@ -78,9 +78,12 @@ function combineCards(){
     newCar.rows[0].model = currentCar.model;
     new Reservation(newCar, 0);
 
+    userSocket.emit('vehicleOverride', newCar.rows[0].id, newCar.rows[0].license, newCar.rows[0].model, $("#report-area").val());
+
     firstReturnedCar = undefined;
     currentCar = undefined;
     cleanFields();
+    $("#report-area").val("");
 }
 
 function setVehicle(index){
