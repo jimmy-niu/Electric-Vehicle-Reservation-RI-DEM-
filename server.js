@@ -93,10 +93,10 @@ conn.query('CREATE TABLE IF NOT EXISTS reservations(id INTEGER PRIMARY KEY AUTOI
 conn.query('CREATE TABLE IF NOT EXISTS reports(id INTEGER PRIMARY KEY AUTOINCREMENT, reservation INTEGER, report TEXT)');
 
 //test data
-conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?)',["Jenna Tishler", "ABC123", "Chevy Volt", "2018-04-18 11:00", "2018-04-18 15:00", ["home", "work"], false, ""]);
-conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?)',["Jenna Tishler", "DEF456", "Chevy Volt", "2018-04-19 11:00", "2018-04-20 11:00", ["home", "work"], false, ""]);
-conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?)',["Max Luebbers", "GHI789", "Chevy Volt", "2018-04-18 11:00", "2018-04-18 15:00", ["home", "work"], false, ""]);
-conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?)',["Jimmy Niu", "DOL234", "Chevy Equinox", "2018-04-19 14:00", "2018-04-18 17:00", ["home", "work"], true, "I have a reason."]);
+conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?)',["Jenna Tishler", "ABC123", "Chevy Volt", "2018-04-18 11:00", "2018-04-18 15:00", JSON.stringify(["home", "work"]), false, ""]);
+conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?)',["Jenna Tishler", "DEF456", "Chevy Volt", "2018-04-19 11:00", "2018-04-20 11:00", JSON.stringify(["home", "work"]), false, ""]);
+conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?)',["Max Luebbers", "GHI789", "Chevy Volt", "2018-04-18 11:00", "2018-04-18 15:00", JSON.stringify(["home", "work"]), false, ""]);
+conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?)',["dem_test_u@outlook.com", "DOL234", "Chevy Equinox", "2018-04-19 14:00", "2018-04-18 17:00", JSON.stringify(["home", "work"]), true, "I have a reason."]);
 
 conn.query('INSERT INTO vehicles VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?, ?)', ["ABC123", "Chevy Volt", "Red", true, 100.0, true, true, false, false]);
 conn.query('INSERT INTO vehicles VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?, ?)', ["DEF456", "Chevy Volt", "Blue", true, 100.0, true, true, false, false]);

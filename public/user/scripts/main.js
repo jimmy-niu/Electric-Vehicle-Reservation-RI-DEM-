@@ -15,9 +15,15 @@ $(document).ready(function() {
     userEmail = $("#user_email").html().replace("Welcome, ", "").replace(" <br>", "").replace("\n", "").trim();
     console.log(userEmail);
 
-    userSocket.emit('join',"Jimmy Niu", function(reservations){
-        // getReservations(reservations);
-        // console.log(reservations);
+    userSocket.emit('join',userEmail, function(reservations){
+        for(var i = 0; i < reservations.rows.length; i++){
+            new Reservation(reservations, i);
+            $("#carMakeMText").html($("#carMakeMText").html() + reservations.rows[i].model);
+            $("#plateNumberMText").html($("#plateNumberMText").html() + reservations.rows[i].license);
+            $("#startMText").html($("#startMText").html() + reservations.rows[i].start);
+            $("#endMText").html($("#endMText").html() + reservations.rows[i].end);
+            $("#stopsMText").html($("#stopsMText").html() + JSON.parse(reservations.rows[i].stops));
+        }    
     });
 
     userSocket.on('reservationChange', function(reservations){
@@ -57,7 +63,7 @@ function cleanFields(){
 function renderCar(){
     console.log("drawing car!");
     if(currentCar !== undefined){
-        new Reservation(currentCar);
+        new Reservation(currentCar, 0);
     }
     cleanFields();
 }
@@ -106,8 +112,11 @@ function altVehicles(){
     }
 
     function cancelReservation(){
-        // let reservationID = 
-        console.log("cancelled");
+        let reservationID = $("#res-id").html();
+        $("." + reservationID).remove();
+        userSocket.emit('cancel', reservationID, userEmail);
+        //console.log(reservationID)
+        //console.log("cancelled");
         cleanFields();
     }
 
@@ -119,20 +128,20 @@ function altVehicles(){
     }
 
     class Reservation {
-        constructor(reservationData) {
-            this.addToDom(reservationData.rows[0]);
+        constructor(reservationData, i) {
+            this.addToDom(reservationData.rows[i]);
         }
         addToDom(r) {
             // console.log("r");
             // console.log(r);
-            let DOMobject = `<div class="card border-success mb-3" style="width: 18rem;">
+            let DOMobject = `<div class="card border-success mb-3 ${r.id}" style="width: 18rem;">
 <img class = "card-img-top" src="https://upload.wikimedia.org/wikipedia/commons/5/5f/DCA_Prius_1Gen_12_2011_3592.JPG" alt="prius placeholder image">
 <div class="card-body">
 <h5 class="card-title">${r.model} ${r.license}</h5>
 <p class="card-text"><b>Start</b>: ${r.start} <br>
 <b>End</b>: ${r.end} <br>
 <b>Route</b>: ${JSON.parse(r.stops)} </p>
-<span = "display: hidden;>" ${r.id} </span>
+<span style = "display: none;" id = "res-id">${r.id}</span>
 <a href="#" class="btn btn-primary edit">Edit reservation</a>
 <a href="#" class="btn btn-secondary" data-toggle="modal" data-target="#cancelModal">Cancel</a>
 </div>
