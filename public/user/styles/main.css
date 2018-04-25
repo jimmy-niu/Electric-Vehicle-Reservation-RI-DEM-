@@ -70,3 +70,8 @@ h3 {
     background-color: #4c719d;
     border: 0px;
 }
+
+#decline {
+    margin-right: auto;
+    font-weight: bold;
+}
