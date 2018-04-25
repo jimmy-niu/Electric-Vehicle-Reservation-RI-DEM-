@@ -18,6 +18,7 @@ $(document).ready(function() {
     
     adminSocket.on('reservationChange', function(reservations){
         console.log(reservations);
+        console.log("reservation change");
         for(let i = currentReservation; i < reservations.rowCount; i ++){
             new Reservation(reservations.rows[i]);
             currentReservation ++;
