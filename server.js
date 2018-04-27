@@ -230,7 +230,7 @@ io.of('/user').on('connection', function(socket){
                     console.log(reservationInfo.start);
                     console.log(reservationInfo.end);
                     addEvent(reservationInfo.user + "'s upcoming DEM trip", data.rows[0].model + " " + data.rows[0].license + "\n" + reservationInfo.stops, start.toISOString(), end.toISOString());
-                    io.of('/admin').emit('reservationChange', data);
+                    io.of('/admin').emit("newReservation", data);
                     //console.log("sending to user");
                 });
             });
