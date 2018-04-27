@@ -32,6 +32,7 @@
     "hogan-express": "^0.5.2",
     "hogan.js": "^3.0.2",
     "method-override": "^2.3.10",
+    "mocha": "^5.1.1",
     "moment": "^2.22.1",
     "mysql": "^2.15.0",
     "node-outlook": "^1.1.8",
@@ -41,8 +42,10 @@
     "pug": "^2.0.3",
     "querystring": "^0.2.0",
     "replace": "^0.3.0",
+    "should": "^13.2.1",
     "simple-oauth2": "^1.5.2",
     "socket.io": "^2.1.0",
+    "socket.io-client": "^2.1.0",
     "sqlite3": "^4.0.0"
   }
 }

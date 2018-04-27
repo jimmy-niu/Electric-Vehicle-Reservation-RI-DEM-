@@ -86,24 +86,45 @@ conn.query('DROP TABLE IF EXISTS vehicles');
 //Users
 conn.query('CREATE TABLE IF NOT EXISTS users(id INTEGER PRIMARY KEY AUTOINCREMENT, email TEXT, admin BOOLEAN)');
 //Resevervations
-conn.query('CREATE TABLE IF NOT EXISTS vehicles(id INTEGER PRIMARY KEY AUTOINCREMENT, license TEXT, model TEXT, color TEXT, inService BOOLEAN, miles DOUBLE PRECISION, isEV BOOLEAN, extraTrunk BOOLEAN, offRoad BOOLEAN, equipRack BOOLEAN)');
+conn.query('CREATE TABLE IF NOT EXISTS vehicles(id TEXT, license TEXT, model TEXT, color TEXT, inService BOOLEAN, miles DOUBLE PRECISION, isEV BOOLEAN, extraTrunk BOOLEAN, offRoad BOOLEAN, equipRack BOOLEAN)');
 //Vehicles
 conn.query('CREATE TABLE IF NOT EXISTS reservations(id INTEGER PRIMARY KEY AUTOINCREMENT, user TEXT, license TEXT, model TEXT, start TEXT, end TEXT, stops TEXT, override BOOLEAN, justification TEXT)');
 //Reports
 conn.query('CREATE TABLE IF NOT EXISTS reports(id INTEGER PRIMARY KEY AUTOINCREMENT, reservation INTEGER, report TEXT)');
 
 //test data
-conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?)',["Jenna Tishler", "ABC123", "Chevy Volt", "2018-04-18 11:00", "2018-04-18 15:00", JSON.stringify(["home", "work"]), false, ""]);
-conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?)',["Jenna Tishler", "DEF456", "Chevy Volt", "2018-04-19 11:00", "2018-04-20 11:00", JSON.stringify(["home", "work"]), false, ""]);
-conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?)',["Max Luebbers", "GHI789", "Chevy Volt", "2018-04-18 11:00", "2018-04-18 15:00", JSON.stringify(["home", "work"]), false, ""]);
-conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?)',["dem_test_u@outlook.com", "DOL234", "Chevy Equinox", "2018-04-19 14:00", "2018-04-18 17:00", JSON.stringify(["home", "work"]), true, "I have a reason."]);
+conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?)',["Jenna Tishler", "1322", "2015 FORD CMAX", "2018-04-18 11:00", "2018-04-18 15:00", JSON.stringify(["home", "work"]), false, ""]);
+conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?)',["Jenna Tishler", "704", "2015 FORD CMAX", "2018-04-19 11:00", "2018-04-20 11:00", JSON.stringify(["home", "work"]), false, ""]);
+conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?)',["Max Luebbers", "739", "2015 FORD CMAX", "2018-04-18 11:00", "2018-04-18 15:00", JSON.stringify(["home", "work"]), false, ""]);
+conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?)',["dem_test_u@outlook.com", "1869", "2011 CHEVROLET EQUINOX", "2018-04-19 14:00", "2018-04-18 17:00", JSON.stringify(["home", "work"]), true, "I have a reason."]);
 
-conn.query('INSERT INTO vehicles VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?, ?)', ["ABC123", "Chevy Volt", "Red", true, 100.0, true, true, false, false]);
-conn.query('INSERT INTO vehicles VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?, ?)', ["DEF456", "Chevy Volt", "Blue", true, 100.0, true, true, false, false]);
-conn.query('INSERT INTO vehicles VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?, ?)', ["VNG734", "Chevy Equinox", "Green", true, 100.0, false, true, true, true]);
-conn.query('INSERT INTO vehicles VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?, ?)', ["GHI789", "Chevy Volt", "Purple", true, 100.0, true, false, false, false]);
-conn.query('INSERT INTO vehicles VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?, ?)', ["OLH985", "Chevy Volt", "Silver", true, 100.0, true, false, false, false]);
-conn.query('INSERT INTO vehicles VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?, ?)', ["DOL234", "Chevy Equinox", "Red", true, 100.0, false, true, false, true]);
+conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', ["JF2GPBCC3FH253482", "1011", "2016 SUBARU CV", "Red", true, 11451.5, false, true, false, false]);
+conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', ["1FMCU59329KC41390", "1018", "2009 FORD ESCAPE", "Blue", true, 151071.5, false, true, false, false]);
+conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', ["1GNDT13S552325449", "1052", "2005 CHEVROLET TRAILBLAZER", "Blue", true, 62759.9, false, true, false, false]);
+conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', ["1FADP5CU7FL121713", "1252", "2015 FORD CMAX", "Blue", true, 6041.9, true, true, false, false]);
+conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', ["1FADP5CU9FL121714", "1254", "2015 FORD CMAX", "Blue", true, 9543.2, true, true, false, false]);
+conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', ["1FADP5CU4FL121717", "1322", "2015 FORD CMAX", "Blue", true, 13594.4, true, true, false, false]);
+conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', ["1FMYU96H76KD26489", "1583", "2006 FORD ESCAPE", "Blue", true, 72981.1, false, true, false, false]);
+conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', ["JTMRJREV1HD152175", "1650", "2017 TOYOTA RAV 4", "Blue", true, 11295.3, false, true, false, false]);
+conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', ["1G1ZS52855F285454", "1662", "2003 CHEVROLET MALIBU", "Blue", true, 90057.8, false, true, false, false]);
+conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', ["JTMRJREV7HD151726", "1679", "2017 TOYOTA RAV 4", "Blue", true, 8483.8, false, true, false, false]);
+conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', ["JF2GPBCC0FH232864", "2811", "2015 SUBARU XV", "Blue", true, 9131.5, false, true, false, false]);
+conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', ["1FTEW1E89HFC38284", "1834", "2017 FORD F150", "Blue", true, 4385.0, false, true, false, false]);
+conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', ["2GNF1CEK9C6333734", "1869", "2011 CHEVROLET EQUINOX", "Blue", true, 27513.0, false, true, false, false]);
+conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', ["1FMCU59H18KA54880", "1994", "2008 FORD ESCAPE", "Blue", true, 235952.9, false, true, false, false]);
+conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', ["1FMCU59H38KA54881", "2140", "2008 FORD ESCAPE", "Blue", true, 77522.0, false, true, false, false]);
+conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', ["1FTYR10D67PA83081", "2224", "2007 FORD RANGER", "Blue", true, 40558.2, false, true, false, false]);
+conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', ["1G1RA6E47EU133964", "2242", "2014 CHEVROLET VOLT", "Blue", true, 9391.1, true, true, false, false]);
+conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', ["1FADP5CU6FL121721", "2254", "2016 FORD CMAX", "Blue", true, 17993.8, true, true, false, false]);
+conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', ["JHMES96663S028859", "2468", "2004 HONDA CIVIC", "Blue", true, 363.6, false, true, false, false]);
+conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', ["1FADP5CU8FL121722", "2472", "2015 FORD CMAX", "Blue", true, 9327.3, true, true, false, false]);
+conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', ["1FADP5CU2FL121716", "2473", "2015 FORD CMAX", "Blue", true, 13772.9, true, true, false, false]);
+conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', ["1GBDV13W07D219007", "2579", "2007 CHEVROLET UPLANDER", "Blue", true, 36831.4, false, true, false, false]);
+conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', ["1FTPW14587FB58781", "2709", "2007 FORD F150", "Blue", true, 167668.3, false, true, false, false]);
+conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', ["1FTYR10D47PA83080", "315", "2007 FORD RANGER", "Blue", true, 43196.2, false, true, false, false]);
+conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', ["1FADP5CU0FL121715", "704", "2015 FORD CMAX", "Blue", true, 5868.7, true, true, false, false]);
+conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', ["1FADP5CU8FL121719", "739", "2015 FORD CMAX", "Blue", true, 7883.3, true, true, false, false]);
+conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', ["1FADP5CU6FL121718", "827", "2015 FORD CMAX", "Blue", true, 9055.6, true, true, false, false]);
 
 /*Sets up the server on port 8080.*/
 server.listen(8080, function(){
