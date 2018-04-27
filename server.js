@@ -230,7 +230,7 @@ io.of('/user').on('connection', function(socket){
                     console.log(reservationInfo.start);
                     console.log(reservationInfo.end);
                     addEvent(reservationInfo.user + "'s upcoming DEM trip", data.rows[0].model + " " + data.rows[0].license + "\n" + reservationInfo.stops, start.toISOString(), end.toISOString());
-                    io.of('/admin').emit('reservationChange', data);
+                    io.of('/admin').emit("newReservation", data);
                     //console.log("sending to user");
                 });
             });
@@ -265,7 +265,7 @@ io.of('/user').on('connection', function(socket){
         submitFeedback(reservationID, resport);
 
         conn.query('SELECT * FROM reports', function(error, data){
-            io.of('/admin').emit('reportAdded', data);
+            io.of('/admin').emit('rep2ortAdded', data);
         });
     });
 

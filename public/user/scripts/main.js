@@ -78,9 +78,12 @@ function combineCards(){
     newCar.rows[0].model = currentCar.model;
     new Reservation(newCar, 0);
 
+    userSocket.emit('vehicleOverride', newCar.rows[0].id, newCar.rows[0].license, newCar.rows[0].model, $("#report-area").val());
+
     firstReturnedCar = undefined;
     currentCar = undefined;
     cleanFields();
+    $("#report-area").val("");
 }
 
 function setVehicle(index){
@@ -126,9 +129,8 @@ function newReservation(){
 }
 
 function cancelReservation(){
-    let reservationID = $("#res-id").html();
-    $("." + reservationID).remove();
-    userSocket.emit('cancel', reservationID, userEmail);
+    $("." + idToDelete).remove();
+    userSocket.emit('cancel', idToDelete, userEmail);
     //console.log(reservationID)
     //console.log("cancelled");
     cleanFields();
@@ -145,6 +147,10 @@ function submitFeedback(reservationID){
     userSocket.emit('reportAdded', reservationID, report);
 }
 
+let idToDelete = "";
+function setDeleteCard(obj){
+    idToDelete = obj.id;
+}
 class Reservation {
     constructor(reservationData, i) {
         this.addToDom(reservationData.rows[i]);
@@ -161,7 +167,7 @@ class Reservation {
 <b>Route</b>: ${JSON.parse(r.stops)} </p>
 <span style = "display: none;" id = "res-id">${r.id}</span>
 <a href="#" class="btn btn-primary edit">Edit reservation</a>
-<a href="#" class="btn btn-secondary" data-toggle="modal" data-target="#cancelModal">Cancel</a>
+<a href="#" id = "${r.id}" class="btn btn-secondary" data-toggle="modal" data-target="#cancelModal" onclick = "setDeleteCard(this);">Cancel</a>
 </div>
 </div>`;
         $('.cards').append(DOMobject);

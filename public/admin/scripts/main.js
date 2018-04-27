@@ -1,6 +1,5 @@
 let adminSocket = io.connect('http://localhost:8080/admin', {forceNew: true});
 
-let currentReservation = 0;
 let currentVehicle = 0;
 
 function toggle_hidden(id, object){
@@ -19,14 +18,22 @@ $(document).ready(function() {
     adminSocket.on('reservationChange', function(reservations){
         console.log("entering reservation change");
         console.log(reservations);
-        
-        for(let i = currentReservation; i < reservations.rowCount; i ++){
+        $('#upcoming').empty();
+        for(let i = 0; i < reservations.rowCount; i++){
             new Reservation(reservations.rows[i]);
-            currentReservation ++;
         }
-        
         console.log("reservation changed");
     });
+    
+    adminSocket.on('newReservation', function(reservation){
+        console.log("entering new res");
+        console.log(reservation);
+        for(let i = 0; i < reservation.rowCount; i++){
+            new Reservation(reservation.rows[i]);
+        }
+        console.log("new res appended");
+    });
+    
     adminSocket.on('vehicleChange', function(vehicles){
         console.log(vehicles);
         for(let i = currentVehicle; i < vehicles.rowCount; i ++){
