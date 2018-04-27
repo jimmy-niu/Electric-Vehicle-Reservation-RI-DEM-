@@ -265,7 +265,7 @@ io.of('/user').on('connection', function(socket){
         submitFeedback(reservationID, resport);
 
         conn.query('SELECT * FROM reports', function(error, data){
-            io.of('/admin').emit('reportAdded', data);
+            io.of('/admin').emit('rep2ortAdded', data);
         });
     });
 
