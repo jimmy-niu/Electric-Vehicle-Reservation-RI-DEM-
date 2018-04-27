@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
     <head>
+        <meta charset="UTF-8">
         <title>User Landing Page: DEM Fleet Reservation</title>
 
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
@@ -19,7 +20,7 @@
     <body>
         <div class = "header drop-shadow">
             <div id = "first-part">
-                <img id = "logo" src = "./media/ri-dem-logo.png"> 
+                <img id="logo" src="./media/ri-dem-logo.png" alt="DEM logo"> 
                 <div id = "title" >
                     <span style = "font-size: 6vh;">V</span>ehicle Reservations
                 </div>
@@ -105,7 +106,7 @@
                                             <label class="form-check-label" for="day">One day before</label>
                                         </div>
                                         <div class="form-check form-check-inline">
-                                            <input type="checkbox" class="form-check-input" id="bour">
+                                            <input type="checkbox" class="form-check-input" id="hour">
                                             <label class="form-check-label" for="hour">One hour before</label>
                                         </div>
                                     </div>
@@ -114,7 +115,7 @@
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                            <button type="button" class="btn btn-primary" id="submit-res" data-dismiss="modal" data-toggle="modal" href="#resModal" onclick = "newReservation()">Make reservation</button>
+                            <button type="button" class="btn btn-primary" id="submit-res" data-dismiss="modal" data-toggle="modal" data-target="#resModal" onclick = "newReservation()">Make reservation</button>
                         </div>
                     </div>
                 </div>
@@ -155,12 +156,12 @@
                         </div>
                         <div class="modal-body">
                             <p>Why won't this vehicle work for you?  Please note that your reasoning will be reviewed by an administrator.</p>
-                            <textarea class="form-control" id="report-area" rows="6"></textarea>
+                            <textarea class="form-control" id="reasoning-field" rows="6"></textarea>
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#resModal" data-dismiss="modal">Cancel</button>
                             
-                            <button type="button" id="confirm-res" class="btn btn-danger" data-toggle="modal" data-target="#altModal" data-dismiss="modal" onclick = "altVehicles();">Show Alternative Vehicles</button>
+                            <button type="button" id="show-alts" class="btn btn-danger" data-toggle="modal" data-target="#altModal" data-dismiss="modal" onclick = "altVehicles();">Show Alternative Vehicles</button>
                         </div>
                     </div>
                 </div>
@@ -182,7 +183,7 @@
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#appealModal" data-dismiss="modal">Cancel</button>
-                            <button type="button" id="confirm-res" class="btn btn-danger" data-toggle="modal" data-dismiss="modal" onclick = "combineCards()">Confirm Alternative Vehicle</button>
+                            <button type="button" id="confirm-alt" class="btn btn-danger" data-toggle="modal" data-dismiss="modal" onclick = "combineCards()">Confirm Alternative Vehicle</button>
                         </div>
                     </div>
                 </div>
