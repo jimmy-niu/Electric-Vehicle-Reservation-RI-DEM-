@@ -1,6 +1,9 @@
 var should = require('should')
 var io = require('socket.io-client')
 
+var benchmark = require('benchmark');
+var suite = new Benchmark.Suite;
+
 describe('log into user side', function(){
 	it('should return and display all the current and past reservations for that client', function(done){
 		var client1 = io.connect('http://localhost:8080/user', {forceNew: true});
@@ -14,8 +17,8 @@ describe('log into user side', function(){
 			done();
 		});
 
-	})
-})
+	});
+});
 
 describe('new reservation', function(){
 	it('should make a new reservation and send the info about it back to the client', function(done){
@@ -27,5 +30,7 @@ describe('new reservation', function(){
 			}
 		});
 		done();
-	})
-})
+	});
+});
+
+// Performance testing
