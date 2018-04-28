@@ -5,6 +5,8 @@ let http =require('http');
 let nodemailer = require('nodemailer');
 let server = http.createServer(app);
 
+let perf = require('./test/perf-test.js');
+
 let io = require('socket.io')(server, {wsEngine: 'ws'}); //fix Windows10 issue
 io.listen(server);
 
@@ -129,19 +131,20 @@ conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', ["1FADP5
 /*Sets up the server on port 8080.*/
 server.listen(8080, function(){
     console.log('- Server listening on port 8080');
+    
 });
 
 //handles events when an admin user is connected
-io.of('/admin').on('connection', function(socket){    
+io.of('/admin').on('connection', function(socket){
     socket.on('vehicleAdded', function(vehicle){
         addVehicle(vehicle);
     });
-    
+
     socket.on('updatePage', function(){
         updateAdminReservations();
         updateVehicles();
     });
-    
+
     socket.on('vehicleRemoved', function(license){
         removeVehicle(license);
     });
@@ -402,7 +405,7 @@ app.all('*', function(req,res,next) {
     if (req.path === '/')
         next();
     else
-        ensureAuthenticated(req,res,next);  
+        ensureAuthenticated(req,res,next);
 });
 
 // ADMIN helper functions
