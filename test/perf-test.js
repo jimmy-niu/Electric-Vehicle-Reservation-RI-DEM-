@@ -29,7 +29,6 @@ suite.add('test1', function(){
 })
 .on('complete', function(){
     console.log("test completed.");
-    suite.reset();
 })
 
-suite.run({'async':true});
+// suite.run({'async':true});
