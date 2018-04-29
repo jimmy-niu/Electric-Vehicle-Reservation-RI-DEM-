@@ -1,30 +1,12 @@
 var should = require('should')
 var io = require('socket.io-client')
 
-var benchmark = require('benchmark');
-var suite = new Benchmark.Suite;
 
 describe('log into user side', function(){
 	it('should return and display all the current and past reservations for that client', function(done){
 		var client1 = io.connect('http://localhost:8080/user', {forceNew: true});
-		client1.emit('reservation', {user: "Jimmy Niu", license: "", start: "2018-04-27 15:00", end: "2018-04-27 17:00", stops: JSON.stringify(["home", "work"]), override: false, justification: ""});
-		client1.on('newReservation', function(data){
-			console.log("hi")
-			should.exist(data);
-			data.rows[0].should.have.property('user');
-			data.rows[0].user.should.equal('Jimmy Niu');
-			data.rows[0].license.should.not.equal("");
-			done();
-		});
-
-	});
-});
-
-describe('new reservation', function(){
-	it('should make a new reservation and send the info about it back to the client', function(done){
-		var client1 = io.connect('http://localhost:8080/user', {forceNew: true});
 		client1.emit('join', "Jenna Tishler", function(data){
-			should.exist(data);
+			data.rows.length.should.be.above(0);
 			for(var i = 0; i < data.rows.length; i++){
 				data.rows[i].user.should.equal("Jenna Tishler");
 			}
@@ -33,4 +15,69 @@ describe('new reservation', function(){
 	});
 });
 
-// Performance testing
+describe('new reservation', function(){
+	it('should make a new reservation and send the info about it back to the client', function(done){
+		var client1 = io.connect('http://localhost:8080/user', {forceNew: true});
+		client1.emit('reservation', {user: "Jimmy Niu", license: "", start: "2018-04-27 15:00", end: "2018-04-27 17:00", stops: JSON.stringify(["home", "work"]), override: false, justification: ""});
+		client1.on('newReservation', function(data){
+			console.log("hi")
+			data.rows.length.should.be.above(0);
+			data.rows[0].should.have.property('user');
+			data.rows[0].user.should.equal('Jimmy Niu');
+			data.rows[0].license.should.not.equal("");
+			done();
+		});
+		client1.on('alternateVehicles', function(data){
+			data.rows.length.should.be.above(0);
+		});
+	});
+});
+
+describe('edit reservation', function(){
+	it('should edit the given reservation and send an updated list of reservations to the client', function(done){
+		var client1 = io.connect('http://localhost:8080/user', {forceNew: true});
+		client1.emit('edit', 4, {user: "dem_test_u@outlook.com", start: "2018-05-06 10:00", end: "2018-05-06 12:00", stops: JSON.stringify(["work", "park", "work"]), justification: ""});
+		client1.on('reservationChange', function(data){
+			for(var i = 0; i < data.rows.length; i++){
+				data.rows[i].user.should.equal("dem_test_u@outlook.com");
+				if (data.rows[i].id === 4){
+					data.rows[i].start.should.equal("2018-05-06 10:00");
+					data.rows[i].end.should.equal("2018-05-06 12:00");
+					data.rows[i].stops.should.equal(JSON.stringify(["work", "park", "work"]));
+					data.rows[i].justification.should.equal("");
+				}
+			}
+			done();
+		});
+	});
+});
+
+describe('cancel reservation', function(){
+	it('should cancel the reservation and send back an updated list of reservations for the client', function(done){
+		var client1 = io.connect('http://localhost:8080/user', {forceNew: true});
+		client1.emit('cancel', 4, "dem_test_u@outlook.com");
+		client1.on('reservationChange', function(data){
+			if (data != null){
+				for(var i = 0; i < data.rows.length; i++){
+					data.rows[i].user.should.equal("dem_test_u@outlook.com");
+					data.rows[i].id.should.not.equal(4);
+				}
+			}
+			done();
+		});
+	})
+});
+
+describe('override reservation', function(){
+	it('should update the reservation and send back an updated list of reservations for the client', function(done){
+		var client1 = io.connect('http://localhost:8080/user', {forceNew: true});
+		client1.emit('vehicleOverride', 5, "1869", "2011 CHEVROLET EQUINOX", "I'm scared of small cars.");
+		client1.on('reservationOverride', function(data){
+			data.rows.length.should.be.above(0);
+			data.rows[0].license.should.equal("1869");
+			data.rows[0].model.should.equal("2011 CHEVROLET EQUINOX");
+			data.rows[0].justification.should.equal("I'm scared of small cars.");
+			done();
+		});
+	})
+});

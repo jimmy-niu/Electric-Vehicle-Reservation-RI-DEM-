@@ -99,15 +99,16 @@ conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?)',["Jen
 conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?)',["Jenna Tishler", "704", "2015 FORD CMAX", "2018-04-19 11:00", "2018-04-20 11:00", JSON.stringify(["home", "work"]), false, ""]);
 conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?)',["Max Luebbers", "739", "2015 FORD CMAX", "2018-04-18 11:00", "2018-04-18 15:00", JSON.stringify(["home", "work"]), false, ""]);
 conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?)',["dem_test_u@outlook.com", "1869", "2011 CHEVROLET EQUINOX", "2018-04-19 14:00", "2018-04-18 17:00", JSON.stringify(["home", "work"]), true, "I have a reason."]);
+conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?)',["dem_test_u@outlook.com", "2254", "2016 FORD CMAX", "2018-04-21 11:00", "2018-04-21 17:00", JSON.stringify(["work", "beach"]), false, ""]);
 
 conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', ["JF2GPBCC3FH253482", "1011", "2016 SUBARU CV", "Red", true, 11451.5, false, true, false, false]);
 conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', ["1FMCU59329KC41390", "1018", "2009 FORD ESCAPE", "Blue", true, 151071.5, false, true, false, false]);
 conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', ["1GNDT13S552325449", "1052", "2005 CHEVROLET TRAILBLAZER", "Blue", true, 62759.9, false, true, false, false]);
-conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', ["1FADP5CU7FL121713", "1252", "2015 FORD CMAX", "Blue", true, 6041.9, true, true, false, false]);
-conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', ["1FADP5CU9FL121714", "1254", "2015 FORD CMAX", "Blue", true, 9543.2, true, true, false, false]);
-conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', ["1FADP5CU4FL121717", "1322", "2015 FORD CMAX", "Blue", true, 13594.4, true, true, false, false]);
+conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', ["1FADP5CU7FL121713", "1252", "2015 FORD CMAX", "Black", true, 6041.9, true, false, false, false]);
+conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', ["1FADP5CU9FL121714", "1254", "2015 FORD CMAX", "Black", true, 9543.2, true, false, false, false]);
+conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', ["1FADP5CU4FL121717", "1322", "2015 FORD CMAX", "Black", true, 13594.4, true, false, false, false]);
 conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', ["1FMYU96H76KD26489", "1583", "2006 FORD ESCAPE", "Blue", true, 72981.1, false, true, false, false]);
-conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', ["JTMRJREV1HD152175", "1650", "2017 TOYOTA RAV 4", "Blue", true, 11295.3, false, true, false, false]);
+conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', ["JTMRJREV1HD152175", "1650", "2017 TOYOTA RAV 4", "Blue", true, 11295.3, false, true, false, true]);
 conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', ["1G1ZS52855F285454", "1662", "2003 CHEVROLET MALIBU", "Blue", true, 90057.8, false, true, false, false]);
 conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', ["JTMRJREV7HD151726", "1679", "2017 TOYOTA RAV 4", "Blue", true, 8483.8, false, true, false, false]);
 conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', ["JF2GPBCC0FH232864", "2811", "2015 SUBARU XV", "Blue", true, 9131.5, false, true, false, false]);
@@ -116,17 +117,17 @@ conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', ["2GNF1C
 conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', ["1FMCU59H18KA54880", "1994", "2008 FORD ESCAPE", "Blue", true, 235952.9, false, true, false, false]);
 conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', ["1FMCU59H38KA54881", "2140", "2008 FORD ESCAPE", "Blue", true, 77522.0, false, true, false, false]);
 conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', ["1FTYR10D67PA83081", "2224", "2007 FORD RANGER", "Blue", true, 40558.2, false, true, false, false]);
-conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', ["1G1RA6E47EU133964", "2242", "2014 CHEVROLET VOLT", "Blue", true, 9391.1, true, true, false, false]);
-conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', ["1FADP5CU6FL121721", "2254", "2016 FORD CMAX", "Blue", true, 17993.8, true, true, false, false]);
+conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', ["1G1RA6E47EU133964", "2242", "2014 CHEVROLET VOLT", "Black", true, 9391.1, true, false, false, false]);
+conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', ["1FADP5CU6FL121721", "2254", "2016 FORD CMAX", "Black", true, 17993.8, true, false, false, false]);
 conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', ["JHMES96663S028859", "2468", "2004 HONDA CIVIC", "Blue", true, 363.6, false, true, false, false]);
-conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', ["1FADP5CU8FL121722", "2472", "2015 FORD CMAX", "Blue", true, 9327.3, true, true, false, false]);
-conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', ["1FADP5CU2FL121716", "2473", "2015 FORD CMAX", "Blue", true, 13772.9, true, true, false, false]);
-conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', ["1GBDV13W07D219007", "2579", "2007 CHEVROLET UPLANDER", "Blue", true, 36831.4, false, true, false, false]);
+conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', ["1FADP5CU8FL121722", "2472", "2015 FORD CMAX", "Black", true, 9327.3, true, false, false, false]);
+conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', ["1FADP5CU2FL121716", "2473", "2015 FORD CMAX", "Black", true, 13772.9, true, false, false, false]);
+conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', ["1GBDV13W07D219007", "2579", "2007 CHEVROLET UPLANDER", "Blue", true, 36831.4, false, true, true, true]);
 conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', ["1FTPW14587FB58781", "2709", "2007 FORD F150", "Blue", true, 167668.3, false, true, false, false]);
 conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', ["1FTYR10D47PA83080", "315", "2007 FORD RANGER", "Blue", true, 43196.2, false, true, false, false]);
-conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', ["1FADP5CU0FL121715", "704", "2015 FORD CMAX", "Blue", true, 5868.7, true, true, false, false]);
-conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', ["1FADP5CU8FL121719", "739", "2015 FORD CMAX", "Blue", true, 7883.3, true, true, false, false]);
-conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', ["1FADP5CU6FL121718", "827", "2015 FORD CMAX", "Blue", true, 9055.6, true, true, false, false]);
+conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', ["1FADP5CU0FL121715", "704", "2015 FORD CMAX", "Black", true, 5868.7, true, false, false, false]);
+conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', ["1FADP5CU8FL121719", "739", "2015 FORD CMAX", "Black", true, 7883.3, true, false, false, false]);
+conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', ["1FADP5CU6FL121718", "827", "2015 FORD CMAX", "Black", true, 9055.6, true, false, false, false]);
 
 /*Sets up the server on port 8080.*/
 server.listen(8080, function(){
@@ -268,16 +269,20 @@ io.of('/user').on('connection', function(socket){
     });
 
     socket.on('edit', function(reservationID, reservationInfo){
-        editReservation(reservationID, reservationInfo.user, reservationInfo.start, reservationInfo.end, reservationInfo.stops, reservationInfo.justification)
-        console.time("Get User Reservations Query"); // TIMER START
-        conn.query('SELECT * FROM reservations WHERE user = ?', [reservationInfo.user], function(error, data){
-            console.timeEnd("Get User Reservations Query"); // TIMER END
-            socket.emit('reservationChange', data);
-        });
-        console.time("Get Reservations Query"); // TIMER START
-        conn.query('SELECT * FROM reservations', function(error, data){
-            console.time("Get Reservations Query") // TIMER END
-            io.of('/admin').emit('reservationChange', data);
+        //editReservation(reservationID, reservationInfo.start, reservationInfo.end, reservationInfo.stops, reservationInfo.justification);
+        console.time("Reservation Edit Query");
+        conn.query('UPDATE reservations SET start = ?, end = ?, stops = ?, justification = ? WHERE id = ?', [reservationInfo.start, reservationInfo.end, reservationInfo.stops, reservationInfo.justification, reservationID], function(error, data){
+            console.timeEnd("Reservation Edit Query");
+            console.time("Get User Reservations Query"); // TIMER START
+            conn.query('SELECT * FROM reservations WHERE user = ?', [reservationInfo.user], function(error, data){
+                console.timeEnd("Get User Reservations Query"); // TIMER END
+                socket.emit('reservationChange', data);
+            });
+            console.time("Get Reservations Query"); // TIMER START
+            conn.query('SELECT * FROM reservations', function(error, data){
+                console.timeEnd("Get Reservations Query") // TIMER END
+                io.of('/admin').emit('reservationChange', data);
+            });
         });
     });
 
@@ -290,7 +295,7 @@ io.of('/user').on('connection', function(socket){
         });
         console.time("Get Reservations Query"); // TIMER START
         conn.query('SELECT * FROM reservations', function(error, data){
-            console.time("Get Reservations Query") // TIMER END
+            console.timeEnd("Get Reservations Query") // TIMER END
             io.of('/admin').emit('reservationChange', data);
         });
     });
@@ -300,7 +305,7 @@ io.of('/user').on('connection', function(socket){
         console.time("Get Reports Query"); // TIMER START
         conn.query('SELECT * FROM reports', function(error, data){
             console.timeEnd("Get Reports Query"); // TIMER END
-            io.of('/admin').emit('rep2ortAdded', data);
+            io.of('/admin').emit('reportChange', data);
         });
     });
 
@@ -516,7 +521,7 @@ function removeUser(email){
 // USER help functions
 function editReservation(id, start, end, stops, justification){
     console.time("Reservation Edit Query");
-    conn.query('UPDATE reservations SET start = ?, end = ?, stops = ?, justification = ? WHERE reservationID = ?', [license, start, end, stops, override, justification, id], function(error, data){
+    conn.query('UPDATE reservations SET start = ?, end = ?, stops = ?, justification = ? WHERE reservationID = ?', [start, end, stops, justification, id], function(error, data){
         console.timeEnd("Reservation Edit Query");
     });
 }

@@ -137,7 +137,7 @@ function cancelReservation(){
 }
 
 function editReservation(){
-    userSocket.emit('edit', {user: "Jimmy Niu", license: "19087", start: "6932", end: "6361", stops: ["home", "work"], override: false, justification: ""});
+    //userSocket.emit('edit', {user: "Jimmy Niu", license: "19087", start: "6932", end: "6361", stops: ["home", "work"], override: false, justification: ""});
 }
 
 
@@ -174,6 +174,6 @@ class Reservation {
     }
 }
 
-function overrideVehicle(reservationID, license, justification){
-    userSocket.emit('vehicleOverride', reservationID, license, justification);
+function overrideVehicle(reservationID, license, model, justification){
+    userSocket.emit('vehicleOverride', reservationID, license, model, justification);
 }
