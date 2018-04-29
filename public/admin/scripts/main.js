@@ -13,8 +13,11 @@ function toggle_hidden(id, object){
 
 // Sets up the sockets.
 $(document).ready(function() {
-    adminSocket.emit('updatePage');
-    
+    console.time('Page Update Event');
+    adminSocket.emit('updatePage', function(){
+        console.timeEnd('Page Update Event');
+    });
+
     adminSocket.on('reservationChange', function(reservations){
         console.log("entering reservation change");
         console.log(reservations);
@@ -24,7 +27,7 @@ $(document).ready(function() {
         }
         console.log("reservation changed");
     });
-    
+
     adminSocket.on('newReservation', function(reservation){
         console.log("entering new res");
         console.log(reservation);
@@ -33,7 +36,7 @@ $(document).ready(function() {
         }
         console.log("new res appended");
     });
-    
+
     adminSocket.on('vehicleChange', function(vehicles){
         console.log(vehicles);
         for(let i = currentVehicle; i < vehicles.rowCount; i ++){
@@ -89,25 +92,36 @@ function addVehicle(){
     let equipmentRack = $('#equipChoice').is(':checked');
 
     if(license !== '' && model !== '' && color !== ''){
-        let vehicle = {license: license, model: model, color: color, miles: miles, status: status, 
+        let vehicle = {license: license, model: model, color: color, miles: miles, status: status,
                        isEv: carType, trunk: trunk, offRoad: offRoad, equipmentRack: equipmentRack};
-
-        adminSocket.emit("vehicleAdded", vehicle);
+        console.time("Add Vehicle");
+        adminSocket.emit("vehicleAdded", vehicle, function(){
+                console.timeEnd("Add Vehicle");
+        });
     }
 }
 
 function editVehicle(id, vehicle){
-    adminSocket.emit('vehicleEdited', id, vehicle);
+    console.time("Edit Vehicle");
+    adminSocket.emit('vehicleEdited', id, vehicle, function(){
+        console.timeEnd("Edit Vehicle")
+    });
 }
 
 function deleteVehicle(license){
-    adminSocket.emit("vehicleRemoved", license);
-    // This works on just deleting the vehicle dom obj btw. 
+    console.time("Delete Vehicle");
+    adminSocket.emit("vehicleRemoved", license, function(){
+        console.timeEnd("Delete Vehicle")
+    });
+    // This works on just deleting the vehicle dom obj btw.
     $('.'+license).remove();
 }
 
 function updateVehicleStatus(license, status){
-    adminSocket.emit('vehicleStatusUpdated', license, status);
+    console.time("Update Vehicle Status");
+    adminSocket.emit('vehicleStatusUpdated', license, status, function(){
+        console.timeEnd("Update Vehicle Status");
+    });
 }
 
 function setJustificationModal(text){
@@ -115,7 +129,7 @@ function setJustificationModal(text){
     $('#justificationModalText').append(text);
 }
 
-// Classes used to create DOM objects. 
+// Classes used to create DOM objects.
 class Reservation {
     constructor(reservationData){
         this.addToDOM(reservationData);
@@ -124,7 +138,7 @@ class Reservation {
         let justification = r.justification;
         if(justification !== ''){
             justification = `<a href = "#justificationModal" class = "btn btn-large btn-primary drop-shadow" data-toggle="modal" onclick = "setJustificationModal('${r.justification}')">Click To See</a>`
-        }     
+        }
 
         let DOMobject = `<div class = "col-entry reservation-user">${r.user}</div>` +
             `<div class = "col-entry reservation-start ${r.license}">${r.start}</div>` +
@@ -171,5 +185,3 @@ function removeReport(id){
 function changeUserStatus(email, admin){
     adminSocket.emit('userStatusChanged', email, admin);
 }
-
-

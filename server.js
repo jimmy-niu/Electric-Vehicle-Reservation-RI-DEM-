@@ -136,23 +136,28 @@ server.listen(8080, function(){
 
 //handles events when an admin user is connected
 io.of('/admin').on('connection', function(socket){
-    socket.on('vehicleAdded', function(vehicle){
+    socket.on('vehicleAdded', function(vehicle,callback){
         addVehicle(vehicle);
+        callback();
     });
 
-    socket.on('updatePage', function(){
+    socket.on('updatePage', function(callback){
         updateAdminReservations();
         updateVehicles();
+        callback();
     });
 
-    socket.on('vehicleRemoved', function(license){
+    socket.on('vehicleRemoved', function(license, callback){
         removeVehicle(license);
+        callback();
     });
-    socket.on('vehicleEdited', function(id, vehicle){
+    socket.on('vehicleEdited', function(id, vehicle, callback){
         editVehicle(id, vehicle);
+        callback();
     });
-    socket.on('vehicleStatusUpdated', function(license, status){
+    socket.on('vehicleStatusUpdated', function(license, status, callback){
         updateVehicleStatus(license, status);
+        callback();
     });
     socket.on('reportRemoved', function(license, status){
         removeReport(license, status);
@@ -220,7 +225,7 @@ io.of('/user').on('connection', function(socket){
         });
     });
     //emitted when a user makes a new reservation
-    socket.on('reservation', function(reservationInfo){
+    socket.on('reservation', function(reservationInfo, callback){
         //console.log("got a reservation!");
 
         var needsTrunk;
@@ -265,9 +270,10 @@ io.of('/user').on('connection', function(socket){
                 });
             });
         });
+        callback();
     });
 
-    socket.on('edit', function(reservationID, reservationInfo){
+    socket.on('edit', function(reservationID, reservationInfo, callback){
         editReservation(reservationID, reservationInfo.user, reservationInfo.start, reservationInfo.end, reservationInfo.stops, reservationInfo.justification)
         console.time("Get User Reservations Query"); // TIMER START
         conn.query('SELECT * FROM reservations WHERE user = ?', [reservationInfo.user], function(error, data){
@@ -279,9 +285,10 @@ io.of('/user').on('connection', function(socket){
             console.time("Get Reservations Query") // TIMER END
             io.of('/admin').emit('reservationChange', data);
         });
+        callback();
     });
 
-    socket.on('cancel', function(reservationID, user){
+    socket.on('cancel', function(reservationID, user, callback){
         cancelReservation(reservationID);
         console.time("Get User Reservations Query"); // TIMER START
         conn.query('SELECT * FROM reservations WHERE user = ?', [user], function(error, data){
@@ -293,6 +300,7 @@ io.of('/user').on('connection', function(socket){
             console.time("Get Reservations Query") // TIMER END
             io.of('/admin').emit('reservationChange', data);
         });
+        callback();
     });
 
     socket.on('feedback', function(reservationID, report){

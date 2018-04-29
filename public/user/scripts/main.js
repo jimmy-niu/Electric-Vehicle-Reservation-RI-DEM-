@@ -24,7 +24,7 @@ $(document).ready(function() {
             $("#startMText").html($("#startMText").html() + reservations.rows[i].start);
             $("#endMText").html($("#endMText").html() + reservations.rows[i].end);
             $("#stopsMText").html($("#stopsMText").html() + JSON.parse(reservations.rows[i].stops));
-        }    
+        }
     });
 
     userSocket.on('reservationChange', function(reservations){
@@ -115,7 +115,7 @@ function newReservation(){
     let start = $("#start-date").val();
     let end = $("#end-date").val();
 
-    let stops = [];    
+    let stops = [];
     $('.route-stop').each(function() {
         stops.push($(this).val());
     });
@@ -125,19 +125,28 @@ function newReservation(){
     let rack = $('#kayak').prop('checked');
 
     let resData = {user: userEmail, start: start, end: end, stops: JSON.stringify(stops).split('},{').join('}, {'), override: false, justification: "", needsTrunk: trunk, needsOffRoad: offroad, needsRack: rack};
-    userSocket.emit('reservation', resData);
+    console.time("Reservation Created");
+    userSocket.emit('reservation', resData, function(){
+        console.timeEnd("Reservation Created");
+    });
 }
 
 function cancelReservation(){
     $("." + idToDelete).remove();
-    userSocket.emit('cancel', idToDelete, userEmail);
+    console.time("Reservation Cancelled")
+    userSocket.emit('cancel', idToDelete, userEmail,function(){
+        console.timeEnd("Reservation Cancelled");
+    });
     //console.log(reservationID)
     //console.log("cancelled");
     cleanFields();
 }
 
 function editReservation(){
-    userSocket.emit('edit', {user: "Jimmy Niu", license: "19087", start: "6932", end: "6361", stops: ["home", "work"], override: false, justification: ""});
+    console.time("Reservation Edited");
+    userSocket.emit('edit', {user: "Jimmy Niu", license: "19087", start: "6932", end: "6361", stops: ["home", "work"], override: false, justification: ""}, function(){
+        console.timeEnd("Reservation Edited");
+    });
 }
 
 
