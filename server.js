@@ -83,6 +83,7 @@ transporter.sendMail(mailOptions, function(error, info){
 //for testing purposes- data resets every time
 conn.query('DROP TABLE IF EXISTS reservations');
 conn.query('DROP TABLE IF EXISTS vehicles');
+conn.query('DROP TABLE IF EXISTS reports');
 
 
 //Users
@@ -129,6 +130,9 @@ conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', ["1FADP5
 conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', ["1FADP5CU8FL121719", "739", "2015 FORD CMAX", "Black", true, 7883.3, true, false, false, false]);
 conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', ["1FADP5CU6FL121718", "827", "2015 FORD CMAX", "Black", true, 9055.6, true, false, false, false]);
 
+conn.query('INSERT INTO reports VALUES(null, ?, ?)', [5, "Car sucks."]);
+conn.query('INSERT INTO reports VALUES(null, ?, ?)', [1, "Car is dirty af."]);
+
 /*Sets up the server on port 8080.*/
 server.listen(8080, function(){
     console.log('- Server listening on port 8080');
@@ -160,8 +164,8 @@ io.of('/admin').on('connection', function(socket){
         updateVehicleStatus(license, status);
         callback();
     });
-    socket.on('reportRemoved', function(license, status){
-        removeReport(license, status);
+    socket.on('reportRemoved', function(id){
+        removeReport(id);
     });
     socket.on('userAdded', function(email, admin){
         addUser(email, admin);
@@ -489,7 +493,7 @@ function updateReports(){
         io.of('/admin').emit('reportChange', data);
     });
 }
-function removeReports(id){
+function removeReport(id){
     console.time("Remove Reports Query");
     conn.query('DELETE FROM reports WHERE id =?', [id], function(error, data){
         console.timeEnd("Remove Reports Query");

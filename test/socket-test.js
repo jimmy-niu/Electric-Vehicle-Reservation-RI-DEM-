@@ -20,7 +20,6 @@ describe('new reservation', function(){
 		var admin1 = io.connect('http://localhost:8080/admin', {forceNew: true});
 		client1.emit('reservation', {user: "Jimmy Niu", license: "", start: "2018-04-27 15:00", end: "2018-04-27 17:00", stops: JSON.stringify(["home", "work"]), override: false, justification: ""});
 		client1.on('newReservation', function(data){
-			console.log("hi")
 			data.rows.length.should.be.above(0);
 			data.rows[0].should.have.property('user');
 			data.rows[0].user.should.equal('Jimmy Niu');
@@ -133,6 +132,87 @@ describe('add report', function(){
 				if (data.rows[i].reservation === 5){
 					data.rows[i].report.should.equal("The car was just fine.");
 				}
+			}
+		});
+		done();
+	})
+});
+
+describe('log into admin side', function(){
+	it('should display all the current reservations and vehicles', function(done){
+		var admin1 = io.connect('http://localhost:8080/admin', {forceNew: true});
+		admin1.emit('updatePage', function(){
+
+		});
+		admin1.on('reservationChange', function(data){
+			data.rows.length.should.be.above(0);
+		});
+		admin1.on('vehicleChange', function(data){
+			data.rows.length.should.be.above(0);
+		});
+		done();
+	})
+});
+
+describe('vehicle removed', function(){
+	it('should return an updated list of vehicles', function(done){
+		var admin1 = io.connect('http://localhost:8080/admin', {forceNew: true});
+		admin1.emit('vehicleRemoved', "2242", function(){
+			
+		});
+		admin1.on('vehicleChange', function(data){
+			for(var i = 0; i < data.rows.length; i++){
+				data.rows[i].license.should.not.equal("2242");
+			}
+		});
+		done();
+	})
+});
+
+describe('edit vehicle', function(){
+	it('should return an updated list of vehicles', function(done){
+		var admin1 = io.connect('http://localhost:8080/admin', {forceNew: true});
+		admin1.emit('vehicleEdited', "2GNF1CEK9C6333734", {license: "1869", model: "2011 CHEVROLET EQUINOX", color: "Red", miles: 27513.0, status: true,
+                       isEv: false, trunk: true, offRoad: false, equintRack: false}, function(){
+			
+		});
+		admin1.on('vehicleChange', function(data){
+			for(var i = 0; i < data.rows.length; i++){
+				if(data.rows[i].id === "2GNF1CEK9C6333734"){
+					data.rows[i].color.should.equal('Red');
+				}
+			}
+		});
+		done();
+	})
+});
+
+describe('update vehicle status', function(){
+	it('should return an updated list of vehicles', function(done){
+		var admin1 = io.connect('http://localhost:8080/admin', {forceNew: true});
+		admin1.emit('vehicleStatusUpdated', "704", false, function(){
+			
+		});
+		admin1.on('vehicleChange', function(data){
+			for(var i = 0; i < data.rows.length; i++){
+				if(data.rows[i].license === "704"){
+					data.rows[i].status.should.equal(false);
+				}
+			}
+		});
+		done();
+	})
+});
+
+describe('report removed', function(){
+	it('should return an updated list of vehicles', function(done){
+		var admin1 = io.connect('http://localhost:8080/admin', {forceNew: true});
+		admin1.emit('reportRemoved', 1, function(){
+			
+		});
+		admin1.on('reportChange', function(data){
+			for(var i = 0; i < data.rows.length; i++){
+				data.rows[i].id.should.not.equal(1);
 			}
 		});
 		done();
