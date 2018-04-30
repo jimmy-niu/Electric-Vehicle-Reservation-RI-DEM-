@@ -271,9 +271,9 @@ io.of('/user').on('connection', function(socket){
                 });
             });
         });
-        callback();
+        //callback();
     });
-    
+
     socket.on('edit', function(reservationID, reservationInfo){
         //editReservation(reservationID, reservationInfo.start, reservationInfo.end, reservationInfo.stops, reservationInfo.justification);
         console.time("Reservation Edit Query");
@@ -290,7 +290,7 @@ io.of('/user').on('connection', function(socket){
                 io.of('/admin').emit('reservationChange', data);
             });
         });
-        callback();
+        //callback();
     });
 
     socket.on('cancel', function(reservationID, user, callback){
@@ -305,7 +305,7 @@ io.of('/user').on('connection', function(socket){
             console.timeEnd("Get Reservations Query") // TIMER END
             io.of('/admin').emit('reservationChange', data);
         });
-        callback();
+        //callback();
     });
 
     socket.on('feedback', function(reservationID, report){
