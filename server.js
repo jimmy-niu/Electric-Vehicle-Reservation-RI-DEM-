@@ -344,6 +344,8 @@ io.of('/user').on('connection', function(socket){
  */
 
 var token = undefined;
+var authorized_users = ['dem_test_u@outlook.com', 'dem_test_u_2@outlook.com'];
+var authorized_admins = ['dem_test_a@outlook.com'];
 
 app.use(passport.initialize());
 app.use(passport.session());
@@ -376,12 +378,31 @@ app.get('/', function(req, res) {
     res.send(index.loginPagePassport());
 });
 
+
+function ensureAuthenticated(req, res, next) {
+    var email = req.user._json.EmailAddress;
+    if (req.isAuthenticated() && authorized_users.includes(email) && req.path.startsWith("/user/")) {
+        return next();
+    }
+    if (req.isAuthenticated() && authorized_admins.includes(email) && req.path.startsWith("/admin/")) {
+        return next();
+    }
+    else res.redirect('/');
+}
+
+app.all('*', function(req,res,next) {
+    if (req.path === '/' || req.path === '/auth/outlook' || req.path === '/authorize')
+        next();
+    else
+        ensureAuthenticated(req,res,next);
+});
+
 app.get('/authorize',
         passport.authenticate('windowslive', { failureRedirect: '/' }),
         function(req, res) {
     var user_email = req.user._json.EmailAddress;
     var name = req.user._json.DisplayName;
-    if (user_email === 'dem_test_a@outlook.com') {
+    if (authorized_admins.includes(user_email)) {
         app.use("/admin", express.static(__dirname + '/public/admin'));
         replace({
             regex: "Welcome,(.+)<br>",
@@ -393,7 +414,7 @@ app.get('/authorize',
         //res.render('admin/index.html', {user : user_email});
         //res.redirect('admin/index/?email=' + encodeURIComponent(user_email));
         io.of('/admin').emit('admin-connected', user_email);
-    } else if (user_email === 'dem_test_u@outlook.com' || user_email === 'dem_test_u_2@outlook.com') {
+    } else if (authorized_users.includes(user_email)) {
         app.use("/user", express.static(__dirname + '/public/user'));
         io.sockets.emit('user-connected', user_email);
         replace({
@@ -427,18 +448,6 @@ app.get('/logout', function(req, res) {
     req.session.destroy(function (err) {
         res.redirect('/');
     });
-});
-
-function ensureAuthenticated(req, res, next) {
-    if (req.isAuthenticated()) { return next(); }
-    res.redirect('/');
-}
-
-app.all('*', function(req,res,next) {
-    if (req.path === '/')
-        next();
-    else
-        ensureAuthenticated(req,res,next);
 });
 
 // ADMIN helper functions
