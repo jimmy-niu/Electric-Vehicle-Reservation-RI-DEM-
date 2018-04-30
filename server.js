@@ -102,30 +102,30 @@ conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?)',["Max
 conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?)',["dem_test_u@outlook.com", "1869", "2011 CHEVROLET EQUINOX", "2018-04-19 14:00", "2018-04-18 17:00", JSON.stringify(["home", "work"]), true, "I have a reason."]);
 conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?)',["dem_test_u@outlook.com", "2254", "2016 FORD CMAX", "2018-04-21 11:00", "2018-04-21 17:00", JSON.stringify(["work", "beach"]), false, ""]);
 
-conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', ["JF2GPBCC3FH253482", "1011", "2016 SUBARU CV", "Red", true, 11451.5, false, true, false, false]);
-conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', ["1FMCU59329KC41390", "1018", "2009 FORD ESCAPE", "Blue", true, 151071.5, false, true, false, false]);
-conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', ["1GNDT13S552325449", "1052", "2005 CHEVROLET TRAILBLAZER", "Blue", true, 62759.9, false, true, false, false]);
+conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', ["JF2GPBCC3FH253482", "1011", "2016 SUBARU CV", "Black/White", true, 11451.5, false, true, true, false]);
+conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', ["1FMCU59329KC41390", "1018", "2009 FORD ESCAPE", "Black/White", true, 151071.5, false, true, true, false]);
+conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', ["1GNDT13S552325449", "1052", "2005 CHEVROLET TRAILBLAZER", "Black/White", true, 62759.9, false, false, false, false]);
 conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', ["1FADP5CU7FL121713", "1252", "2015 FORD CMAX", "Black", true, 6041.9, true, false, false, false]);
 conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', ["1FADP5CU9FL121714", "1254", "2015 FORD CMAX", "Black", true, 9543.2, true, false, false, false]);
 conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', ["1FADP5CU4FL121717", "1322", "2015 FORD CMAX", "Black", true, 13594.4, true, false, false, false]);
-conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', ["1FMYU96H76KD26489", "1583", "2006 FORD ESCAPE", "Blue", true, 72981.1, false, true, false, false]);
-conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', ["JTMRJREV1HD152175", "1650", "2017 TOYOTA RAV 4", "Blue", true, 11295.3, false, true, false, true]);
-conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', ["1G1ZS52855F285454", "1662", "2003 CHEVROLET MALIBU", "Blue", true, 90057.8, false, true, false, false]);
-conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', ["JTMRJREV7HD151726", "1679", "2017 TOYOTA RAV 4", "Blue", true, 8483.8, false, true, false, false]);
-conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', ["JF2GPBCC0FH232864", "2811", "2015 SUBARU XV", "Blue", true, 9131.5, false, true, false, false]);
-conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', ["1FTEW1E89HFC38284", "1834", "2017 FORD F150", "Blue", true, 4385.0, false, true, false, false]);
-conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', ["2GNF1CEK9C6333734", "1869", "2011 CHEVROLET EQUINOX", "Blue", true, 27513.0, false, true, false, false]);
-conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', ["1FMCU59H18KA54880", "1994", "2008 FORD ESCAPE", "Blue", true, 235952.9, false, true, false, false]);
-conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', ["1FMCU59H38KA54881", "2140", "2008 FORD ESCAPE", "Blue", true, 77522.0, false, true, false, false]);
-conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', ["1FTYR10D67PA83081", "2224", "2007 FORD RANGER", "Blue", true, 40558.2, false, true, false, false]);
+conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', ["1FMYU96H76KD26489", "1583", "2006 FORD ESCAPE", "Black/White", true, 72981.1, false, true, true, false]);
+conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', ["JTMRJREV1HD152175", "1650", "2017 TOYOTA RAV 4", "Black/White", true, 11295.3, false, true, true, false]);
+conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', ["1G1ZS52855F285454", "1662", "2003 CHEVROLET MALIBU", "Black/White", true, 90057.8, false, false, false, false]);
+conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', ["JTMRJREV7HD151726", "1679", "2017 TOYOTA RAV 4", "Black/White", true, 8483.8, false, true, true, false]);
+conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', ["JF2GPBCC0FH232864", "2811", "2015 SUBARU XV", "Black/White", true, 9131.5, false, true, true, false]);
+conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', ["1FTEW1E89HFC38284", "1834", "2017 FORD F150", "Black/White", true, 4385.0, false, true, true, true]);
+conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', ["2GNF1CEK9C6333734", "1869", "2011 CHEVROLET EQUINOX", "Black/White", true, 27513.0, false, true, true, false]);
+conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', ["1FMCU59H18KA54880", "1994", "2008 FORD ESCAPE", "Black/White", true, 235952.9, false, true, true, false]);
+conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', ["1FMCU59H38KA54881", "2140", "2008 FORD ESCAPE", "Black/White", true, 77522.0, false, true, true, false]);
+conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', ["1FTYR10D67PA83081", "2224", "2007 FORD RANGER", "Black/White", true, 40558.2, false, true, true, true]);
 conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', ["1G1RA6E47EU133964", "2242", "2014 CHEVROLET VOLT", "Black", true, 9391.1, true, false, false, false]);
 conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', ["1FADP5CU6FL121721", "2254", "2016 FORD CMAX", "Black", true, 17993.8, true, false, false, false]);
-conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', ["JHMES96663S028859", "2468", "2004 HONDA CIVIC", "Blue", true, 363.6, false, true, false, false]);
+conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', ["JHMES96663S028859", "2468", "2004 HONDA CIVIC", "Black/White", true, 363.6, false, false, false, false]);
 conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', ["1FADP5CU8FL121722", "2472", "2015 FORD CMAX", "Black", true, 9327.3, true, false, false, false]);
 conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', ["1FADP5CU2FL121716", "2473", "2015 FORD CMAX", "Black", true, 13772.9, true, false, false, false]);
-conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', ["1GBDV13W07D219007", "2579", "2007 CHEVROLET UPLANDER", "Blue", true, 36831.4, false, true, true, true]);
-conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', ["1FTPW14587FB58781", "2709", "2007 FORD F150", "Blue", true, 167668.3, false, true, false, false]);
-conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', ["1FTYR10D47PA83080", "315", "2007 FORD RANGER", "Blue", true, 43196.2, false, true, false, false]);
+conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', ["1GBDV13W07D219007", "2579", "2007 CHEVROLET UPLANDER", "Black/White", true, 36831.4, false, true, false, false]);
+conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', ["1FTPW14587FB58781", "2709", "2007 FORD F150", "Black/White", true, 167668.3, false, true, true, true]);
+conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', ["1FTYR10D47PA83080", "315", "2007 FORD RANGER", "Black/White", true, 43196.2, false, true, true, true]);
 conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', ["1FADP5CU0FL121715", "704", "2015 FORD CMAX", "Black", true, 5868.7, true, false, false, false]);
 conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', ["1FADP5CU8FL121719", "739", "2015 FORD CMAX", "Black", true, 7883.3, true, false, false, false]);
 conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', ["1FADP5CU6FL121718", "827", "2015 FORD CMAX", "Black", true, 9055.6, true, false, false, false]);
@@ -344,8 +344,6 @@ io.of('/user').on('connection', function(socket){
  */
 
 var token = undefined;
-var authorized_users = ['dem_test_u@outlook.com', 'dem_test_u_2@outlook.com'];
-var authorized_admins = ['dem_test_a@outlook.com'];
 
 app.use(passport.initialize());
 app.use(passport.session());
@@ -378,31 +376,12 @@ app.get('/', function(req, res) {
     res.send(index.loginPagePassport());
 });
 
-
-function ensureAuthenticated(req, res, next) {
-    var email = req.user._json.EmailAddress;
-    if (req.isAuthenticated() && authorized_users.includes(email) && req.path.startsWith("/user/")) {
-        return next();
-    }
-    if (req.isAuthenticated() && authorized_admins.includes(email) && req.path.startsWith("/admin/")) {
-        return next();
-    }
-    else res.redirect('/');
-}
-
-app.all('*', function(req,res,next) {
-    if (req.path === '/' || req.path === '/auth/outlook' || req.path === '/authorize')
-        next();
-    else
-        ensureAuthenticated(req,res,next);
-});
-
 app.get('/authorize',
         passport.authenticate('windowslive', { failureRedirect: '/' }),
         function(req, res) {
     var user_email = req.user._json.EmailAddress;
     var name = req.user._json.DisplayName;
-    if (authorized_admins.includes(user_email)) {
+    if (user_email === 'dem_test_a@outlook.com') {
         app.use("/admin", express.static(__dirname + '/public/admin'));
         replace({
             regex: "Welcome,(.+)<br>",
@@ -414,7 +393,7 @@ app.get('/authorize',
         //res.render('admin/index.html', {user : user_email});
         //res.redirect('admin/index/?email=' + encodeURIComponent(user_email));
         io.of('/admin').emit('admin-connected', user_email);
-    } else if (authorized_users.includes(user_email)) {
+    } else if (user_email === 'dem_test_u@outlook.com' || user_email === 'dem_test_u_2@outlook.com') {
         app.use("/user", express.static(__dirname + '/public/user'));
         io.sockets.emit('user-connected', user_email);
         replace({
@@ -448,6 +427,18 @@ app.get('/logout', function(req, res) {
     req.session.destroy(function (err) {
         res.redirect('/');
     });
+});
+
+function ensureAuthenticated(req, res, next) {
+    if (req.isAuthenticated()) { return next(); }
+    res.redirect('/');
+}
+
+app.all('*', function(req,res,next) {
+    if (req.path === '/')
+        next();
+    else
+        ensureAuthenticated(req,res,next);
 });
 
 // ADMIN helper functions
