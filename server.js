@@ -43,7 +43,7 @@ app.use(session(
      resave: false,
      saveUninitialized: true
     })
-       );
+);
 
 /*email sender (will eventually change to a different email)
 you can use your email and password to test

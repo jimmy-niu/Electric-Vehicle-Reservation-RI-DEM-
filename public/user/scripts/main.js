@@ -37,6 +37,8 @@ $(document).ready(function() {
         $("#startMText").html($("#startMText").html() + reservation.rows[0].start);
         $("#endMText").html($("#endMText").html() + reservation.rows[0].end);
         $("#stopsMText").html($("#stopsMText").html() + JSON.parse(reservation.rows[0].stops));
+        $('#backCancelButton').addClass('d-none');
+        $('#acceptDeclineButtons').removeClass('d-none');
         console.log(reservation);
     });
 
@@ -50,7 +52,14 @@ $(document).ready(function() {
 
     userSocket.on('noVehicle', function(){
         console.log("There is no vehicle available at that time that meets your needs.");
-        //pop-up/change of modal needed on front end
+        $("#carMakeMText").html("");
+        $("#plateNumberMText").html("");
+        $("#startMText").html("");
+        $("#endMText").html("");
+        $("#stopsMText").html("");
+        $("#noVehicleMText").html("There is no vehicle available at that time that meets your needs.");
+        $('#backCancelButton').removeClass('d-none');
+        $('#acceptDeclineButtons').addClass('d-none');
     });
 
     userSocket.on('isOverlap', function(){
@@ -68,6 +77,7 @@ function cleanFields(){
     $("#startMText").html("Start Time: ");
     $("#endMText").html("End Time: ");
     $("#stopsMText").html("Stops: ");
+    $("#noVehicleMText").html("");
 }
 
 function renderCar(){
@@ -131,6 +141,14 @@ function newReservation(){
     //the reservation is in the present
     if(startDate >= endDate || startDate < today){
         console.log("bad user- you wrong");
+        $("#carMakeMText").html("");
+        $("#plateNumberMText").html("");
+        $("#startMText").html("");
+        $("#endMText").html("");
+        $("#stopsMText").html("");
+        $("#noVehicleMText").html("The dates you entered are invalid. Please go back and try again.");
+        $('#acceptDeclineButtons').addClass('d-none');
+        $('#backCancelButton').removeClass('d-none');
     } else {
         let stops = [];
         $('.route-stop').each(function() {

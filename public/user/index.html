@@ -136,10 +136,15 @@
                             <p id = "startMText">Start Time: </p>
                             <p id = "endMText">End Date: </p>
                             <p id = "stopsMText">Stops: </p>
+                            <p id = "noVehicleMText"></p>
                         </div>
-                        <div class="modal-footer">
+                        <div class="modal-footer" id="acceptDeclineButtons">
                             <button type="button" id="decline" class="btn btn-danger" data-toggle="modal" data-target="#appealModal" data-dismiss="modal">–</button>
                             <button type="button" id="confirm-res" class="btn btn-success" data-dismiss="modal" onclick = "renderCar();">Confirm and Finish Reservation</button>
+                        </div>
+                        <div class="modal-footer" id="backCancelButton">
+                            <button type="button" id="decline" class="btn btn-danger" data-toggle="modal" data-target="#new-res-form" data-dismiss="modal">Back</button>
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
                         </div>
                     </div>
                 </div>
@@ -155,7 +160,7 @@
                             </button>
                         </div>
                         <div class="modal-body">
-                            <p>Why won't this vehicle work for you?  Please note that your reasoning will be reviewed by an administrator.</p>
+                            <p>The vehicle you were assigned was chosen just for you, and meets all the criteria you specified when making your reservation. Why won't this vehicle work for you?  Please note that your reasoning will be reviewed by an administrator.</p>
                             <textarea class="form-control" id="reasoning-field" rows="6"></textarea>
                         </div>
                         <div class="modal-footer">
