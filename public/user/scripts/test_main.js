@@ -53,11 +53,6 @@ $(document).ready(function() {
         //pop-up/change of modal needed on front end
     });
 
-    userSocket.on('isOverlap', function(){
-        console.log("You have a reservation that overlaps with the times selected.");
-        //pop-up/change of modal needed on front end
-    });
-
     flatpickr(".datePicker", {enableTime: true, dateFormat: "Y-m-d H:i",});
 
 });
@@ -121,14 +116,13 @@ function newReservation(){
     let start = $("#start-date").val();
     let end = $("#end-date").val();
 
-    //convert strings to Date objects
     let startDate = new Date(start);
     let endDate = new Date(end);
-    //gets current date and time
     let today = new Date();
+    console.log(today);
+    console.log(startDate);
+    console.log(endDate);
 
-    //only makes reservation when start date is before end date, and
-    //the reservation is in the present
     if(startDate >= endDate || startDate < today){
         console.log("bad user- you wrong");
     } else {
@@ -142,15 +136,18 @@ function newReservation(){
         let rack = $('#kayak').prop('checked');
 
         let resData = {user: userEmail, start: start, end: end, stops: JSON.stringify(stops).split('},{').join('}, {'), override: false, justification: "", needsTrunk: trunk, needsOffRoad: offroad, needsRack: rack};
+        console.time("Reservation Created");
         userSocket.emit('reservation', resData, function(){
-
+            console.timeEnd("Reservation Created");
         });
     }
 }
 
 function cancelReservation(){
     $("." + idToDelete).remove();
+    console.time("Reservation Cancelled")
     userSocket.emit('cancel', idToDelete, userEmail,function(){
+        console.timeEnd("Reservation Cancelled");
     });
     //console.log(reservationID)
     //console.log("cancelled");
@@ -158,7 +155,9 @@ function cancelReservation(){
 }
 
 function editReservation(){
+    console.time("Reservation Edited");
     userSocket.emit('edit', {user: "Jimmy Niu", start: "2018-05-07 12:00", end: "2018-05-07 14:00", stops: ["home", "work", "beach"], justification: ""}, function(){
+        console.timeEnd("Reservation Edited");
     });
 }
 
