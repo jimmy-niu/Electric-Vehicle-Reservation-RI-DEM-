@@ -37,7 +37,6 @@ $(document).ready(function() {
         $("#startMText").html($("#startMText").html() + reservation.rows[0].start);
         $("#endMText").html($("#endMText").html() + reservation.rows[0].end);
         $("#stopsMText").html($("#stopsMText").html() + JSON.parse(reservation.rows[0].stops));
-        $("#resModal").modal();
         console.log(reservation);
     });
 
@@ -50,16 +49,11 @@ $(document).ready(function() {
     });
 
     userSocket.on('noVehicle', function(){
-        $("#messageMText").html("There is no vehicle available at that time that meets your needs.");
-        $('#errorModal').modal();
+        console.log("There is no vehicle available at that time that meets your needs.");
+        //pop-up/change of modal needed on front end
     });
 
-    userSocket.on('isOverlap', function(){
-        $("#messageMText").html("You have an existing reservation that overlaps with the times you selected.");
-        $('#errorModal').modal();
-    });
-
-    flatpickr(".datePicker", {enableTime: true, dateFormat: "Y-m-d H:i"});
+    flatpickr(".datePicker", {enableTime: true, dateFormat: "Y-m-d H:i",});
 
 });
 
@@ -69,8 +63,6 @@ function cleanFields(){
     $("#startMText").html("Start Time: ");
     $("#endMText").html("End Time: ");
     $("#stopsMText").html("Stops: ");
-    $("#new-stops").empty();
-    $("#noVehicleMText").html("");
 }
 
 function renderCar(){
@@ -115,14 +107,8 @@ function addStop() {
     let newStop = ` <div class="form-group">
 <label>Destination</label>
 <input type=text class="form-control route-stop">
-<div onclick = "deleteStop(this)">X</div>
 </div>`
-    $('#new-stops').append(newStop);
-}
-
-function deleteStop(obj){
-    console.log("we in deletestops");
-    console.log(obj);
+    $('#stops').append(newStop);
 }
 
 function newReservation(){
@@ -130,17 +116,15 @@ function newReservation(){
     let start = $("#start-date").val();
     let end = $("#end-date").val();
 
-    //convert strings to Date objects
     let startDate = new Date(start);
     let endDate = new Date(end);
-    //gets current date and time
     let today = new Date();
+    console.log(today);
+    console.log(startDate);
+    console.log(endDate);
 
-    //only makes reservation when start date is before end date, and
-    //the reservation is in the present
     if(startDate >= endDate || startDate < today){
-        $("#messageMText").html("The dates you entered are invalid. Please go back and try again.");
-        $('#errorModal').modal();
+        console.log("bad user- you wrong");
     } else {
         let stops = [];
         $('.route-stop').each(function() {
@@ -152,29 +136,28 @@ function newReservation(){
         let rack = $('#kayak').prop('checked');
 
         let resData = {user: userEmail, start: start, end: end, stops: JSON.stringify(stops).split('},{').join('}, {'), override: false, justification: "", needsTrunk: trunk, needsOffRoad: offroad, needsRack: rack};
+        console.time("Reservation Created");
         userSocket.emit('reservation', resData, function(){
-
+            console.timeEnd("Reservation Created");
         });
     }
 }
 
 function cancelReservation(){
     $("." + idToDelete).remove();
+    console.time("Reservation Cancelled")
     userSocket.emit('cancel', idToDelete, userEmail,function(){
+        console.timeEnd("Reservation Cancelled");
     });
     //console.log(reservationID)
     //console.log("cancelled");
     cleanFields();
 }
-function cancelReservationProcess(){
-    userSocket.emit('cancel', idToDelete, userEmail,function(){
-    });
-    //console.log("cancelled");
-    cleanFields();
-}
 
 function editReservation(){
+    console.time("Reservation Edited");
     userSocket.emit('edit', {user: "Jimmy Niu", start: "2018-05-07 12:00", end: "2018-05-07 14:00", stops: ["home", "work", "beach"], justification: ""}, function(){
+        console.timeEnd("Reservation Edited");
     });
 }
 
