@@ -69,6 +69,7 @@ function cleanFields(){
     $("#startMText").html("Start Time: ");
     $("#endMText").html("End Time: ");
     $("#stopsMText").html("Stops: ");
+    $("#new-stops").empty();
     $("#noVehicleMText").html("");
 }
 
@@ -111,11 +112,18 @@ function altVehicles(){
 }
 
 function addStop() {
+    console.log("we in addStop");
     let newStop = ` <div class="form-group">
-<label>Destination</label>
+<label>Destination <span onclick = "deleteStop(this);" 
+id = "deleteX">x</span></label>
 <input type=text class="form-control route-stop">
 </div>`
-    $('#stops').append(newStop);
+    $('#new-stops').append(newStop);
+}
+
+function deleteStop(obj){
+    let toDelete = obj.parentNode.parentNode;
+    toDelete.parentNode.removeChild(toDelete);
 }
 
 function newReservation(){

@@ -10,6 +10,29 @@ body {
     padding: 2vh 2vw 2vh 2vw;
 }
 
+#deleteX {
+    color: grey;
+    cursor: pointer;
+}
+
+#new-res-content{
+    max-height: 85vh;
+    overflow: auto;
+}
+
+.btn-danger{
+    font-weight: 400 !important;
+}
+
+.btn-success{
+    font-weight: 600 !important;
+}
+
+#altVehiclesForm{
+    max-height: 40vh;
+    overflow: auto;
+}
+
 #first-part{
     display: flex;
     justify-content: flex-start;
