@@ -91,7 +91,7 @@ function combineCards(){
     firstReturnedCar = undefined;
     currentCar = undefined;
     cleanFields();
-    $("#report-area").val("");
+    $("#reasoning-field").val("");
 }
 
 function setVehicle(index){
@@ -174,8 +174,11 @@ function editReservation(){
 
 function submitFeedback(reservationID){
     let report = $('#report-area').val();
+    let serviceNeeded = $('#service-needed').is(":checked");
+    let cleaningNeeded = $('#cleaning-needed').is(":checked");
+    let notCharging = $('#not-charging').is(":checked");
     // console.log(report);
-    userSocket.emit('reportAdded', reservationID, report);
+    userSocket.emit('reportAdded', reservationID, report, serviceNeeded, cleaningNeeded, notCharging);
 }
 
 let idToDelete = "";
