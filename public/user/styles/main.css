@@ -15,6 +15,16 @@ body {
     cursor: pointer;
 }
 
+#new-res-content{
+    max-height: 85vh;
+    overflow: auto;
+}
+
+#altVehiclesForm{
+    max-height: 40vh;
+    overflow: auto;
+}
+
 #first-part{
     display: flex;
     justify-content: flex-start;
