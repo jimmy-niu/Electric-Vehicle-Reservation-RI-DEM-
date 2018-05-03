@@ -45,15 +45,18 @@ app.use(session(
     })
 );
 
-/*email sender (will eventually change to a different email)
-you can use your email and password to test
 var transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    user: 'jenna_tishler@brown.edu',
-    pass: ''
-  }
-}); */
+    host: "smtp-mail.outlook.com", // hostname
+    secureConnection: false, // TLS requires secureConnection to be false
+    port: 587, // port for secure SMTP
+    tls: {
+       ciphers:'SSLv3'
+    },
+    auth: {
+        user: 'dem_do-not-reply@outlook.com',
+        pass: 'DEMnoreply123'
+    }
+}); 
 
 // let transporter = nodemailer.createTransport({
 //     service: 'gmail',
@@ -93,14 +96,14 @@ conn.query('CREATE TABLE IF NOT EXISTS vehicles(id TEXT, license TEXT, model TEX
 //Vehicles
 conn.query('CREATE TABLE IF NOT EXISTS reservations(id INTEGER PRIMARY KEY AUTOINCREMENT, user TEXT, license TEXT, model TEXT, start TEXT, end TEXT, stops TEXT, override BOOLEAN, justification TEXT)');
 //Reports
-conn.query('CREATE TABLE IF NOT EXISTS reports(id INTEGER PRIMARY KEY AUTOINCREMENT, reservation INTEGER, report TEXT)');
+conn.query('CREATE TABLE IF NOT EXISTS reports(id INTEGER PRIMARY KEY AUTOINCREMENT, reservation INTEGER, report TEXT, needsService BOOLEAN, needsCleaning BOOLEAN, notCharging BOOLEAN)');
 
 //test data
 conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?)',["Jenna Tishler", "1322", "2015 FORD CMAX", "2018-05-18 11:00", "2018-05-18 15:00", JSON.stringify(["Work", "Home"]), false, ""]);
 conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?)',["Jenna Tishler", "704", "2015 FORD CMAX", "2018-05-19 11:00", "2018-05-20 11:00", JSON.stringify(["home", "work"]), false, ""]);
-conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?)',["Max Luebbers", "739", "2015 FORD CMAX", "2018-05-18 11:00", "2018-05-18 15:00", JSON.stringify(["home", "work"]), false, ""]);
+conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?)',["Max Luebbers", "2254", "2016 FORD CMAX", "2018-05-21 11:00", "2018-05-21 15:00", JSON.stringify(["home", "work"]), false, ""]);
 conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?)',["dem_test_u@outlook.com", "1869", "2011 CHEVROLET EQUINOX", "2018-05-19 14:00", "2018-05-19 17:00", JSON.stringify(["home", "work"]), true, "I have a reason."]);
-conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?)',["dem_test_u@outlook.com", "2254", "2016 FORD CMAX", "2018-05-21 11:00", "2018-05-21 17:00", JSON.stringify(["work", "beach"]), false, ""]);
+conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?)',["dem_test_u@outlook.com", "2254", "2016 FORD CMAX", "2018-05-21 10:00", "2018-05-21 10:30", JSON.stringify(["work", "beach"]), false, ""]);
 
 conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', ["JF2GPBCC3FH253482", "1011", "2016 SUBARU CV", "Black/White", true, 11451.5, false, true, true, false]);
 conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', ["1FMCU59329KC41390", "1018", "2009 FORD ESCAPE", "Black/White", true, 151071.5, false, true, true, false]);
@@ -130,8 +133,8 @@ conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', ["1FADP5
 conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', ["1FADP5CU8FL121719", "739", "2015 FORD CMAX", "Black", true, 7883.3, true, false, false, false]);
 conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', ["1FADP5CU6FL121718", "827", "2015 FORD CMAX", "Black", true, 9055.6, true, false, false, false]);
 
-conn.query('INSERT INTO reports VALUES(null, ?, ?)', [5, "Car sucks."]);
-conn.query('INSERT INTO reports VALUES(null, ?, ?)', [1, "Car is dirty af."]);
+conn.query('INSERT INTO reports VALUES(null, ?, ?, ?, ?, ?)', [5, "Car sucks.", true, true, false]);
+conn.query('INSERT INTO reports VALUES(null, ?, ?, ?, ?, ?)', [1, "Car is dirty af.", false, true, false]);
 
 /*Sets up the server on port 8080.*/
 server.listen(8080, function(){
@@ -342,7 +345,6 @@ io.of('/user').on('connection', function(socket){
                             });
                         });
                     } else {
-                        console.log('no vehicle');
                         socket.emit('noVehicle');
                     }
                 });
@@ -372,10 +374,28 @@ io.of('/user').on('connection', function(socket){
         });
     });
 
-    socket.on('feedback', function(reservationID, report){
-        submitFeedback(reservationID, resport);
-        conn.query('SELECT * FROM reports', function(error, data){
-            io.of('/admin').emit('reportChange', data);
+    socket.on('reportAdded', function(reservationID, report, needsService, needsCleaning, notCharging){
+        //submitFeedback(reservationID, resport);
+        console.log('report added')
+        conn.query("INSERT INTO reports VALUES(null, ?, ?, ?, ?, ?)", [reservationID, report, needsService, needsCleaning, notCharging], function(error, data){
+            updateReports();
+        });
+
+        conn.query('SELECT * FROM reservations WHERE id = ?', [5], function(error, data){
+            let mailOptions = {
+                from: 'dem_do-not-reply@outlook.com',
+                to: 'jenna_tishler@brown.edu',
+                subject: 'New Report Added',
+                html: '<h1>Reservation: ' + data.rows[0].id + '</h1>' + '<h2>Name: ' + data.rows[0].user + '</h2>' + '<h2>License Plate: ' + data.rows[0].license + '</h2>' + '<p>Report: ' + report + '<p>' + '<p>Needs Service: ' + needsService + '<p>' + '<p>Needs Cleaning: ' + needsCleaning + '<p>' + '<p>Not Charging: ' + notCharging + '<p>'
+            };
+            transporter.sendMail(mailOptions, function(error, info){
+              if (error) {
+                console.log(error);
+              } else {
+                console.log('Email sent: ' + info.response);
+              }
+            });
+            console.log('email sent')
         });
     });
 
@@ -529,6 +549,7 @@ function updateVehicleStatus(license, status){
 function updateReports(){
     conn.query('SELECT * FROM reports', function(error, data){
         io.of('/admin').emit('reportChange', data);
+        console.log(data);
     });
 }
 function removeReport(id){

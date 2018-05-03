@@ -38,8 +38,7 @@ $(document).ready(function() {
         $("#startMText").html($("#startMText").html() + reservation.rows[0].start);
         $("#endMText").html($("#endMText").html() + reservation.rows[0].end);
         $("#stopsMText").html($("#stopsMText").html() + JSON.parse(reservation.rows[0].stops));
-        $('#backCancelButton').addClass('d-none');
-        $('#acceptDeclineButtons').removeClass('d-none');
+        $("#resModal").modal();
         console.log(reservation);
     });
 
@@ -52,23 +51,16 @@ $(document).ready(function() {
     });
 
     userSocket.on('noVehicle', function(){
-        console.log("There is no vehicle available at that time that meets your needs.");
-        $("#carMakeMText").html("");
-        $("#plateNumberMText").html("");
-        $("#startMText").html("");
-        $("#endMText").html("");
-        $("#stopsMText").html("");
-        $("#noVehicleMText").html("There is no vehicle available at that time that meets your needs.");
-        $('#backCancelButton').removeClass('d-none');
-        $('#acceptDeclineButtons').addClass('d-none');
+        $("#messageMText").html("There is no vehicle available at that time that meets your needs.");
+        $('#errorModal').modal();
     });
 
     userSocket.on('isOverlap', function(){
-        console.log("You have a reservation that overlaps with the times selected.");
-        //pop-up/change of modal needed on front end
+        $("#messageMText").html("You have an existing reservation that overlaps with the times you selected.");
+        $('#errorModal').modal();
     });
 
-    flatpickr(".datePicker", {enableTime: true, dateFormat: "Y-m-d H:i",});
+    flatpickr(".datePicker", {enableTime: true, dateFormat: "Y-m-d H:i"});
 
 });
 
@@ -78,6 +70,7 @@ function cleanFields(){
     $("#startMText").html("Start Time: ");
     $("#endMText").html("End Time: ");
     $("#stopsMText").html("Stops: ");
+    $("#new-stops").empty();
     $("#noVehicleMText").html("");
 }
 
@@ -100,7 +93,7 @@ function combineCards(){
     firstReturnedCar = undefined;
     currentCar = undefined;
     cleanFields();
-    $("#report-area").val("");
+    $("#reasoning-field").val("");
 }
 
 function setVehicle(index){
@@ -120,11 +113,18 @@ function altVehicles(){
 }
 
 function addStop() {
+    console.log("we in addStop");
     let newStop = ` <div class="form-group">
-<label>Destination</label>
+<label>Destination <span onclick = "deleteStop(this);" 
+id = "deleteX">x</span></label>
 <input type=text class="form-control route-stop">
 </div>`
-    $('#stops').append(newStop);
+    $('#new-stops').append(newStop);
+}
+
+function deleteStop(obj){
+    let toDelete = obj.parentNode.parentNode;
+    toDelete.parentNode.removeChild(toDelete);
 }
 
 function newReservation(){
@@ -141,15 +141,8 @@ function newReservation(){
     //only makes reservation when start date is before end date, and
     //the reservation is in the present
     if(startDate >= endDate || startDate < today){
-        console.log("bad user- you wrong");
-        $("#carMakeMText").html("");
-        $("#plateNumberMText").html("");
-        $("#startMText").html("");
-        $("#endMText").html("");
-        $("#stopsMText").html("");
-        $("#noVehicleMText").html("The dates you entered are invalid. Please go back and try again.");
-        $('#acceptDeclineButtons').addClass('d-none');
-        $('#backCancelButton').removeClass('d-none');
+        $("#messageMText").html("The dates you entered are invalid. Please go back and try again.");
+        $('#errorModal').modal();
     } else {
         let stops = [];
         $('.route-stop').each(function() {
@@ -190,8 +183,11 @@ function editReservation(){
 
 function submitFeedback(reservationID){
     let report = $('#report-area').val();
+    let serviceNeeded = $('#service-needed').is(":checked");
+    let cleaningNeeded = $('#cleaning-needed').is(":checked");
+    let notCharging = $('#not-charging').is(":checked");
     // console.log(report);
-    userSocket.emit('reportAdded', reservationID, report);
+    userSocket.emit('reportAdded', reservationID, report, serviceNeeded, cleaningNeeded, notCharging);
 }
 
 let idToDelete = "";
