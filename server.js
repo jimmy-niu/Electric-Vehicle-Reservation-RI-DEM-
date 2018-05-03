@@ -319,9 +319,9 @@ io.of('/user').on('connection', function(socket){
             //don't make reservation is overlaps, alert user
             if(isOverlap){
                 socket.emit('isOverlap');
-            } 
+            }
             else {
-                //alerts users via email that they have reservations at the same time w/ same stops    
+                //alerts users via email that they have reservations at the same time w/ same stops
                 if(canCarpool){
                     console.log("You can carpool!");
                     //email users or pop up?
@@ -340,6 +340,7 @@ io.of('/user').on('connection', function(socket){
                                 var end = new Date(reservationInfo.end);
                                 addEvent(reservationInfo.user + "'s upcoming DEM trip", data.rows[0].model + " " + data.rows[0].license + "\n" + reservationInfo.stops, start.toISOString(), end.toISOString());
                             });
+                            consol.log('sdjfhdsf');
                         });
                     } else {
                         console.log('no vehicle');
@@ -538,7 +539,7 @@ function removeReport(id){
 }
 function getSpecificReports(reservation){
     conn.query('SELECT * FROM reports WHERE reservation = ?', [reservation], function(error, data){
-    
+
     });
 }
 
@@ -551,7 +552,7 @@ function addUser(email, admin){
 
 function changeUserStatus(email, admin){
     conn.query('UPDATE users SET admin = ? WHERE email = ?',[admin, email],function(error, data){
-    
+
     });
 }
 function removeUser(email){

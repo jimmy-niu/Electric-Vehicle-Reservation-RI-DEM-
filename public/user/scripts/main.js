@@ -174,6 +174,12 @@ function cancelReservation(){
     //console.log("cancelled");
     cleanFields();
 }
+function cancelReservationProcess(){
+    userSocket.emit('cancel', idToDelete, userEmail,function(){
+    });
+    //console.log("cancelled");
+    cleanFields();
+}
 
 function editReservation(){
     userSocket.emit('edit', {user: "Jimmy Niu", start: "2018-05-07 12:00", end: "2018-05-07 14:00", stops: ["home", "work", "beach"], justification: ""}, function(){
