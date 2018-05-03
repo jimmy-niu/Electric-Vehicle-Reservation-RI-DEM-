@@ -37,8 +37,7 @@ $(document).ready(function() {
         $("#startMText").html($("#startMText").html() + reservation.rows[0].start);
         $("#endMText").html($("#endMText").html() + reservation.rows[0].end);
         $("#stopsMText").html($("#stopsMText").html() + JSON.parse(reservation.rows[0].stops));
-        $('#backCancelButton').addClass('d-none');
-        $('#acceptDeclineButtons').removeClass('d-none');
+        $("#resModal").modal();
         console.log(reservation);
     });
 
@@ -51,23 +50,16 @@ $(document).ready(function() {
     });
 
     userSocket.on('noVehicle', function(){
-        console.log("There is no vehicle available at that time that meets your needs.");
-        $("#carMakeMText").html("");
-        $("#plateNumberMText").html("");
-        $("#startMText").html("");
-        $("#endMText").html("");
-        $("#stopsMText").html("");
-        $("#noVehicleMText").html("There is no vehicle available at that time that meets your needs.");
-        $('#backCancelButton').removeClass('d-none');
-        $('#acceptDeclineButtons').addClass('d-none');
+        $("#messageMText").html("There is no vehicle available at that time that meets your needs.");
+        $('#errorModal').modal();
     });
 
     userSocket.on('isOverlap', function(){
-        console.log("You have a reservation that overlaps with the times selected.");
-        //pop-up/change of modal needed on front end
+        $("#messageMText").html("You have an existing reservation that overlaps with the times you selected.");
+        $('#errorModal').modal();
     });
 
-    flatpickr(".datePicker", {enableTime: true, dateFormat: "Y-m-d H:i",});
+    flatpickr(".datePicker", {enableTime: true, dateFormat: "Y-m-d H:i"});
 
 });
 
@@ -140,15 +132,8 @@ function newReservation(){
     //only makes reservation when start date is before end date, and
     //the reservation is in the present
     if(startDate >= endDate || startDate < today){
-        console.log("bad user- you wrong");
-        $("#carMakeMText").html("");
-        $("#plateNumberMText").html("");
-        $("#startMText").html("");
-        $("#endMText").html("");
-        $("#stopsMText").html("");
-        $("#noVehicleMText").html("The dates you entered are invalid. Please go back and try again.");
-        $('#acceptDeclineButtons').addClass('d-none');
-        $('#backCancelButton').removeClass('d-none');
+        $("#messageMText").html("The dates you entered are invalid. Please go back and try again.");
+        $('#errorModal').modal();
     } else {
         let stops = [];
         $('.route-stop').each(function() {

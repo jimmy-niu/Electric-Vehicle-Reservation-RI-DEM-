@@ -98,9 +98,9 @@ conn.query('CREATE TABLE IF NOT EXISTS reports(id INTEGER PRIMARY KEY AUTOINCREM
 //test data
 conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?)',["Jenna Tishler", "1322", "2015 FORD CMAX", "2018-05-18 11:00", "2018-05-18 15:00", JSON.stringify(["Work", "Home"]), false, ""]);
 conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?)',["Jenna Tishler", "704", "2015 FORD CMAX", "2018-05-19 11:00", "2018-05-20 11:00", JSON.stringify(["home", "work"]), false, ""]);
-conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?)',["Max Luebbers", "739", "2015 FORD CMAX", "2018-05-18 11:00", "2018-05-18 15:00", JSON.stringify(["home", "work"]), false, ""]);
+conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?)',["Max Luebbers", "2254", "2016 FORD CMAX", "2018-05-21 11:00", "2018-05-21 15:00", JSON.stringify(["home", "work"]), false, ""]);
 conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?)',["dem_test_u@outlook.com", "1869", "2011 CHEVROLET EQUINOX", "2018-05-19 14:00", "2018-05-19 17:00", JSON.stringify(["home", "work"]), true, "I have a reason."]);
-conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?)',["dem_test_u@outlook.com", "2254", "2016 FORD CMAX", "2018-05-21 11:00", "2018-05-21 17:00", JSON.stringify(["work", "beach"]), false, ""]);
+conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?)',["dem_test_u@outlook.com", "2254", "2016 FORD CMAX", "2018-05-21 10:00", "2018-05-21 10:30", JSON.stringify(["work", "beach"]), false, ""]);
 
 conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', ["JF2GPBCC3FH253482", "1011", "2016 SUBARU CV", "Black/White", true, 11451.5, false, true, true, false]);
 conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', ["1FMCU59329KC41390", "1018", "2009 FORD ESCAPE", "Black/White", true, 151071.5, false, true, true, false]);
@@ -342,7 +342,6 @@ io.of('/user').on('connection', function(socket){
                             });
                         });
                     } else {
-                        console.log('no vehicle');
                         socket.emit('noVehicle');
                     }
                 });
