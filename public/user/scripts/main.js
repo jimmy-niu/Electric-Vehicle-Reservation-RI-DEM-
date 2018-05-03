@@ -7,6 +7,7 @@ let currentCar = undefined;
 let firstReturnedCar = undefined;
 let alternateVehicles = [];
 
+
 // Sets up the sockets.
 $(document).ready(function() {
     $("#cancel-res").click(cancelReservation);
@@ -175,9 +176,9 @@ function cancelReservation(){
     cleanFields();
 }
 function cancelReservationProcess(){
-    userSocket.emit('cancel', idToDelete, userEmail,function(){
+    console.log(currentCar.id);
+    userSocket.emit('cancel', currentCar.rows[0].id, userEmail,function(){
     });
-    //console.log("cancelled");
     cleanFields();
 }
 

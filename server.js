@@ -340,7 +340,6 @@ io.of('/user').on('connection', function(socket){
                                 var end = new Date(reservationInfo.end);
                                 addEvent(reservationInfo.user + "'s upcoming DEM trip", data.rows[0].model + " " + data.rows[0].license + "\n" + reservationInfo.stops, start.toISOString(), end.toISOString());
                             });
-                            consol.log('sdjfhdsf');
                         });
                     } else {
                         console.log('no vehicle');
