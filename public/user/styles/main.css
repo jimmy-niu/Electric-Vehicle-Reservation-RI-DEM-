@@ -20,6 +20,14 @@ body {
     overflow: auto;
 }
 
+.btn-danger{
+    font-weight: 400 !important;
+}
+
+.btn-success{
+    font-weight: 600 !important;
+}
+
 #altVehiclesForm{
     max-height: 40vh;
     overflow: auto;
