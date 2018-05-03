@@ -10,6 +10,11 @@ body {
     padding: 2vh 2vw 2vh 2vw;
 }
 
+#deleteX {
+    color: grey;
+    cursor: pointer;
+}
+
 #first-part{
     display: flex;
     justify-content: flex-start;

@@ -112,17 +112,18 @@ function altVehicles(){
 }
 
 function addStop() {
+    console.log("we in addStop");
     let newStop = ` <div class="form-group">
-<label>Destination</label>
+<label>Destination <span onclick = "deleteStop(this);" 
+id = "deleteX">x</span></label>
 <input type=text class="form-control route-stop">
-<div onclick = "deleteStop(this)">X</div>
 </div>`
     $('#new-stops').append(newStop);
 }
 
 function deleteStop(obj){
-    console.log("we in deletestops");
-    console.log(obj);
+    let toDelete = obj.parentNode.parentNode;
+    toDelete.parentNode.removeChild(toDelete);
 }
 
 function newReservation(){
