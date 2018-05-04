@@ -122,6 +122,88 @@
                 </div>
             </div>
 
+             <div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="new-res-label" aria-hidden="true">
+                <div id = "edit-res-content" class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="edit-res-label">Edit Your Reservation</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <form>
+                                <p id="reservation-id-edit" class="d-none"></p>
+                                <div class="form-group">
+                                    <label for="start-date-edit">Reservation Start</label>
+                                    <input class = "datePicker" id ="start-date-edit" placeholder="Select Date.." type="text" value = "2018-04-26 1:00">
+                                </div>
+                                <div class="form-group">
+                                    <label for="end-date-edit">Reservation End</label>
+                                    <input class = "datePicker" id ="end-date-edit" placeholder="Select Date.." type="text" value = "2018-05-1 3:00">
+                                </div>
+                                <div class="form-group">
+                                    <label>Pickup Location</label>
+                                    <input type=text class="form-control route-stop-edit" value="Work">
+                                </div>
+                                <div id="stops">
+                                    <div class="form-group">
+                                        <label>Destination</label>
+                                        <input type=text class="form-control route-stop-edit" value="Home">
+                                    </div>
+                                    <div id = "new-stops-edit"></div>
+                                </div>
+                                <p><a href="#" id="add-stop-edit"><small>Add a destination</small></a></p>
+                                <div class="form-group">
+                                    <label>Extra Features</label>
+                                    <div class="form-check">
+                                        <input type="checkbox" class="form-check-input" id="trunk-edit">
+                                        <label class="form-check-label" for="trunk-edit">Extra trunk space</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input type="checkbox" class="form-check-input" id="offroading-edit">
+                                        <label class="form-check-label" for="offroading-edit">Offroading capabilities</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input type="checkbox" class="form-check-input" id="kayak-edit">
+                                        <label class="form-check-label" for="kayak-edit">Equipment rack</label>
+                                    </div>
+                                </div>
+                                <label>Remind Me</label>
+                                <div class="form-group">
+                                    <div class="form-check form-check-inline">
+                                        <input type="checkbox" class="form-check-input" id="email-edit">
+                                        <label class="form-check-label" for="email-edit">Email</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input type="checkbox" class="form-check-input" id="text-edit">
+                                        <label class="form-check-label" for="text-edit">Text</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input type="checkbox" class="form-check-input" id="outlook-edit">
+                                        <label class="form-check-label" for="outlook-edit">Outlook notification</label>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="form-check form-check-inline">
+                                            <input type="checkbox" class="form-check-input" id="day-edit">
+                                            <label class="form-check-label" for="day-edit">One day before</label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input type="checkbox" class="form-check-input" id="hour-edit">
+                                            <label class="form-check-label" for="hour-edit">One hour before</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick = "cleanFields();">Cancel</button>
+                            <button type="button" class="btn btn-primary" id="submit-res-edit" data-dismiss="modal" onclick = "editReservation()">Edit reservation</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div class="modal fade" id="resModal" tabindex="-2" role="dialog" aria-labelledby="resModalLabel" aria-hidden="true">
                 <div class="modal-dialog" role="document">
                     <div class="modal-content">
@@ -280,11 +362,6 @@
                                 </div>
                                 <div class="form-group">
                                     <div class="form-check form-check-inline">
-<<<<<<< HEAD
-                                        <input type="checkbox" class="form-check-input" id="remove-from-fleet">
-                                        <label class="form-check-label" for="remove-from-fleet">Immediate maintenance needed</label>
-                                    </div>
-=======
                                         <input type="checkbox" class="form-check-input" id="service-needed">
                                         <label class="form-check-label" for="service-needed">Immediate maintenance needed</label>
                                         <input type="checkbox" class="form-check-input" id="cleaning-needed">
@@ -292,7 +369,6 @@
                                         <input type="checkbox" class="form-check-input" id="not-charging">
                                         <label class="form-check-label" for="not-charging">Not charging/No charging space available</label>
                                     </div>
->>>>>>> origin/master
                                 </div>
                             </div>
                             <div class="modal-footer">
