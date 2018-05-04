@@ -179,6 +179,7 @@ io.of('/admin').on('connection', function(socket){
 });
 
 function addEvent(title, bodytext, start, end) {
+    console.log(bodytext)
     var newEvent = {
         "Subject": title,
         "Body": {

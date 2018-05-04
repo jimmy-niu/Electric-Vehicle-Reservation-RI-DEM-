@@ -4,6 +4,16 @@ body{
     margin: 0px;
 }
 
+.ui-autocomplete { {
+    z-index: 1051 !important;
+}
+.modal{
+    z-index: 20;   
+}
+.modal-backdrop{
+    z-index: 10;        
+}​
+
 .header{
     display: flex;
     justify-content: space-between;

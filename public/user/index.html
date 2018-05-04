@@ -15,6 +15,8 @@
 
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
         <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+        <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC8Z1eImtyFGgIBO_HyUZqeN5M5DW6z0e4&libraries=places&callback=initMap"
+        async defer></script>
     </head>
 
     <body>
@@ -26,6 +28,8 @@
                 </div>
             </div>
 
+            <!-- <input type="text" id="autocomplete"/> -->
+            
             <div>
                 <div id = "user">
                     <span id = "user_email">Welcome, dem_test_u@outlook.com <br>
@@ -62,12 +66,15 @@
                                 </div>
                                 <div class="form-group">
                                     <label>Pickup Location</label>
-                                    <input type=text class="form-control route-stop" value="Work">
+
+                                    <input id="startInput" type="text" placeholder="Enter a location"/>
+                                    <!-- <input type=text class="form-control route-stop" value="Work"> -->
                                 </div>
                                 <div id="stops">
                                     <div class="form-group">
                                         <label>Destination</label>
-                                        <input type=text class="form-control route-stop" value="Home">
+                                        <input id="endInput" type="text" placeholder="Enter a location"/>
+                                        <!-- <input type=text class="form-control route-stop" value="Home"> -->
                                     </div>
                                 </div>
                                 <p><a href="#" id="add-stop"><small>Add a destination</small></a></p>
@@ -292,5 +299,19 @@
                 </div>
             </div>
         </div>
+        <script>
+            function initMap() {
+                var input1 = document.getElementById('startInput');
+                var autocomplete1 = new google.maps.places.Autocomplete(input1);
+                var input2 = document.getElementById('endInput');
+                var autocomplete2 = new google.maps.places.Autocomplete(input2);
+                //autocomplete.addListener('placed_changed', () => console.log(autocomplete.getPlace()))
+            }
+            
+        // var start = document.getElementById('startInput');
+        // var end = document.getElementById('endInput');
+        // var startautocomplete = new google.maps.places.Autocomplete(start);
+        // var endautocomplete = new google.maps.places.Autocomplete(end);
+        </script>
     </body>
 </html>
