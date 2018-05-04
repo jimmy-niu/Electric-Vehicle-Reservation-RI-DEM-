@@ -183,9 +183,9 @@ class Reservation {
 <img class = "card-img-top" src="https://upload.wikimedia.org/wikipedia/commons/5/5f/DCA_Prius_1Gen_12_2011_3592.JPG" alt="prius placeholder image">
 <div class="card-body">
 <h5 class="card-title">${r.model} ${r.license}</h5>
-<p class="card-text"><b>Start</b>: ${r.start} <br>
-<b>End</b>: ${r.end} <br>
-<b>Route</b>: ${JSON.parse(r.stops)} </p>
+<p class="card-text"><strong>Start</strong>: ${r.start} <br>
+<strong>End</strong>: ${r.end} <br>
+<strong>Route</strong>: ${JSON.parse(r.stops)} </p>
 <span style = "display: none;" id = "res-id">${r.id}</span>
 <a href="#" class="btn btn-primary edit">Edit reservation</a>
 <a href="#" id = "${r.id}" class="btn btn-secondary" data-toggle="modal" data-target="#cancelModal" onclick = "setDeleteCard(this);">Cancel</a>

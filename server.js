@@ -280,89 +280,23 @@ io.of('/user').on('connection', function(socket){
     socket.on('reservation', function(reservationInfo, callback){
         //console.log("got a reservation!");
         //removeEvent("dem_test_u@outlook.com's upcoming DEM trip", "2018-05-12T16:00:00Z", "2018-05-23T16:00:00Z");
-        var needsTrunk;
-        if(reservationInfo.needsTrunk){
-            needsTrunk = 1;
-        } else {
-            needsTrunk = 0;
-        }
-
-        var needsOffRoad;
-        if(reservationInfo.needsOffRoad){
-            needsOffRoad = 1;
-        } else {
-            needsOffRoad = 0;
-        }
-
-        var needsRack;
-        if(reservationInfo.needsRack){
-            needsRack = 1;
-        } else {
-            needsRack = 0;
-        }
-
-        var isOverlap = false;
-        var canCarpool = false;
-        var carpoolUsers = [reservationInfo.user];
-        //this queries finds overlapping reservations
-        conn.query('SELECT user, start, end, stops FROM reservations WHERE (start >= ? AND start <= ?) OR (end >= ? AND end <= ?)', [reservationInfo.start, reservationInfo.end, reservationInfo.start, reservationInfo.end], function(error, data){
-            console.log(data);
-            for(var i = 0; i < data.rows.length; i++){
-                //if reservations overlaps and is from same user
-                if(data.rows[i].user === reservationInfo.user){
-                    isOverlap = true;
-                }
-                //if reservation is at exact times and is from different user
-                else if (data.rows[i].start === reservationInfo.start && data.rows[i].end === reservationInfo.end){
-                    if (stopsEqual(data.rows[i].stops, reservationInfo.stops)){
-                        canCarpool = true;
-                        carpoolUsers.push(data.rows[i].user);
-                    }
-                }
-            }
-            //don't make reservation is overlaps, alert user
-            if(isOverlap){
-                socket.emit('isOverlap');
-            }
-            else {
-                //alerts users via email that they have reservations at the same time w/ same stops
-                if(canCarpool){
-                    console.log("You can carpool!");
-                    //email users or pop up?
-                }
-
-                conn.query('SELECT license, model FROM vehicles WHERE extraTrunk >= ? AND offRoad >= ? AND equipRack >= ? AND license NOT IN (SELECT license FROM reservations WHERE start <= ? AND end >= ?) ORDER BY isEV DESC, (extraTrunk + offRoad + equipRack) ASC', [needsTrunk, needsOffRoad, needsRack, reservationInfo.end, reservationInfo.start], function(error, data){
-                    if(data.rows.length !== 0){
-                        socket.emit('alternateVehicles', data);
-                        conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?)',[reservationInfo.user, data.rows[0].license, data.rows[0].model, reservationInfo.start, reservationInfo.end, reservationInfo.stops, reservationInfo.override, reservationInfo.justification],function(error, data){
-                            conn.query('SELECT * FROM reservations WHERE id = ?', [data.lastInsertId], function(error, data){
-                                //Send to user and admins
-                                socket.emit('newReservation', data);
-                                io.of('/admin').emit("newReservation", data);
-                                //Calendar event
-                                var start = new Date(reservationInfo.start);
-                                var end = new Date(reservationInfo.end);
-                                addEvent(reservationInfo.user + "'s upcoming DEM trip", data.rows[0].model + " " + data.rows[0].license + "\n" + reservationInfo.stops, start.toISOString(), end.toISOString());
-                            });
-                        });
-                    } else {
-                        socket.emit('noVehicle');
-                    }
-                });
-            }
-        });
+        newReservation(socket, reservationInfo);
     });
 
     socket.on('edit', function(reservationID, reservationInfo){
         //editReservation(reservationID, reservationInfo.start, reservationInfo.end, reservationInfo.stops, reservationInfo.justification);
-        conn.query('UPDATE reservations SET start = ?, end = ?, stops = ?, justification = ? WHERE id = ?', [reservationInfo.start, reservationInfo.end, reservationInfo.stops, reservationInfo.justification, reservationID], function(error, data){
-            conn.query('SELECT * FROM reservations WHERE user = ?', [reservationInfo.user], function(error, data){
-                socket.emit('reservationChange', data);
-            });
-            conn.query('SELECT * FROM reservations', function(error, data){
-                io.of('/admin').emit('reservationChange', data);
-            });
+        conn.query('DELETE FROM reservations WHERE id = ?', [reservationID], function(error, data){
+
         });
+        newReservation(socket, reservationInfo);
+        // conn.query('UPDATE reservations SET start = ?, end = ?, stops = ?, justification = ? WHERE id = ?', [reservationInfo.start, reservationInfo.end, reservationInfo.stops, reservationInfo.justification, reservationID], function(error, data){
+        //     conn.query('SELECT * FROM reservations WHERE user = ?', [reservationInfo.user], function(error, data){
+        //         socket.emit('reservationChange', data);
+        //     });
+        //     conn.query('SELECT * FROM reservations', function(error, data){
+        //         io.of('/admin').emit('reservationChange', data);
+        //     });
+        // });
     });
 
     socket.on('cancel', function(reservationID, user, callback){
@@ -583,6 +517,80 @@ function removeUser(email){
 }
 
 // USER help functions
+function newReservation(socket, reservationInfo){
+    var needsTrunk;
+    if(reservationInfo.needsTrunk){
+        needsTrunk = 1;
+    } else {
+        needsTrunk = 0;
+    }
+
+    var needsOffRoad;
+    if(reservationInfo.needsOffRoad){
+        needsOffRoad = 1;
+    } else {
+        needsOffRoad = 0;
+    }
+
+    var needsRack;
+    if(reservationInfo.needsRack){
+        needsRack = 1;
+    } else {
+        needsRack = 0;
+    }
+
+    var isOverlap = false;
+    var canCarpool = false;
+    var carpoolUsers = [reservationInfo.user];
+    //this queries finds overlapping reservations
+    conn.query('SELECT user, start, end, stops FROM reservations WHERE (start >= ? AND start <= ?) OR (end >= ? AND end <= ?)', [reservationInfo.start, reservationInfo.end, reservationInfo.start, reservationInfo.end], function(error, data){
+        console.log(data);
+        for(var i = 0; i < data.rows.length; i++){
+            //if reservations overlaps and is from same user
+            if(data.rows[i].user === reservationInfo.user){
+                isOverlap = true;
+            }
+            //if reservation is at exact times and is from different user
+            else if (data.rows[i].start === reservationInfo.start && data.rows[i].end === reservationInfo.end){
+                if (stopsEqual(data.rows[i].stops, reservationInfo.stops)){
+                    canCarpool = true;
+                    carpoolUsers.push(data.rows[i].user);
+                }
+            }
+        }
+        //don't make reservation is overlaps, alert user
+        if(isOverlap){
+            socket.emit('isOverlap');
+        }
+        else {
+            //alerts users via email that they have reservations at the same time w/ same stops
+            if(canCarpool){
+                console.log("You can carpool!");
+                //email users or pop up?
+            }
+
+            conn.query('SELECT license, model FROM vehicles WHERE extraTrunk >= ? AND offRoad >= ? AND equipRack >= ? AND license NOT IN (SELECT license FROM reservations WHERE start <= ? AND end >= ?) ORDER BY isEV DESC, (extraTrunk + offRoad + equipRack) ASC', [needsTrunk, needsOffRoad, needsRack, reservationInfo.end, reservationInfo.start], function(error, data){
+                if(data.rows.length !== 0){
+                    socket.emit('alternateVehicles', data);
+                    conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?)',[reservationInfo.user, data.rows[0].license, data.rows[0].model, reservationInfo.start, reservationInfo.end, reservationInfo.stops, reservationInfo.override, reservationInfo.justification],function(error, data){
+                        conn.query('SELECT * FROM reservations WHERE id = ?', [data.lastInsertId], function(error, data){
+                            //Send to user and admins
+                            socket.emit('newReservation', data);
+                            io.of('/admin').emit("newReservation", data);
+                            //Calendar event
+                            var start = new Date(reservationInfo.start);
+                            var end = new Date(reservationInfo.end);
+                            addEvent(reservationInfo.user + "'s upcoming DEM trip", data.rows[0].model + " " + data.rows[0].license + "\n" + reservationInfo.stops, start.toISOString(), end.toISOString());
+                        });
+                    });
+                } else {
+                    socket.emit('noVehicle');
+                }
+            });
+        }
+    });
+}
+
 function editReservation(id, start, end, stops, justification){
     conn.query('UPDATE reservations SET start = ?, end = ?, stops = ?, justification = ? WHERE reservationID = ?', [start, end, stops, justification, id], function(error, data){
 

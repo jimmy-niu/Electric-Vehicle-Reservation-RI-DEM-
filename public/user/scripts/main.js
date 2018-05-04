@@ -106,17 +106,17 @@ function altVehicles(){
         $("#appealModal").modal('hide');
         $("#altModal").modal();
         $("#justification-help").addClass('d-none');
+
+        $("#altVehiclesForm").empty();
+        for(let i = 0; i < alternateVehicles.rowCount; i++){
+            let command = alternateVehicles.rows[i].model + " || " + alternateVehicles.rows[i].license + ` <input type = "radio" name="altVehiclesGroup" onclick = "setVehicle(${i})"><br>`
+            //console.log(command);
+            $("#altVehiclesForm").append(command);
+        }
+        cleanFields();
     } else {
         $("#justification-help").removeClass('d-none');
     }
-
-    $("#altVehiclesForm").empty();
-    for(let i = 0; i < alternateVehicles.rowCount; i++){
-        let command = alternateVehicles.rows[i].model + " || " + alternateVehicles.rows[i].license + ` <input type = "radio" name="altVehiclesGroup" onclick = "setVehicle(${i})"><br>`
-        //console.log(command);
-        $("#altVehiclesForm").append(command);
-    }
-    cleanFields();
 }
 
 function addStop() {
@@ -182,9 +182,44 @@ function cancelReservationProcess(){
     cleanFields();
 }
 
+function addIDToModal(reservationObj){
+    $("#reservation-id").html(reservationObj.id);
+    setDeleteCard(reservationObj);
+    cancelReservation();
+}
+
 function editReservation(){
-    userSocket.emit('edit', {user: "Jimmy Niu", start: "2018-05-07 12:00", end: "2018-05-07 14:00", stops: ["home", "work", "beach"], justification: ""}, function(){
-    });
+    let id =  $("#reservation-id-edit").html();
+
+    let start = $("#start-date-edit").val();
+    let end = $("#end-date-edit").val();
+
+    //convert strings to Date objects
+    let startDate = new Date(start);
+    let endDate = new Date(end);
+    //gets current date and time
+    let today = new Date();
+
+    //only makes reservation when start date is before end date, and
+    //the reservation is in the present
+    if(startDate >= endDate || startDate < today){
+        $("#messageMText").html("The dates you entered are invalid. Please go back and try again.");
+        $('#errorModal').modal();
+    } else {
+        let stops = [];
+        $('.route-stop-edit').each(function() {
+            stops.push($(this).val());
+        });
+
+        let trunk = $("#trunk-edit").prop('checked');
+        let offroad = $("#offroading-edit").prop('checked');
+        let rack = $('#kayak-edit').prop('checked');
+
+        let resData = {user: userEmail, start: start, end: end, stops: JSON.stringify(stops).split('},{').join('}, {'), override: false, justification: "", needsTrunk: trunk, needsOffRoad: offroad, needsRack: rack};
+        userSocket.emit('edit', id, resData, function(){
+
+        });
+    }
 }
 
 
@@ -212,11 +247,11 @@ class Reservation {
 <img class = "card-img-top" src="https://upload.wikimedia.org/wikipedia/commons/5/5f/DCA_Prius_1Gen_12_2011_3592.JPG" alt="prius placeholder image">
 <div class="card-body">
 <h5 class="card-title">${r.model} ${r.license}</h5>
-<p class="card-text"><b>Start</b>: ${r.start} <br>
-<b>End</b>: ${r.end} <br>
-<b>Route</b>: ${JSON.parse(r.stops)} </p>
+<p class="card-text"><strong>Start</strong>: ${r.start} <br>
+<strong>End</strong>: ${r.end} <br>
+<strong>Route</strong>: ${JSON.parse(r.stops)} </p>
 <span style = "display: none;" id = "res-id">${r.id}</span>
-<a href="#" class="btn btn-primary edit">Edit reservation</a>
+<a href="#" id = "${r.id}" class="btn btn-primary edit" data-toggle="modal" data-target="#editModal" onclick = "addIDToModal(this);">Edit reservation</a>
 <a href="#" id = "${r.id}" class="btn btn-secondary" data-toggle="modal" data-target="#cancelModal" onclick = "setDeleteCard(this);">Cancel</a>
 </div>
 </div>`;

@@ -10,7 +10,6 @@ let base =
     '<style>' +
         'body{' +
             'font-family: sans-serif;' +
-            'background-color: white;' +
             'margin: 0px;' +
         '}' +
     
@@ -28,6 +27,38 @@ let base =
             'align-items: flex-end;' +
         '}' +
 
+        'html { ' +
+          'background-image: url("https://goo.gl/WLebPB");' +
+          'background-position: center 10%; ' +
+        '}' +
+
+        '#login-container { ' + 
+          'background-color: rgba(255, 255, 255, .8);' +
+          'width: 400px; ' +
+          'height: 230px; ' +
+          'margin: auto; ' +
+          'border-radius: 30px; ' +
+          'padding-left: 15px; ' +
+        '}' +
+
+        '#login-container h5 {' +
+          'padding: 20px 20px 0; ' +
+        '}' +
+
+        '#login-container ul {' +
+          'margin-top: -20px;' +
+          'margin-bottom: 30px;' +
+          'font-size: 14px;' +
+        '}' +
+
+        '#outlook-btn { ' +
+          'text-decoration: none; ' +
+          'background-color: #17426D; ' +
+          'color: white;' + 
+          'padding: 10px 30px; ' +
+          'border-radius: 10px;' +
+          'margin-left: 17%;' +
+        '}' +
 
         '#logo{ height: 8vh; padding-right: 1vw; }' +
 
@@ -55,7 +86,14 @@ module.exports = {
     return base.replace('%body%', html);
   },
   loginPagePassport: function() {
-    let html = '<a class="btn btn-outline-primary" href="/auth/outlook">Sign in to Outlook</a>';
+    let html = '<div id="login-container">' +
+    '<h5> Welcome to DEM\'s Vehicle Reservation System!</h5>' +
+    '<ul><li>Reserve any of our fleet\'s vehicles</li>' +
+    '<li>Edit or cancel a reservation</li>'+
+    '<li>Get email notifications</li>'+
+    '<li>Integrate seamlessly with Outlook Calendar</li></ul>'+
+    '<a id="outlook-btn" href="/auth/outlook">Sign in with Outlook</a>' +
+    '</div>';
     return base.replace('%body%', html);
   },
   loginCompletePage: function(userEmail) {
