@@ -41,6 +41,10 @@
 
         </div>
 
+        <div id="fun-fact">
+            <img src="media/polar_bear.png" alt="Polar bear">
+        </div>
+
         <div id="content">
             <button type="button" class="btn btn-primary" id="new-res" data-toggle="modal" data-target="#new-res-form">+ Make a new reservation</button>
 
@@ -234,6 +238,30 @@
                 </div>
             </div>
 
+            <div class="modal fade" id="resModal-edit" tabindex="-2" role="dialog" aria-labelledby="resModalLabel" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="resModalLabel-edit">Your Reserved Vehicle</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close" onclick="cancelReservationProcess()">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <p id = "carMakeMText-edit">Car Model: </p>
+                            <p id = "plateNumberMText-edit">Plate Number: </p>
+                            <p id = "startMText-edit">Start Time: </p>
+                            <p id = "endMText-edit">End Date: </p>
+                            <p id = "stopsMText-edit">Stops: </p>
+                        </div>
+                        <div class="modal-footer" id="acceptDeclineButtons-edit">
+                            <button type="button" id="decline-edit" class="btn btn-danger" data-toggle="modal" data-target="#declineModal-edit" data-dismiss="modal">Decline</button>
+                            <button type="button" id="confirm-res-edit" class="btn btn-success" data-dismiss="modal" onclick = "newEditedReservation();">Confirm Reservation</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
              <div class="modal fade" id="declineModal" tabindex="-2" role="dialog" aria-labelledby="resModalLabel" aria-hidden="true">
                 <div class="modal-dialog" role="document">
                     <div class="modal-content">
@@ -249,6 +277,26 @@
                         <div class="modal-footer" id="backCancelButton">
                             <button type="button" id="decline" class="btn btn-danger" data-toggle="modal" data-target="#appealModal" data-dismiss="modal">Continue to Appeal</button>
                             <button type="button" class="btn btn-success" data-dismiss="modal" data-toggle="modal" data-target="#resModal">Go Back and Accept</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal fade" id="declineModal-edit" tabindex="-2" role="dialog" aria-labelledby="resModalLabel" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="errorModalLabel-edit">Decline Vehicle</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <p id = "declineConfirmMText-edit">Are you sure you want to decline your assigned vehicle?</p>
+                        </div>
+                        <div class="modal-footer" id="backCancelButton-edit">
+                            <button type="button" id="decline-edit" class="btn btn-danger" data-toggle="modal" data-target="#appealModal-edit" data-dismiss="modal">Continue to Appeal</button>
+                            <button type="button" class="btn btn-success" data-dismiss="modal" data-toggle="modal" data-target="#resModal-edit">Go Back and Accept</button>
                         </div>
                     </div>
                 </div>
@@ -297,6 +345,29 @@
                 </div>
             </div>
 
+            <div class="modal fade" id="appealModal-edit" tabindex="-2" role="dialog" aria-labelledby="appealModalLabel" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="appealModalLabel-edit">Appeal Reservation</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <p>The vehicle you were assigned was chosen just for you, and meets all the criteria you specified when making your reservation. Why won't this vehicle work for you?  Please note that your reasoning will be reviewed by an administrator.</p>
+                            <textarea class="form-control" id="reasoning-field-edit" rows="6"></textarea>
+                            <p id="justification-help-edit" class='d-none'>You must submit a justification.</p>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#resModal-edit" data-dismiss="modal">Cancel</button>
+
+                            <button type="button" id="show-alts-edit" class="btn btn-danger" onclick="altVehiclesEdit()">Show Alternative Vehicles</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div class="modal fade" id="altModal" tabindex="-2" role="dialog" aria-labelledby="altModalLabel" aria-hidden="true">
                 <div class="modal-dialog" role="document">
                     <div class="modal-content">
@@ -314,6 +385,28 @@
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#appealModal" data-dismiss="modal">Cancel</button>
                             <button type="button" id="confirm-alt" class="btn btn-danger" data-toggle="modal" data-dismiss="modal" onclick = "combineCards()">Confirm Alternative Vehicle</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal fade" id="altModal-edit" tabindex="-2" role="dialog" aria-labelledby="altModalLabel" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="altModalLabel-edit">Alternative Vehicles</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <p>Please select a vehicle.</p>
+                            <form id = "altVehiclesForm-edit">
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#appealModal" data-dismiss="modal">Cancel</button>
+                            <button type="button" id="confirm-alt-edit" class="btn btn-danger" data-toggle="modal" data-dismiss="modal" onclick = "newEditedReservationOverride()">Confirm Alternative Vehicle</button>
                         </div>
                     </div>
                 </div>
