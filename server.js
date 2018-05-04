@@ -1,4 +1,4 @@
-let express = require('express')
+let express = require('express');
 let app = express();
 let path = require('path');
 let http =require('http');
@@ -10,6 +10,7 @@ let perf = require('./test/perf-test.js');
 let io = require('socket.io')(server, {wsEngine: 'ws'}); //fix Windows10 issue
 io.listen(server);
 
+let multer = require("multer");
 let bodyParser = require('body-parser');
 app.use(bodyParser.urlencoded({extended:false}));
 app.use(bodyParser.json());
@@ -43,14 +44,14 @@ app.use(session(
      resave: false,
      saveUninitialized: true
     })
-);
+       );
 
 var transporter = nodemailer.createTransport({
     host: "smtp-mail.outlook.com", // hostname
     secureConnection: false, // TLS requires secureConnection to be false
     port: 587, // port for secure SMTP
     tls: {
-       ciphers:'SSLv3'
+        ciphers:'SSLv3'
     },
     auth: {
         user: 'dem_do-not-reply@outlook.com',
@@ -214,7 +215,7 @@ function addEvent(title, bodytext, start, end) {
     };
 
     outlook.calendar.createEvent(addEventParameters,
-        function(error, result) {
+                                 function(error, result) {
         if (error) {
             console.log(error);
         }
@@ -226,8 +227,8 @@ function addEvent(title, bodytext, start, end) {
 
 function removeEvent(subject, start, end) {
     var queryParams = {
-      '$select': 'Subject,Start,End,Id',
-      '$top': 50,
+        '$select': 'Subject,Start,End,Id',
+        '$top': 50,
     };
 
     var userInfo = {
@@ -235,17 +236,17 @@ function removeEvent(subject, start, end) {
     };
 
     outlook.calendar.getEvents({token: token, odataParams: queryParams, user: userInfo},
-      function(error, result){
+                               function(error, result){
         if (error) {
-          console.log('getEvents returned an error: ' + error);
+            console.log('getEvents returned an error: ' + error);
         }
         else if (result) {
-          console.log('getEvents returned ' + result.value.length + ' events.');
-          //return result.value;
-          result.value.forEach(function(event) {
-            if (event.Subject === subject && event.Start === start && event.End == end) {
-                outlook.calendar.deleteEvent({token: token, user: userInfo, eventId: event.Id},
-                    function(error, result) {
+            console.log('getEvents returned ' + result.value.length + ' events.');
+            //return result.value;
+            result.value.forEach(function(event) {
+                if (event.Subject === subject && event.Start === start && event.End == end) {
+                    outlook.calendar.deleteEvent({token: token, user: userInfo, eventId: event.Id},
+                                                 function(error, result) {
                         if (error) {
                             console.log(error)
                             console.log(event)
@@ -254,17 +255,17 @@ function removeEvent(subject, start, end) {
                             console.log("deleteEvent success");
                         }
                     })
-            }
-            /*console.log(event.Subject === subject);
+                }
+                /*console.log(event.Subject === subject);
             console.log(event.Start === start);
             console.log(event.End === end);*/
-            console.log('  Subject:', event.Subject);
-            console.log('  Id:', event.Id);
-            console.log('  Start:', event.Start);
-            console.log('  End:', event.End);
-          });
+                console.log('  Subject:', event.Subject);
+                console.log('  Id:', event.Id);
+                console.log('  Start:', event.Start);
+                console.log('  End:', event.End);
+            });
         }
-      });
+    });
 }
 
 //handles events when a regular user is connnected
@@ -324,11 +325,11 @@ io.of('/user').on('connection', function(socket){
                 html: '<h1>Reservation: ' + data.rows[0].id + '</h1>' + '<h2>Name: ' + data.rows[0].user + '</h2>' + '<h2>License Plate: ' + data.rows[0].license + '</h2>' + '<p>Report: ' + report + '<p>' + '<p>Needs Service: ' + needsService + '<p>' + '<p>Needs Cleaning: ' + needsCleaning + '<p>' + '<p>Not Charging: ' + notCharging + '<p>'
             };
             transporter.sendMail(mailOptions, function(error, info){
-              if (error) {
-                console.log(error);
-              } else {
-                console.log('Email sent: ' + info.response);
-              }
+                if (error) {
+                    console.log(error);
+                } else {
+                    console.log('Email sent: ' + info.response);
+                }
             });
             console.log('email sent')
         });
@@ -367,17 +368,17 @@ passport.deserializeUser(function(obj, done) {
 });
 
 passport.use(new OutlookStrategy({
-        clientID: OUTLOOK_CLIENT_ID,
-        clientSecret: OUTLOOK_CLIENT_SECRET,
-        callbackURL: "http://localhost:8080/authorize"
-    },
-    function(accessToken, refreshToken, profile, done) {
-        process.nextTick(function () {
-            token = accessToken;
-            return done(null, profile);
-        });
-    }
-));
+    clientID: OUTLOOK_CLIENT_ID,
+    clientSecret: OUTLOOK_CLIENT_SECRET,
+    callbackURL: "http://localhost:8080/authorize"
+},
+                                 function(accessToken, refreshToken, profile, done) {
+    process.nextTick(function () {
+        token = accessToken;
+        return done(null, profile);
+    });
+}
+                                ));
 
 app.get('/', function(req, res) {
     res.send(index.loginPagePassport());
@@ -414,8 +415,8 @@ app.get('/authorize',
 });
 
 app.get('/auth/outlook',
-    passport.authenticate('windowslive', { scope: process.env.CLIENT_SCOPES }),
-    function(req, res) {
+        passport.authenticate('windowslive', { scope: process.env.CLIENT_SCOPES }),
+        function(req, res) {
 });
 
 app.get('/logout', function(req, res) {
@@ -628,3 +629,25 @@ function stopsEqual(stops1, stops2){
     }
     return true;
 }
+
+// that good image stuff.
+
+let Storage = multer.diskStorage({
+    destination: function (req, file, callback) {
+        callback(null, "./public/images");
+    },
+    filename: function (req, file, callback) {
+        callback(null, file.originalname);
+    }
+});
+
+let upload = multer({ storage: Storage }).array("imgUploader", 3); //Field name and max count
+
+app.post("/admin/api/Upload", function (req, res) {
+    upload(req, res, function (err) {
+        if (err) {
+            return "Something went wrong!";
+        }
+        return "File uploaded sucessfully!.";
+    });
+});

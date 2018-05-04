@@ -13,7 +13,6 @@ function toggle_hidden(id, object){
 
 // Sets up the sockets.
 $(document).ready(function() {
-    console.time('Page Update Event');
     adminSocket.emit('updatePage', function(){
         console.timeEnd('Page Update Event');
     });
@@ -44,10 +43,36 @@ $(document).ready(function() {
             currentVehicle ++;
         }
     });
+    
     adminSocket.on('reportChange', function(reports){
         console.log(reports);
     });
+    
+    let options = {
+        beforeSubmit: showRequest,  // pre-submit callback
+        success: showResponse  // post-submit callback
+    };
+
+    // bind to the form's submit event
+    $('#frmUploader').on('submit', (function (e) {
+        console.log("should be submitting....");
+        e.preventDefault();
+        $(this).ajaxSubmit(options);
+        return false;
+    }));
 });
+
+// pre-submit callback
+function showRequest(formData, jqForm, options) {
+    console.log(formData);
+    console.log(jqForm);
+    return true;
+}
+
+// post-submit callback
+function showResponse(responseText, statusText, xhr, $form) {
+    alert('status: ' + statusText + '\n\nresponseText: \n' + responseText );
+}
 
 function modifyUser() {
     let email = $('#emailField').val();
@@ -96,7 +121,7 @@ function addVehicle(){
                        isEv: carType, trunk: trunk, offRoad: offRoad, equipmentRack: equipmentRack};
         console.time("Add Vehicle");
         adminSocket.emit("vehicleAdded", vehicle, function(){
-                console.timeEnd("Add Vehicle");
+            console.timeEnd("Add Vehicle");
         });
     }
 }
