@@ -66,14 +66,13 @@
                                 </div>
                                 <div class="form-group">
                                     <label>Pickup Location</label>
-
-                                    <input id="startInput" type="text" placeholder="Enter a location"/>
+                                    <input class="form-control route-stop" type="text" placeholder="Enter a location"/>
                                     <!-- <input type=text class="form-control route-stop" value="Work"> -->
                                 </div>
                                 <div id="stops">
                                     <div class="form-group">
                                         <label>Destination</label>
-                                        <input id="endInput" type="text" placeholder="Enter a location"/>
+                                        <input class="form-control route-stop" type="text" placeholder="Enter a location"/>
                                         <!-- <input type=text class="form-control route-stop" value="Home"> -->
                                     </div>
                                     <div id = "new-stops"></div>
@@ -347,12 +346,20 @@
         </div>
         <script>
             function initMap() {
-                var input1 = document.getElementById('startInput');
-                var autocomplete1 = new google.maps.places.Autocomplete(input1);
-                var input2 = document.getElementById('endInput');
-                var autocomplete2 = new google.maps.places.Autocomplete(input2);
+                var input1 = document.getElementsByClassName('route-stop');
+                var i;
+                for (i = 0; i < input1.length; i++) {
+                    autocomplete = new google.maps.places.Autocomplete(input1[i]);
+                }
+                //var input2 = document.getElementById('endInput');
+                //var autocomplete2 = new google.maps.places.Autocomplete(input2);
                 //autocomplete.addListener('placed_changed', () => console.log(autocomplete.getPlace()))
             }
+            $(document).ready(function() {
+                $("#add-stop").click(function() {
+                    initMap();
+                });
+            });
             
         // var start = document.getElementById('startInput');
         // var end = document.getElementById('endInput');
