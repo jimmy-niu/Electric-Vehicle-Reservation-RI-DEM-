@@ -47,14 +47,15 @@ app.use(session(
 
 var transporter = nodemailer.createTransport({
     host: "smtp-mail.outlook.com", // hostname
+    pool: true,
     secureConnection: false, // TLS requires secureConnection to be false
     port: 587, // port for secure SMTP
-    tls: {
-       ciphers:'SSLv3'
-    },
     auth: {
         user: 'dem_do-not-reply@outlook.com',
         pass: 'DEMnoreply123'
+    },
+    tls: {
+       ciphers:'SSLv3'
     }
 }); 
 
@@ -87,6 +88,7 @@ transporter.sendMail(mailOptions, function(error, info){
 conn.query('DROP TABLE IF EXISTS reservations');
 conn.query('DROP TABLE IF EXISTS vehicles');
 conn.query('DROP TABLE IF EXISTS reports');
+conn.query('DROP TABLE IF EXISTS users');
 
 
 //Users
@@ -136,6 +138,8 @@ conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', ["1FADP5
 conn.query('INSERT INTO reports VALUES(null, ?, ?, ?, ?, ?)', [5, "Car sucks.", true, true, false]);
 conn.query('INSERT INTO reports VALUES(null, ?, ?, ?, ?, ?)', [1, "Car is dirty af.", false, true, false]);
 
+conn.query('INSERT INTO users VALUES(null, ?, ?)', ["jenna.tishler@gmail.com", true]);
+conn.query('INSERT INTO users VALUES(null, ?, ?)', ["jenna_tishler@brown.edu", true]);
 /*Sets up the server on port 8080.*/
 server.listen(8080, function(){
     console.log('- Server listening on port 8080');
@@ -280,7 +284,7 @@ io.of('/user').on('connection', function(socket){
     socket.on('reservation', function(reservationInfo, callback){
         //console.log("got a reservation!");
         //removeEvent("dem_test_u@outlook.com's upcoming DEM trip", "2018-05-12T16:00:00Z", "2018-05-23T16:00:00Z");
-        newReservation(socket, reservationInfo);
+        newReservation(socket, reservationInfo, false);
     });
 
     socket.on('edit', function(reservationID, reservationInfo){
@@ -288,7 +292,7 @@ io.of('/user').on('connection', function(socket){
         conn.query('DELETE FROM reservations WHERE id = ?', [reservationID], function(error, data){
 
         });
-        newReservation(socket, reservationInfo);
+        newReservation(socket, reservationInfo, true);
         // conn.query('UPDATE reservations SET start = ?, end = ?, stops = ?, justification = ? WHERE id = ?', [reservationInfo.start, reservationInfo.end, reservationInfo.stops, reservationInfo.justification, reservationID], function(error, data){
         //     conn.query('SELECT * FROM reservations WHERE user = ?', [reservationInfo.user], function(error, data){
         //         socket.emit('reservationChange', data);
@@ -317,20 +321,23 @@ io.of('/user').on('connection', function(socket){
         });
 
         conn.query('SELECT * FROM reservations WHERE id = ?', [5], function(error, data){
-            let mailOptions = {
-                from: 'dem_do-not-reply@outlook.com',
-                to: 'jenna_tishler@brown.edu',
-                subject: 'New Report Added',
-                html: '<h1>Reservation: ' + data.rows[0].id + '</h1>' + '<h2>Name: ' + data.rows[0].user + '</h2>' + '<h2>License Plate: ' + data.rows[0].license + '</h2>' + '<p>Report: ' + report + '<p>' + '<p>Needs Service: ' + needsService + '<p>' + '<p>Needs Cleaning: ' + needsCleaning + '<p>' + '<p>Not Charging: ' + notCharging + '<p>'
-            };
-            transporter.sendMail(mailOptions, function(error, info){
-              if (error) {
-                console.log(error);
-              } else {
-                console.log('Email sent: ' + info.response);
-              }
+            conn.query('SELECT email FROM users WHERE admin = ?', [true], function(error, data){
+                let mailOptsList = [];
+                for(var i = 0; i < data.rows.length; i++){
+                    mailOptsList.push({
+                        from: 'dem_do-not-reply@outlook.com',
+                        to: data.rows[i].email,
+                        subject: 'New Report Added',
+                        html: '<h1>Reservation: ' + data.rows[0].id + '</h1>' + '<h2>Name: ' + data.rows[0].user + '</h2>' + '<h2>License Plate: ' + data.rows[0].license + '</h2>' + '<p>Report: ' + report + '<p>' + '<p>Needs Service: ' + needsService + '<p>' + '<p>Needs Cleaning: ' + needsCleaning + '<p>' + '<p>Not Charging: ' + notCharging + '<p>'
+                    });
+                }
+                transporter.on('idle', function(){
+                    while(transporter.isIdle() && messages.length > 0){
+                        transporter.sendMail(mailOptsList.shift());
+                        console.log("email sent")
+                    }
+                });
             });
-            console.log('email sent')
         });
     });
 
@@ -517,7 +524,7 @@ function removeUser(email){
 }
 
 // USER help functions
-function newReservation(socket, reservationInfo){
+function newReservation(socket, reservationInfo, isEdit){
     var needsTrunk;
     if(reservationInfo.needsTrunk){
         needsTrunk = 1;
@@ -575,7 +582,11 @@ function newReservation(socket, reservationInfo){
                     conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?)',[reservationInfo.user, data.rows[0].license, data.rows[0].model, reservationInfo.start, reservationInfo.end, reservationInfo.stops, reservationInfo.override, reservationInfo.justification],function(error, data){
                         conn.query('SELECT * FROM reservations WHERE id = ?', [data.lastInsertId], function(error, data){
                             //Send to user and admins
-                            socket.emit('newReservation', data);
+                            if(isEdit){
+                                socket.emit('editReservation', data);
+                            } else {
+                                socket.emit('newReservation', data);
+                            }
                             io.of('/admin').emit("newReservation", data);
                             //Calendar event
                             var start = new Date(reservationInfo.start);
