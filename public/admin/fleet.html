@@ -41,12 +41,6 @@
             <div class = "Nav-Buttons">
                 <a href = "./index.html"><div class = "button drop-shadow">Reservations</div></a>
                 <a href = "#addVehicleModal" class = "btn btn-large btn-primary drop-shadow" data-toggle="modal">Add Vehicle</a>
-
-                <form id="frmUploader" enctype="multipart/form-data" action="api/Upload/" method="post">
-                    <input type="file" name="imgUploader" multiple />
-                    <input type="submit" name="submit" id="btnSubmit" value="Upload" />
-                </form>  
-
             </div>
 
             <div class = "content drop-shadow">
@@ -80,9 +74,17 @@
                             Color: <input type = "text" id = "colorField" title="Color">
                             <br> <br>
                             Miles on Car: <input type = "number" id = "milesField" value = 0>
-                            <hr>
+                            <br><br>
+                        </form>
+                        
+                        Upload Image:
+                        <form id="frmUploader" enctype="multipart/form-data" method="POST" action="api/Upload/" onsubmit="formSubmit">
+                            <input id = "imageInput" type="file" name="imgUploader" multiple />
+                            <input type="submit" name="submit" id="btnSubmit" value="Upload" />
+                        </form>  
+                        <hr>
 
-
+                        <form>
                             <h5>Car Capabilities:</h5>
                             Car Status:  <select id="carStatusField">
                             <option value="ready">Ready</option>

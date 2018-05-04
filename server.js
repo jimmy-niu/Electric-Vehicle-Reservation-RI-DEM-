@@ -646,15 +646,18 @@ let Storage = multer.diskStorage({
     filename: function (req, file, callback) {
         callback(null, file.originalname);
     }
-});
+});     
 
 let upload = multer({ storage: Storage }).array("imgUploader", 3); //Field name and max count
 
 app.post("/admin/api/Upload", function (req, res) {
+    console.log("uploading image");
     upload(req, res, function (err) {
         if (err) {
             return "Something went wrong!";
+        } else {
+            return "success!";
         }
-        return "File uploaded sucessfully!.";
+        
     });
 });

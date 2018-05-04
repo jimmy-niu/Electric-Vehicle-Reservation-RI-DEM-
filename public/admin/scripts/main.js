@@ -43,35 +43,41 @@ $(document).ready(function() {
             currentVehicle ++;
         }
     });
-    
+
     adminSocket.on('reportChange', function(reports){
         console.log(reports);
     });
-    
-    let options = {
-        beforeSubmit: showRequest,  // pre-submit callback
-        success: showResponse  // post-submit callback
-    };
+
+
 
     // bind to the form's submit event
-    $('#frmUploader').on('submit', (function (e) {
-        console.log("should be submitting....");
-        e.preventDefault();
-        $(this).ajaxSubmit(options);
-        return false;
-    }));
+    $('#frmUploader').submit(formSubmit);
 });
 
+function formSubmit(event){
+    let options = {
+        beforeSubmit: showRequest,  // pre-submit callback
+        uploadProgress: showProgress,
+        clearForm: true,
+        method: "POST"
+    };
+
+    console.log("should be submitting....");
+    $(this).ajaxSubmit(options);
+    return false;
+}
 // pre-submit callback
 function showRequest(formData, jqForm, options) {
-    console.log(formData);
-    console.log(jqForm);
+    console.log("Is submitting file!");
     return true;
 }
 
-// post-submit callback
-function showResponse(responseText, statusText, xhr, $form) {
-    alert('status: ' + statusText + '\n\nresponseText: \n' + responseText );
+function showProgress(event, position, total, percentageComplete){
+    console.log(percentageComplete);
+    if(percentageComplete === 100){
+        $("#imageInput").val('');
+        window.alert("done with upload!");
+    }
 }
 
 function modifyUser() {
