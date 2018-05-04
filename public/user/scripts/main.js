@@ -71,7 +71,6 @@ function cleanFields(){
     $("#endMText").html("End Time: ");
     $("#stopsMText").html("Stops: ");
     $("#new-stops").empty();
-    $("#noVehicleMText").html("");
 }
 
 function renderCar(){
@@ -103,10 +102,18 @@ function setVehicle(index){
 }
 
 function altVehicles(){
+    if($("#reasoning-field").val().trim().length > 0){
+        $("#appealModal").modal('hide');
+        $("#altModal").modal();
+        $("#justification-help").addClass('d-none');
+    } else {
+        $("#justification-help").removeClass('d-none');
+    }
+
     $("#altVehiclesForm").empty();
     for(let i = 0; i < alternateVehicles.rowCount; i++){
         let command = alternateVehicles.rows[i].model + " || " + alternateVehicles.rows[i].license + ` <input type = "radio" name="altVehiclesGroup" onclick = "setVehicle(${i})"><br>`
-        console.log(command);
+        //console.log(command);
         $("#altVehiclesForm").append(command);
     }
     cleanFields();

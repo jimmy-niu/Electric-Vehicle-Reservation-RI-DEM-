@@ -198,11 +198,12 @@
                         <div class="modal-body">
                             <p>The vehicle you were assigned was chosen just for you, and meets all the criteria you specified when making your reservation. Why won't this vehicle work for you?  Please note that your reasoning will be reviewed by an administrator.</p>
                             <textarea class="form-control" id="reasoning-field" rows="6"></textarea>
+                            <p id="justification-help" class='d-none'>You must submit a justification.</p>
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#resModal" data-dismiss="modal">Cancel</button>
 
-                            <button type="button" id="show-alts" class="btn btn-danger" data-dismiss="modal" data-toggle="modal" data-target="#altModal" onclick = "altVehicles();">Show Alternative Vehicles</button>
+                            <button type="button" id="show-alts" class="btn btn-danger" onclick="altVehicles()">Show Alternative Vehicles</button>
                         </div>
                     </div>
                 </div>
