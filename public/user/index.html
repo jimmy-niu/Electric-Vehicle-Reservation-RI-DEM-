@@ -65,14 +65,14 @@
                                     <input class = "datePicker" id ="end-date" placeholder="Select Date.." type="text" value = "2018-05-1 3:00">
                                 </div>
                                 <div class="form-group">
-                                    <label>Pickup Location</label>
+                                    <label for="startInput">Pickup Location</label>
 
                                     <input id="startInput" type="text" placeholder="Enter a location"/>
                                     <!-- <input type=text class="form-control route-stop" value="Work"> -->
                                 </div>
                                 <div id="stops">
                                     <div class="form-group">
-                                        <label>Destination</label>
+                                        <label for="endInput">Destination</label>
                                         <input id="endInput" type="text" placeholder="Enter a location"/>
                                         <!-- <input type=text class="form-control route-stop" value="Home"> -->
                                     </div>
@@ -151,12 +151,12 @@
                                 </div>
                                 <div class="form-group">
                                     <label>Pickup Location</label>
-                                    <input type=text class="form-control route-stop-edit" value="Work">
+                                    <input type=text class="form-control route-stop-edit" value="Work" title="Pickup Location">
                                 </div>
                                 <div id="stops">
                                     <div class="form-group">
                                         <label>Destination</label>
-                                        <input type=text class="form-control route-stop-edit" value="Home">
+                                        <input type=text class="form-control route-stop-edit" value="Home" title="Destination">
                                     </div>
                                     <div id = "new-stops-edit"></div>
                                 </div>
@@ -286,7 +286,7 @@
                         </div>
                         <div class="modal-body">
                             <p>The vehicle you were assigned was chosen just for you, and meets all the criteria you specified when making your reservation. Why won't this vehicle work for you?  Please note that your reasoning will be reviewed by an administrator.</p>
-                            <textarea class="form-control" id="reasoning-field" rows="6"></textarea>
+                            <textarea class="form-control" id="reasoning-field" rows="6" title="Override justification"></textarea>
                             <p id="justification-help" class='d-none'>You must submit a justification.</p>
                         </div>
                         <div class="modal-footer">
@@ -349,8 +349,8 @@
                     <img class = "card-img-top" src="https://upload.wikimedia.org/wikipedia/commons/5/5f/DCA_Prius_1Gen_12_2011_3592.JPG" alt="prius placeholder image">
                     <div class="card-body">
                         <h5 class="card-title">Toyota Prius 787ZXC</h5>
-                        <p class="card-text"><b>Start</b>: April 15, 2018 10:00am<br>
-                            <b>End</b>: April 15, 2018 11:30am</p>
+                        <p class="card-text"><strong>Start</strong>: April 15, 2018 10:00am<br>
+                            <strong>End</strong>: April 15, 2018 11:30am</p>
                         <a href="#" class="btn btn-primary edit" data-toggle="modal" data-target="#reportModal">Make report </a>
                     </div>
                 </div>
@@ -365,7 +365,7 @@
                             </div>
                             <div class="modal-body">
                                 <div class="form-group">
-                                    <textarea class="form-control" id="report-area" rows="6" placeholder="Enter report here."></textarea>
+                                    <textarea class="form-control" id="report-area" rows="6" placeholder="Enter report here." title="Vehicle report"></textarea>
                                 </div>
                                 <div class="form-group">
                                     <div class="form-check form-check-inline">
@@ -390,8 +390,8 @@
                     <img class = "card-img-top" src="https://media.ed.edmunds-media.com/ford/explorer/2017/oem/2017_ford_explorer_4dr-suv_platinum_rq_oem_1_815.jpg" alt="explorer placeholder image">
                     <div class="card-body">
                         <h5 class="card-title">Ford Explorer 721ZYD</h5>
-                        <p class="card-text"><b>Start</b>: April 15, 2018 10:00am<br>
-                            <b>End</b>: April 15, 2018 11:30am</p>
+                        <p class="card-text"><strong>Start</strong>: April 15, 2018 10:00am<br>
+                            <strong>End</strong>: April 15, 2018 11:30am</p>
                         <a href="#" class="btn btn-primary edit" data-toggle="modal" data-target="#reportModal">Make report </a>
                     </div>
                 </div>
@@ -400,8 +400,8 @@
                     <img class = "card-img-top" src="https://media.ed.edmunds-media.com/ford/explorer/2017/oem/2017_ford_explorer_4dr-suv_platinum_rq_oem_1_815.jpg" alt="explorer placeholder image">
                     <div class="card-body">
                         <h5 class="card-title">Ford Explorer 721ZYD</h5>
-                        <p class="card-text"><b>Start</b>: April 15, 2018 10:00am<br>
-                            <b>End</b>: April 15, 2018 11:30am</p>
+                        <p class="card-text"><strong>Start</strong>: April 15, 2018 10:00am<br>
+                            <strong>End</strong>: April 15, 2018 11:30am</p>
                         <a href="#" class="btn btn-primary edit" data-toggle="modal" data-target="#reportModal">Make report </a>
                     </div>
                 </div>
@@ -410,8 +410,8 @@
                     <img class = "card-img-top" src="https://upload.wikimedia.org/wikipedia/commons/5/5f/DCA_Prius_1Gen_12_2011_3592.JPG" alt="prius placeholder image">
                     <div class="card-body">
                         <h5 class="card-title">Toyota Prius 787ZXC</h5>
-                        <p class="card-text"><b>Start</b>: April 15, 2018 10:00am<br>
-                            <b>End</b>: April 15, 2018 11:30am</p>
+                        <p class="card-text"><strong>Start</strong>: April 15, 2018 10:00am<br>
+                            <strong>End</strong>: April 15, 2018 11:30am</p>
                         <a href="#" class="btn btn-primary edit" data-toggle="modal" data-target="#reportModal">Make report </a>
                     </div>
                 </div>
@@ -420,8 +420,8 @@
                     <img class = "card-img-top" src="https://media.ed.edmunds-media.com/ford/explorer/2017/oem/2017_ford_explorer_4dr-suv_platinum_rq_oem_1_815.jpg" alt="explorer placeholder image">
                     <div class="card-body">
                         <h5 class="card-title">Ford Explorer 721ZYD</h5>
-                        <p class="card-text"><b>Start</b>: April 15, 2018 10:00am<br>
-                            <b>End</b>: April 15, 2018 11:30am</p>
+                        <p class="card-text"><strong>Start</strong>: April 15, 2018 10:00am<br>
+                            <strong>End</strong>: April 15, 2018 11:30am</p>
                         <a href="#" class="btn btn-primary edit" data-toggle="modal" data-target="#reportModal">Make report </a>
                     </div>
                 </div>
