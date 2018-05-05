@@ -41,7 +41,19 @@ $(document).ready(function() {
         $("#resModal").modal();
         console.log(reservation);
     });
-
+    userSocket.on('editReservation', function(reservation){
+        console.log('edit reservation made');
+        cleanFieldsEdit();
+        currentCar = reservation;
+        firstReturnedCar = reservation;
+        $("#carMakeMText-edit").html($("#carMakeMText-edit").html() + reservation.rows[0].model);
+        $("#plateNumberMText-edit").html($("#plateNumberMText-edit").html() + reservation.rows[0].license);
+        $("#startMText-edit").html($("#startMText-edit").html() + reservation.rows[0].start);
+        $("#endMText-edit").html($("#endMText-edit").html() + reservation.rows[0].end);
+        $("#stopsMText-edit").html($("#stopsMText-edit").html() + JSON.parse(reservation.rows[0].stops));
+        $("#resModal-edit").modal();
+        console.log(reservation);
+    });
     userSocket.on('reservationOverride', function(reservations){
         console.log("reservation vehicle override");
     });
@@ -61,7 +73,19 @@ $(document).ready(function() {
     });
 
     flatpickr(".datePicker", {enableTime: true, dateFormat: "Y-m-d H:i"});
+    let facts = Array();
+    facts.push("An electric vehicle has an expected range of 80 to 250+ miles!");
+    facts.push("Plug-in hybrid electric vehicles offer 15-50 miles of all-electric driving and can be driven an additional 350-600 miles on the gas engine if needed.");
+    facts.push("Fuel cell electric vehicles have a range of 300 to 350 miles!");
+    facts.push("Fast charging stations recharge electric cars in about 30 minutes!");
+    facts.push("90% of all charging is done at home and the workplace.");
+    facts.push("Apps can quickly locate the closest charging stations!");
+    facts.push("Electric cars currently produce 54% less (lifetime) carbon pollution than gas-powered cars!");
+    facts.push("Electric Vehicles typically produce far lower tailpipe emissions than gas-powered cars do!");
+    facts.push("Electric cars typically accelerate far faster and more smoothly than gas-powered cars!");
 
+    let fact = facts[Math.floor(Math.random()*facts.length)];
+    $("#fun-fact").append("<p>"+fact+"</p>");
 });
 
 function cleanFields(){
@@ -72,6 +96,15 @@ function cleanFields(){
     $("#stopsMText").html("Stops: ");
     $("#new-stops").empty();
 }
+
+function cleanFieldsEdit(){
+    $("#carMakeMText-edit").html("Car Model: ");
+    $("#plateNumberMText-edit").html("License Plate: ");
+    $("#startMText-edit").html("Start Time: ");
+    $("#endMText-edit").html("End Time: ");
+    $("#stopsMText-edit").html("Stops: ");
+    $("#new-stops-edit").empty();
+ }
 
 function renderCar(){
     console.log("drawing car!");
@@ -119,6 +152,23 @@ function altVehicles(){
     }
 }
 
+function altVehiclesEdit(){
+    if($("#reasoning-field-edit").val().trim().length > 0){
+        $("#appealModal-edit").modal('hide');-        $("#altModal-edit").modal();
+        $("#justification-help-edit").addClass('d-none');
+ 
+         $("#altVehiclesForm-edit").empty();
+         for(let i = 0; i < alternateVehicles.rowCount; i++){
+             let command = alternateVehicles.rows[i].model + " || " + alternateVehicles.rows[i].license + ` <input type = "radio" name="altVehiclesGroup" onclick = "setVehicle(${i})"><br>`
+             //console.log(command);
+             $("#altVehiclesForm-edit").append(command);
+         }
+         cleanFieldsEdit();
+     } else {
+         $("#justification-help-edit").removeClass('d-none');
+     }
+ }
+
 function addStop() {
     console.log("we in addStop");
     let newStop = ` <div class="form-group">
@@ -129,9 +179,23 @@ id = "deleteX">x</span></label>
     $('#new-stops').append(newStop);
 }
 
+
 function deleteStop(obj){
     let toDelete = obj.parentNode.parentNode;
     toDelete.parentNode.removeChild(toDelete);
+}
+
+function newEditedReservation(){
+    cancelReservation();
+    renderCar();
+    cleanFieldsEdit();
+}
+
+function newEditedReservationOverride(){
+    console.log(idToDelete);
+    cancelReservation();
+    combineCards();
+    cleanFieldsEdit();
 }
 
 function newReservation(){
