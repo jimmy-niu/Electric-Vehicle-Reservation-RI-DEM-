@@ -73,20 +73,25 @@ $(document).ready(function() {
     });
 
     flatpickr(".datePicker", {enableTime: true, dateFormat: "Y-m-d H:i"});
-    let facts = Array();
-    facts.push("An electric vehicle has an expected range of 80 to 250+ miles!");
-    facts.push("Plug-in hybrid electric vehicles offer 15-50 miles of all-electric driving and can be driven an additional 350-600 miles on the gas engine if needed.");
-    facts.push("Fuel cell electric vehicles have a range of 300 to 350 miles!");
-    facts.push("Fast charging stations recharge electric cars in about 30 minutes!");
-    facts.push("90% of all charging is done at home and the workplace.");
-    facts.push("Apps can quickly locate the closest charging stations!");
-    facts.push("Electric cars currently produce 54% less (lifetime) carbon pollution than gas-powered cars!");
-    facts.push("Electric Vehicles typically produce far lower tailpipe emissions than gas-powered cars do!");
-    facts.push("Electric cars typically accelerate far faster and more smoothly than gas-powered cars!");
+    let facts = readFacts();
 
     let fact = facts[Math.floor(Math.random()*facts.length)];
     $("#fun-fact").append("<p>"+fact+"</p>");
 });
+
+function readFacts() {
+    var rawFile = new XMLHttpRequest();
+    rawFile.open("GET", 'media/facts.txt', false);
+    rawFile.onreadystatechange = function() {
+        if (rawFile.readyState === 4) {
+            if (rawFile.status === 200 || rawFile.status == 0) {
+                var allText = rawFile.responseText;
+                alert(allText);
+            }
+        }
+    }
+    rawFile.send(null);
+}
 
 function cleanFields(){
     $("#carMakeMText").html("Car Model: ");
