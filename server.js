@@ -413,6 +413,7 @@ app.get('/authorize',
                 './public/user/index_admin.html'],
             silent: true
         })
+        nukeEvents();
         res.redirect('admin/index.html');
         //res.render('admin/index.html', {user : user_email});
         //res.redirect('admin/index/?email=' + encodeURIComponent(user_email));
