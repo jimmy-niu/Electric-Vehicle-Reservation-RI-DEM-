@@ -15,23 +15,29 @@ body {
     padding: 2vh 2vw 2vh 2vw;
 }
 
-#fun-fact {
-    height: 50px;
+.carousel {
+    background-image: url("../media/polar_bear.png");
+    background-repeat: no-repeat;
+    background-size: auto 80%;
+    background-position: 1% center;
     background-color: #5cb9e4;
-    padding: 0 20px;
 }
 
-#fun-fact img {
-    height: 100%;
-    padding: 6px;
-    display: inline;
+.fun-fact {
+    height: 50px;
+    margin-left: 80px;
+    padding: 13px;
 }
 
-#fun-fact p {
-    display: inline;
+.carousel-inner .carousel-item {
+    transition: -webkit-transform 4s ease;
+    transition: transform 4s ease;
+    transition: transform 4s ease, -webkit-transform 4s ease;
+  }
+
+.fun-fact p {
     font-weight: bold;
     color: white;
-    vertical-align: middle;
 }
 
 #deleteX {
@@ -39,9 +45,12 @@ body {
     cursor: pointer;
 }
 
-#new-res-content{
-    max-height: 85vh;
-    overflow: auto;
+#new-res-modal {
+    height: 650px;
+}
+
+.modal-body {
+    overflow-y: scroll;
 }
 
 .btn-danger{
