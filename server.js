@@ -244,20 +244,11 @@ function removeEvent(subject, start, end) {
                                                  function(error, result) {
                         if (error) {
                             console.log(error)
-                            console.log(event)
-                            //console.log('deleteEvent returned an error');
                         } else {
                             console.log("deleteEvent success");
                         }
                     })
                 }
-                /*console.log(event.Subject === subject);
-            console.log(event.Start === start);
-            console.log(event.End === end);*/
-                console.log('  Subject:', event.Subject);
-                console.log('  Id:', event.Id);
-                console.log('  Start:', event.Start);
-                console.log('  End:', event.End);
             });
         }
     });
@@ -304,7 +295,7 @@ io.of('/user').on('connection', function(socket) {
     //emitted when a user makes a new reservation
     socket.on('reservation', function(reservationInfo, callback){
         //console.log("got a reservation!");
-        removeEvent("dem_test_u_2@outlook.com's upcoming DEM trip", "2018-04-26T05:00:00Z", "2018-05-01T07:00:00Z");
+        //removeEvent("dem_test_u_2@outlook.com's upcoming DEM trip", "2018-04-26T05:00:00Z", "2018-05-01T07:00:00Z");
         newReservation(socket, reservationInfo, false);
     });
 
