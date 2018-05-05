@@ -49,12 +49,6 @@ $(document).ready(function() {
     });
 
 
-
-    // bind to the form's submit event
-    $('#frmUploader').submit(formSubmit);
-});
-
-function formSubmit(event){
     let options = {
         beforeSubmit: showRequest,  // pre-submit callback
         uploadProgress: showProgress,
@@ -62,11 +56,14 @@ function formSubmit(event){
         method: "POST", 
         data: {license: "awkward"}
     };
+    
+    // bind to the form's submit event
+    $('#frmUploader').submit(function(){
+        $(this).ajaxSubmit(options);
+        return false;
+    });
+});
 
-    console.log("should be submitting....");
-    $(this).ajaxSubmit(options);
-    return false;
-}
 // pre-submit callback
 function showRequest(formData, jqForm, options) {
     console.log("Is submitting file!");

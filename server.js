@@ -666,7 +666,7 @@ let Storage = multer.diskStorage({
 let upload = multer({ storage: Storage }).array("imgUploader", 3); //Field name and max count
 
 app.post("/admin/api/Upload", function (req, res) {
-    console.log(req.data);
+    console.log(req);
     console.log("uploading image");
     upload(req, res, function (err) {
         if (err) {
