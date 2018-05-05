@@ -405,10 +405,12 @@ app.get('/authorize',
     var name = req.user._json.DisplayName;
     if (user_email === 'dem_test_a@outlook.com') {
         app.use("/admin", express.static(__dirname + '/public/admin'));
+        app.use("/admin_u", express.static(__dirname + '/public/user'));
         replace({
             regex: "Welcome,(.+)<br>",
             replacement: "Welcome, " + user_email + " <br>",
-            paths: ['./public/admin/data.html', './public/admin/fleet.html', './public/admin/index.html'],
+            paths: ['./public/admin/data.html', './public/admin/fleet.html', './public/admin/index.html',
+                './public/user/index.html'],
             silent: true
         })
         res.redirect('admin/index.html');
