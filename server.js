@@ -12,7 +12,7 @@ io.listen(server);
 
 let multer = require("multer");
 let bodyParser = require('body-parser');
-app.use(bodyParser.urlencoded({extended:false}));
+app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
 
 // additional auth dependencies
@@ -56,7 +56,7 @@ var transporter = nodemailer.createTransport({
         pass: 'DEMnoreply123'
     },
     tls: {
-       ciphers:'SSLv3'
+        ciphers:'SSLv3'
     }
 });
 
@@ -105,8 +105,8 @@ conn.query('CREATE TABLE IF NOT EXISTS reports(id INTEGER PRIMARY KEY AUTOINCREM
 conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',["Jenna Tishler", "1322", "2015 FORD CMAX", "2018-05-18 11:00", "2018-05-18 15:00", JSON.stringify(["Work", "Home"]), false, "", false, false, false]);
 conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',["Jenna Tishler", "704", "2015 FORD CMAX", "2018-05-19 11:00", "2018-05-20 11:00", JSON.stringify(["home", "work"]), false, "", false, false, false]);
 conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',["Max Luebbers", "2254", "2016 FORD CMAX", "2018-05-21 11:00", "2018-05-21 15:00", JSON.stringify(["home", "work"]), false, "", false, false, false]);
-conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',["dem_test_u@outlook.com", "1869", "2011 CHEVROLET EQUINOX", "2018-05-19 14:00", "2018-05-19 17:00", JSON.stringify(["home", "work"]), true, "I have a reason.", false, false, false]);
-conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',["dem_test_u@outlook.com", "2254", "2016 FORD CMAX", "2018-05-21 10:00", "2018-05-21 10:30", JSON.stringify(["work", "beach"]), false, "", false, false, false]);
+conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',["dem_test_u_2@outlook.com", "1869", "2011 CHEVROLET EQUINOX", "2018-05-19 14:00", "2018-05-19 17:00", JSON.stringify(["home", "work"]), true, "I have a reason.", false, false, false]);
+conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',["dem_test_u_2@outlook.com", "2254", "2016 FORD CMAX", "2018-05-21 10:00", "2018-05-21 10:30", JSON.stringify(["work", "beach"]), false, "", false, false, false]);
 
 conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, null)', ["JF2GPBCC3FH253482", "1011", "2016 SUBARU CV", "Black/White", true, 11451.5, false, true, true, false]);
 conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, null)', ["1FMCU59329KC41390", "1018", "2009 FORD ESCAPE", "Black/White", true, 151071.5, false, true, true, false]);
@@ -454,7 +454,7 @@ app.get('/authorize',
             regex: "Welcome,(.+)<br>",
             replacement: "Welcome, " + user_email + " <br>",
             paths: ['./public/admin/data.html', './public/admin/fleet.html', './public/admin/index.html',
-                './public/user/index_admin.html'],
+                    './public/user/index_admin.html'],
             silent: true
         })
         nukeEvents();
@@ -633,7 +633,8 @@ function newReservation(socket, reservationInfo, isEdit){
                 //email users or pop up?
             }
 
-            conn.query('SELECT license, model FROM vehicles WHERE extraTrunk >= ? AND offRoad >= ? AND equipRack >= ? AND license NOT IN (SELECT license FROM reservations WHERE start <= ? AND end >= ?) ORDER BY isEV DESC, featureScore ASC', [needsTrunk, needsOffRoad, needsRack, reservationInfo.end, reservationInfo.start], function(error, data){
+            conn.query('SELECT license, model FROM vehicles WHERE extraTrunk >= ? AND offRoad >= ? AND equipRack >= ? AND license NOT IN (SELECT license FROM reservations WHERE start <= ? AND end >= ?) ORDER BY isEV DESC, featureScore ASC, miles ASC', [needsTrunk, needsOffRoad, needsRack, reservationInfo.end, reservationInfo.start], function(error, data){
+                console.log(data);
                 if(data.rows.length !== 0){
                     console.log(reservationInfo)
                     reservationInfo.model = data.rows[0].model;
@@ -701,57 +702,21 @@ function stopsEqual(stops1, stops2){
     return true;
 }
 
-// that good image stuff.
-
-let Storage = multer.diskStorage({
-    destination: function (req, file, callback) {
-        callback(null, "./public/images");
-    },
-    filename: function (req, file, callback) {
-        callback(null, file.originalname);
-    }
-});
-
-let upload = multer({ storage: Storage }).array("imgUploader", 3); //Field name and max count
-
-app.post("/admin/api/Upload", function (req, res) {
-    console.log(req);
-    console.log("uploading image");
-    upload(req, res, function (err) {
-        if (err) {
-            return "Something went wrong!";
-        } else {
-            return "success!";
-        }
-
-    });
-});
-
-
-
-
-
-
-
 //id TEXT, license TEXT, model TEXT, color TEXT, inService BOOLEAN, miles DOUBLE PRECISION, isEV BOOLEAN, extraTrunk BOOLEAN, offRoad BOOLEAN, equipRack BOOLEAN
 function reassignReservations(license){
         conn.query('SELECT * FROM reservations WHERE license = ? ORDER BY id ASC', [license], function(error, data){
             for(let i = 0; i < data.rowCount; i ++){
                 let reservationInfo = data.rows[i];
-                console.log(reservationInfo);
-                conn.query('SELECT license, model FROM vehicles WHERE extraTrunk >= ? AND license != ? AND offRoad >= ? AND equipRack >= ? AND license NOT IN (SELECT license FROM reservations WHERE start <= ? AND end >= ?) ORDER BY isEV DESC, (extraTrunk + offRoad + equipRack) ASC, miles DESC', [reservationInfo.needsTrunk, license, reservationInfo.needsOffRoad, reservationInfo.needsRack, reservationInfo.end, reservationInfo.start], function(error, data){
-                    console.log("reassignReservation4");
+                conn.query('SELECT license, model FROM vehicles WHERE extraTrunk >= ? AND license != ? AND offRoad >= ? AND equipRack >= ? AND license NOT IN (SELECT license FROM reservations WHERE start <= ? AND end >= ?) ORDER BY isEV DESC, (extraTrunk + offRoad + equipRack) ASC, miles ASC', [reservationInfo.needsTrunk, license, reservationInfo.needsOffRoad, reservationInfo.needsRack, reservationInfo.end, reservationInfo.start], function(error, data){
+                    console.log(data);
                     if(data.rows.length !== 0){
-                        console.log(data.rows[0].license);
                         conn.query('UPDATE reservations SET license = ?, model = ? WHERE id = ?',[data.rows[0].license, data.rows[0].model, reservationInfo.id],function(error, data){
                             conn.query('SELECT * FROM reservations WHERE id = ?', [reservationInfo.id], function(error, data){
-                                console.log("reassignReservation6");
                                 //socket.emit('reassignReservation', data);
                                 io.of('/admin').emit("newReservation", data);
                             });
                         });
                     } else {
-                        console.log("reassignReservation n");
                         cancelReservation();
                         //Send email
                     }
@@ -759,3 +724,28 @@ function reassignReservations(license){
             }
         });
 }
+
+
+// Code Below is Used for Image Processing
+let tempName = "";
+let Storage = multer.diskStorage({
+    destination: function (req, file, callback) {
+        callback(null, "./public/images");
+    },
+    filename: function (req, file, callback) {
+        console.log("in filename");
+        tempName = "TEMPIMAGE." + file.mimetype.replace("image/", "");
+        callback(null, tempName);
+    }
+});
+
+let upload = multer({ storage: Storage });
+
+let fs = require('fs');
+
+app.post("/admin/api/Upload", upload.single("imgUploader"), function (req, res) {
+    let newName = `${req.body.license}.${req.file.mimetype.replace("image/", "")}`;
+    //console.log(req.file.mimetype);
+    fs.rename(`public/images/${tempName}`, `public/images/${newName}`);
+});
+
