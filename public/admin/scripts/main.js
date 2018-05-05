@@ -173,7 +173,7 @@ class Reservation {
 
         let DOMobject = `<div class = "col-entry reservation-user">${r.user}</div>` +
             `<div class = "col-entry reservation-start ${r.license}">${r.start}</div>` +
-            `<div class = "col-entry reservation-end ${r.license}">${r.start}</div>` +
+            `<div class = "col-entry reservation-end ${r.license}">${r.end}</div>` +
             `<div class = "col-entry reservation-license ${r.license}">${r.license}</div>` +
             `<div class = "col-entry reservation-pickup ${r.license}">${justification}</div>`;
 

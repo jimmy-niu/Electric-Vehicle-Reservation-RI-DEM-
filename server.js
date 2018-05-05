@@ -105,8 +105,8 @@ conn.query('CREATE TABLE IF NOT EXISTS reports(id INTEGER PRIMARY KEY AUTOINCREM
 conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?)',["Jenna Tishler", "1322", "2015 FORD CMAX", "2018-05-18 11:00", "2018-05-18 15:00", JSON.stringify(["Work", "Home"]), false, ""]);
 conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?)',["Jenna Tishler", "704", "2015 FORD CMAX", "2018-05-19 11:00", "2018-05-20 11:00", JSON.stringify(["home", "work"]), false, ""]);
 conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?)',["Max Luebbers", "2254", "2016 FORD CMAX", "2018-05-21 11:00", "2018-05-21 15:00", JSON.stringify(["home", "work"]), false, ""]);
-conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?)',["dem_test_u@outlook.com", "1869", "2011 CHEVROLET EQUINOX", "2018-05-19 14:00", "2018-05-19 17:00", JSON.stringify(["home", "work"]), true, "I have a reason."]);
-conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?)',["dem_test_u@outlook.com", "2254", "2016 FORD CMAX", "2018-05-21 10:00", "2018-05-21 10:30", JSON.stringify(["work", "beach"]), false, ""]);
+conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?)',["dem_test_u_2@outlook.com", "1869", "2011 CHEVROLET EQUINOX", "2018-05-19 14:00", "2018-05-19 17:00", JSON.stringify(["home", "work"]), true, "I have a reason."]);
+conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?)',["dem_test_u_2@outlook.com", "2254", "2016 FORD CMAX", "2018-05-21 10:00", "2018-05-21 10:30", JSON.stringify(["work", "beach"]), false, ""]);
 
 conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', ["JF2GPBCC3FH253482", "1011", "2016 SUBARU CV", "Black/White", true, 11451.5, false, true, true, false]);
 conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', ["1FMCU59329KC41390", "1018", "2009 FORD ESCAPE", "Black/White", true, 151071.5, false, true, true, false]);
@@ -137,7 +137,7 @@ conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', ["1FADP5
 conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', ["1FADP5CU6FL121718", "827", "2015 FORD CMAX", "Black", true, 9055.6, true, false, false, false]);
 
 conn.query('INSERT INTO reports VALUES(null, ?, ?, ?, ?, ?)', [5, "Car sucks.", true, true, false]);
-conn.query('INSERT INTO reports VALUES(null, ?, ?, ?, ?, ?)', [1, "Car is dirty af.", false, true, false]);
+conn.query('INSERT INTO reports VALUES(null, ?, ?, ?, ?, ?)', [1, "Car is  very dirty.", false, true, false]);
 
 conn.query('INSERT INTO users VALUES(null, ?, ?)', ["jenna.tishler@gmail.com", true]);
 conn.query('INSERT INTO users VALUES(null, ?, ?)', ["jenna_tishler@brown.edu", true]);
@@ -301,9 +301,9 @@ io.of('/user').on('connection', function(socket) {
 
     socket.on('edit', function(reservationID, reservationInfo){
         //editReservation(reservationID, reservationInfo.start, reservationInfo.end, reservationInfo.stops, reservationInfo.justification);
-        conn.query('DELETE FROM reservations WHERE id = ?', [reservationID], function(error, data){
+        // conn.query('DELETE FROM reservations WHERE id = ?', [reservationID], function(error, data){
 
-        });
+        // });
         newReservation(socket, reservationInfo, true);
         // conn.query('UPDATE reservations SET start = ?, end = ?, stops = ?, justification = ? WHERE id = ?', [reservationInfo.start, reservationInfo.end, reservationInfo.stops, reservationInfo.justification, reservationID], function(error, data){
         //     conn.query('SELECT * FROM reservations WHERE user = ?', [reservationInfo.user], function(error, data){
