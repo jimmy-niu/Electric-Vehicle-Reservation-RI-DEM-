@@ -739,7 +739,7 @@ function reassignReservations(license){
             for(let i = 0; i < data.rowCount; i ++){
                 let reservationInfo = data.rows[i];
                 console.log(reservationInfo);
-                conn.query('SELECT license, model FROM vehicles WHERE extraTrunk >= ? AND license != ? AND offRoad >= ? AND equipRack >= ? AND license NOT IN (SELECT license FROM reservations WHERE start <= ? AND end >= ?) ORDER BY isEV DESC, (extraTrunk + offRoad + equipRack) ASC', [reservationInfo.needsTrunk, license, reservationInfo.needsOffRoad, reservationInfo.needsRack, reservationInfo.end, reservationInfo.start], function(error, data){
+                conn.query('SELECT license, model FROM vehicles WHERE extraTrunk >= ? AND license != ? AND offRoad >= ? AND equipRack >= ? AND license NOT IN (SELECT license FROM reservations WHERE start <= ? AND end >= ?) ORDER BY isEV DESC, (extraTrunk + offRoad + equipRack) ASC, miles DESC', [reservationInfo.needsTrunk, license, reservationInfo.needsOffRoad, reservationInfo.needsRack, reservationInfo.end, reservationInfo.start], function(error, data){
                     console.log("reassignReservation4");
                     if(data.rows.length !== 0){
                         console.log(data.rows[0].license);
