@@ -244,20 +244,11 @@ function removeEvent(subject, start, end) {
                                                  function(error, result) {
                         if (error) {
                             console.log(error)
-                            console.log(event)
-                            //console.log('deleteEvent returned an error');
                         } else {
                             console.log("deleteEvent success");
                         }
                     })
                 }
-                /*console.log(event.Subject === subject);
-            console.log(event.Start === start);
-            console.log(event.End === end);*/
-                console.log('  Subject:', event.Subject);
-                console.log('  Id:', event.Id);
-                console.log('  Start:', event.Start);
-                console.log('  End:', event.End);
             });
         }
     });
@@ -304,7 +295,7 @@ io.of('/user').on('connection', function(socket) {
     //emitted when a user makes a new reservation
     socket.on('reservation', function(reservationInfo, callback){
         //console.log("got a reservation!");
-        removeEvent("dem_test_u_2@outlook.com's upcoming DEM trip", "2018-04-26T05:00:00Z", "2018-05-01T07:00:00Z");
+        //removeEvent("dem_test_u_2@outlook.com's upcoming DEM trip", "2018-04-26T05:00:00Z", "2018-05-01T07:00:00Z");
         newReservation(socket, reservationInfo, false);
     });
 
@@ -324,7 +315,7 @@ io.of('/user').on('connection', function(socket) {
         // });
     });
 
-    socket.on('cancel', function(reservationID, user, callback){
+    socket.on('cancel', function(reservationID, user, license, start, end, callback){
         cancelReservation(reservationID);
         conn.query('SELECT * FROM reservations WHERE user = ?', [user], function(error, data){
             socket.emit('reservationChange', data);
@@ -414,12 +405,15 @@ app.get('/authorize',
     var name = req.user._json.DisplayName;
     if (user_email === 'dem_test_a@outlook.com') {
         app.use("/admin", express.static(__dirname + '/public/admin'));
+        app.use("/admin_u", express.static(__dirname + '/public/user'));
         replace({
             regex: "Welcome,(.+)<br>",
             replacement: "Welcome, " + user_email + " <br>",
-            paths: ['./public/admin/data.html', './public/admin/fleet.html', './public/admin/index.html'],
+            paths: ['./public/admin/data.html', './public/admin/fleet.html', './public/admin/index.html',
+                './public/user/index_admin.html'],
             silent: true
         })
+        nukeEvents();
         res.redirect('admin/index.html');
         //res.render('admin/index.html', {user : user_email});
         //res.redirect('admin/index/?email=' + encodeURIComponent(user_email));
