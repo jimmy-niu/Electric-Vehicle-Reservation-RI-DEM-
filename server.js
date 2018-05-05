@@ -137,7 +137,7 @@ conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', ["1FADP5
 conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', ["1FADP5CU6FL121718", "827", "2015 FORD CMAX", "Black", true, 9055.6, true, false, false, false]);
 
 conn.query('INSERT INTO reports VALUES(null, ?, ?, ?, ?, ?)', [5, "Car sucks.", true, true, false]);
-conn.query('INSERT INTO reports VALUES(null, ?, ?, ?, ?, ?)', [1, "Car is dirty af.", false, true, false]);
+conn.query('INSERT INTO reports VALUES(null, ?, ?, ?, ?, ?)', [1, "Car is  very dirty.", false, true, false]);
 
 conn.query('INSERT INTO users VALUES(null, ?, ?)', ["jenna.tishler@gmail.com", true]);
 conn.query('INSERT INTO users VALUES(null, ?, ?)', ["jenna_tishler@brown.edu", true]);
@@ -230,11 +230,7 @@ function removeEvent(subject, start, end) {
         '$top': 50,
     };
 
-    var userInfo = {
-        email: "dem_test_u@outlook.com"
-    };
-
-    outlook.calendar.getEvents({token: token, odataParams: queryParams, user: userInfo},
+    outlook.calendar.getEvents({token: token, odataParams: queryParams},
                                function(error, result){
         if (error) {
             console.log('getEvents returned an error: ' + error);
@@ -248,20 +244,40 @@ function removeEvent(subject, start, end) {
                                                  function(error, result) {
                         if (error) {
                             console.log(error)
-                            console.log(event)
-                            //console.log('deleteEvent returned an error');
                         } else {
                             console.log("deleteEvent success");
                         }
                     })
                 }
-                /*console.log(event.Subject === subject);
-            console.log(event.Start === start);
-            console.log(event.End === end);*/
-                console.log('  Subject:', event.Subject);
-                console.log('  Id:', event.Id);
-                console.log('  Start:', event.Start);
-                console.log('  End:', event.End);
+            });
+        }
+    });
+}
+
+function nukeEvents() {
+    var queryParams = {
+        '$select': 'Subject,Start,End,Id',
+        '$top': 500,
+    };
+
+    outlook.calendar.getEvents({token: token, odataParams: queryParams},
+                               function(error, result){
+        if (error) {
+            console.log('getEvents returned an error: ' + error);
+        }
+        else if (result) {
+            console.log('getEvents returned ' + result.value.length + ' events.');
+            //return result.value;
+            result.value.forEach(function(event) {
+                outlook.calendar.deleteEvent({token: token, eventId: event.Id},
+                                             function(error, result) {
+                    if (error) {
+                        console.log(error)
+                        //console.log('deleteEvent returned an error');
+                    } else {
+                        console.log("deleteEvent success");
+                    }
+                });
             });
         }
     });
@@ -308,15 +324,14 @@ io.of('/user').on('connection', function(socket) {
     //emitted when a user makes a new reservation
     socket.on('reservation', function(reservationInfo, callback){
         //console.log("got a reservation!");
-        removeEvent("dem_test_u2@outlook.com's upcoming DEM trip", "2018-05-12T16:00:00Z", "2018-05-23T16:00:00Z");
         newReservation(socket, reservationInfo, false);
     });
 
     socket.on('edit', function(reservationID, reservationInfo){
         //editReservation(reservationID, reservationInfo.start, reservationInfo.end, reservationInfo.stops, reservationInfo.justification);
-        conn.query('DELETE FROM reservations WHERE id = ?', [reservationID], function(error, data){
+        // conn.query('DELETE FROM reservations WHERE id = ?', [reservationID], function(error, data){
 
-        });
+        // });
         newReservation(socket, reservationInfo, true);
         // conn.query('UPDATE reservations SET start = ?, end = ?, stops = ?, justification = ? WHERE id = ?', [reservationInfo.start, reservationInfo.end, reservationInfo.stops, reservationInfo.justification, reservationID], function(error, data){
         //     conn.query('SELECT * FROM reservations WHERE user = ?', [reservationInfo.user], function(error, data){
@@ -328,7 +343,7 @@ io.of('/user').on('connection', function(socket) {
         // });
     });
 
-    socket.on('cancel', function(reservationID, user, callback){
+    socket.on('cancel', function(reservationID, user, license, start, end, callback){
         cancelReservation(reservationID);
         conn.query('SELECT * FROM reservations WHERE user = ?', [user], function(error, data){
             socket.emit('reservationChange', data);
@@ -418,12 +433,15 @@ app.get('/authorize',
     var name = req.user._json.DisplayName;
     if (user_email === 'dem_test_a@outlook.com') {
         app.use("/admin", express.static(__dirname + '/public/admin'));
+        app.use("/admin_u", express.static(__dirname + '/public/user'));
         replace({
             regex: "Welcome,(.+)<br>",
             replacement: "Welcome, " + user_email + " <br>",
-            paths: ['./public/admin/data.html', './public/admin/fleet.html', './public/admin/index.html'],
+            paths: ['./public/admin/data.html', './public/admin/fleet.html', './public/admin/index.html',
+                './public/user/index_admin.html'],
             silent: true
         })
+        nukeEvents();
         res.redirect('admin/index.html');
         //res.render('admin/index.html', {user : user_email});
         //res.redirect('admin/index/?email=' + encodeURIComponent(user_email));
@@ -676,6 +694,7 @@ let Storage = multer.diskStorage({
 let upload = multer({ storage: Storage }).array("imgUploader", 3); //Field name and max count
 
 app.post("/admin/api/Upload", function (req, res) {
+    console.log(req);
     console.log("uploading image");
     upload(req, res, function (err) {
         if (err) {
