@@ -58,7 +58,7 @@ var transporter = nodemailer.createTransport({
     tls: {
        ciphers:'SSLv3'
     }
-}); 
+});
 
 // let transporter = nodemailer.createTransport({
 //     service: 'gmail',
@@ -105,8 +105,8 @@ conn.query('CREATE TABLE IF NOT EXISTS reports(id INTEGER PRIMARY KEY AUTOINCREM
 conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?)',["Jenna Tishler", "1322", "2015 FORD CMAX", "2018-05-18 11:00", "2018-05-18 15:00", JSON.stringify(["Work", "Home"]), false, ""]);
 conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?)',["Jenna Tishler", "704", "2015 FORD CMAX", "2018-05-19 11:00", "2018-05-20 11:00", JSON.stringify(["home", "work"]), false, ""]);
 conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?)',["Max Luebbers", "2254", "2016 FORD CMAX", "2018-05-21 11:00", "2018-05-21 15:00", JSON.stringify(["home", "work"]), false, ""]);
-conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?)',["dem_test_u_2@outlook.com", "1869", "2011 CHEVROLET EQUINOX", "2018-05-19 14:00", "2018-05-19 17:00", JSON.stringify(["home", "work"]), true, "I have a reason."]);
-conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?)',["dem_test_u_2@outlook.com", "2254", "2016 FORD CMAX", "2018-05-21 10:00", "2018-05-21 10:30", JSON.stringify(["work", "beach"]), false, ""]);
+conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?)',["dem_test_u@outlook.com", "1869", "2011 CHEVROLET EQUINOX", "2018-05-19 14:00", "2018-05-19 17:00", JSON.stringify(["home", "work"]), true, "I have a reason."]);
+conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?)',["dem_test_u@outlook.com", "2254", "2016 FORD CMAX", "2018-05-21 10:00", "2018-05-21 10:30", JSON.stringify(["work", "beach"]), false, ""]);
 
 conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', ["JF2GPBCC3FH253482", "1011", "2016 SUBARU CV", "Black/White", true, 11451.5, false, true, true, false]);
 conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', ["1FMCU59329KC41390", "1018", "2009 FORD ESCAPE", "Black/White", true, 151071.5, false, true, true, false]);
@@ -488,9 +488,10 @@ function editVehicle(id, vehicle){
     });
 }
 function removeVehicle(license){
-    conn.query('DELETE FROM vehicles WHERE license = ?', [license],function(error, data){
-        updateVehicles();
-    });
+        conn.query('DELETE FROM vehicles WHERE license = ?', [license],function(error, data){
+            updateVehicles();
+            reassignReservations(license);
+        });
 }
 function updateVehicleStatus(license, status){
     conn.query('UPDATE vehicles SET inService = ? WHERE license = ?',[status, license],function(error, data){
@@ -658,7 +659,7 @@ let Storage = multer.diskStorage({
     filename: function (req, file, callback) {
         callback(null, file.originalname);
     }
-});     
+});
 
 let upload = multer({ storage: Storage }).array("imgUploader", 3); //Field name and max count
 
@@ -670,6 +671,39 @@ app.post("/admin/api/Upload", function (req, res) {
         } else {
             return "success!";
         }
-        
+
     });
 });
+
+
+
+
+
+
+
+//id TEXT, license TEXT, model TEXT, color TEXT, inService BOOLEAN, miles DOUBLE PRECISION, isEV BOOLEAN, extraTrunk BOOLEAN, offRoad BOOLEAN, equipRack BOOLEAN
+function reassignReservations(license){
+        conn.query('SELECT * FROM reservations WHERE license = ? ORDER BY id ASC', [license], function(error, data){
+            for(let i = 0; i < data.rowCount; i ++){
+                let reservationInfo = data.rows[i];
+                console.log(reservationInfo);
+                conn.query('SELECT license, model FROM vehicles WHERE extraTrunk >= ? AND license != ? AND offRoad >= ? AND equipRack >= ? AND license NOT IN (SELECT license FROM reservations WHERE start <= ? AND end >= ?) ORDER BY isEV DESC, (extraTrunk + offRoad + equipRack) ASC', [reservationInfo.extraTrunk, license, reservationInfo.offRoad, reservationInfo.equipRack, reservationInfo.end, reservationInfo.start], function(error, data){
+                    console.log("reassignReservation4");
+                    if(data.rows.length !== 0){
+                        console.log("reassignReservation5");
+                        conn.query('UPDATE reservations SET vehicle = ? WHERE id = ?',[data.rows[0].license, reservationInfo.id],function(error, data){
+                            conn.query('SELECT * FROM reservations WHERE id = ?', [data.lastInsertId], function(error, data){
+                                console.log("reassignReservation6");
+                                socket.emit('reassignReservation', data);
+                                io.of('/admin').emit("newReservation", data);
+                            });
+                        });
+                    } else {
+                        console.log("reassignReservation n");
+                        cancelReservation();
+                        //Send email
+                    }
+                });
+            }
+        });
+}
