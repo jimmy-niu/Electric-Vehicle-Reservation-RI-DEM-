@@ -324,7 +324,7 @@ io.of('/user').on('connection', function(socket) {
         // });
     });
 
-    socket.on('cancel', function(reservationID, user, callback){
+    socket.on('cancel', function(reservationID, user, license, start, end, callback){
         cancelReservation(reservationID);
         conn.query('SELECT * FROM reservations WHERE user = ?', [user], function(error, data){
             socket.emit('reservationChange', data);

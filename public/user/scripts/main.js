@@ -168,9 +168,15 @@ function newReservation(){
 }
 
 function cancelReservation(){
-    $("." + idToDelete).remove();
-    userSocket.emit('cancel', idToDelete, userEmail,function(){
+    //console.log($(`"#${idToDelete}"`))
+    let start = $("." + idToDelete)[0].children[1].children[1].children[0].nextSibling.textContent.substring(2);
+    let end = $("." + idToDelete)[0].children[1].children[1].children[2].nextSibling.textContent.substring(2);
+    let carName = $("." + idToDelete)[0].children[1].children[0].firstChild.textContent.split(" ");
+    let license = carName[carName.length - 1]
+    userSocket.emit('cancel', idToDelete, userEmail, license, start, end, function(){
     });
+
+    $("." + idToDelete).remove();
     //console.log(reservationID)
     //console.log("cancelled");
     cleanFields();
