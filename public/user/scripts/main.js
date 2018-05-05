@@ -7,11 +7,56 @@ let currentCar = undefined;
 let firstReturnedCar = undefined;
 let alternateVehicles = [];
 
+var count = 3;
+function initMap() {
+    var i;
+    for (i = 1; i <= count; i++) {
+        var curr = document.getElementById('route-stop-' + i);
+        autocomplete = new google.maps.places.Autocomplete(curr);
+        /*google.maps.event.addListener(autocomplete, 'place_changed', function(){
+            var place = autocomplete.getPlace();
+        })*/
+    }
+    //var input2 = document.getElementById('endInput');
+    //var autocomplete2 = new google.maps.places.Autocomplete(input2);
+    //autocomplete.addListener('placed_changed', () => console.log(autocomplete.getPlace()))
+}
+function addStop(count) {
+    let newStop = ` <div class="form-group">
+        <label>Destination <span onclick = "deleteStop(this);" 
+        id = "deleteX">x</span></label>
+        <input type=text class="form-control" id="route-stop-` + count + `">
+        </div>`
+    $('#stops').append(newStop);
+}
+
+function deleteStop(obj){
+    let toDelete = obj.parentNode.parentNode;
+    toDelete.parentNode.removeChild(toDelete);
+}
 
 // Sets up the sockets.
 $(document).ready(function() {
+    var mapOptions = {
+        center: new google.maps.LatLng(51.219987, 4.396237),
+        zoom: 12,
+        mapTypeId: google.maps.MapTypeId.ROADMAP
+    };
+    var map = new google.maps.Map(document.getElementById("mapCanvas"), mapOptions);
+  
+    initMap(count);
+    $("#add-stop").click(function() {
+        count++;
+        addStop(count);
+        initMap(count);
+    });
+    
+    $("#new-res-form").on("shown.bs.modal", function () {
+        google.maps.event.trigger(map, "resize");
+    });
+
     $("#cancel-res").click(cancelReservation);
-    $("#add-stop").click(function() {addStop(); return false; });
+    //$("#add-stop").click(function() {addStop(); return false; });
     $("#submit-report").click(submitFeedback);
 
     userEmail = $("#user_email").html().replace("Welcome, ", "").replace(" <br>", "").replace("\n", "").trim();
@@ -19,7 +64,7 @@ $(document).ready(function() {
 
     userSocket.emit('join',userEmail, function(reservations){
         for(var i = 0; i < reservations.rows.length; i++){
-            new Reservation(reservations, i);
+            new Reservation(reservations.rows[i]);
         }
     });
 
@@ -28,16 +73,17 @@ $(document).ready(function() {
         //console.log(reservations);
     });
 
-    userSocket.on('newReservation', function(reservation){
+    userSocket.on('newReservation', function(vehicles, reservation){
         console.log('new reservation made');
         cleanFields();
         currentCar = reservation;
+        alternateVehicles = vehicles;
         firstReturnedCar = reservation;
-        $("#carMakeMText").html($("#carMakeMText").html() + reservation.rows[0].model);
-        $("#plateNumberMText").html($("#plateNumberMText").html() + reservation.rows[0].license);
-        $("#startMText").html($("#startMText").html() + reservation.rows[0].start);
-        $("#endMText").html($("#endMText").html() + reservation.rows[0].end);
-        $("#stopsMText").html($("#stopsMText").html() + JSON.parse(reservation.rows[0].stops));
+        $("#carMakeMText").html($("#carMakeMText").html() + reservation.model);
+        $("#plateNumberMText").html($("#plateNumberMText").html() + reservation.license);
+        $("#startMText").html($("#startMText").html() + reservation.start);
+        $("#endMText").html($("#endMText").html() + reservation.end);
+        $("#stopsMText").html($("#stopsMText").html() + JSON.parse(reservation.stops));
         $("#resModal").modal();
         console.log(reservation);
     });
@@ -60,7 +106,7 @@ $(document).ready(function() {
         console.log("reservation vehicle override");
     });
 
-    userSocket.on('alternateVehicles', function(vehicles){
+    userSocket.on('alternateVehicles', function(vehicles, reservationInfo){
         alternateVehicles = vehicles;
     });
 
@@ -75,20 +121,7 @@ $(document).ready(function() {
     });
 
     flatpickr(".datePicker", {enableTime: true, dateFormat: "Y-m-d H:i"});
-
-    let facts = Array();
-    facts.push("An electric vehicle has an expected range of 80 to 250+ miles!");
-    facts.push("Plug-in hybrid electric vehicles offer 15-50 miles of all-electric driving and can be driven an additional 350-600 miles on the gas engine if needed.");
-    facts.push("Fuel cell electric vehicles have a range of 300 to 350 miles!");
-    facts.push("Fast charging stations recharge electric cars in about 30 minutes!");
-    facts.push("90% of all charging is done at home and the workplace.");
-    facts.push("Apps can quickly locate the closest charging stations!");
-    facts.push("Electric cars currently produce 54% less (lifetime) carbon pollution than gas-powered cars!");
-    facts.push("Electric Vehicles typically produce far lower tailpipe emissions than gas-powered cars do!");
-    facts.push("Electric cars typically accelerate far faster and more smoothly than gas-powered cars!");
-
-    let fact = facts[Math.floor(Math.random()*facts.length)];
-    $("#fun-fact").append("<p>"+fact+"</p>");
+    jQuery.fn.carousel.Constructor.TRANSITION_DURATION = 5000;
 });
 
 function cleanFields(){
@@ -110,6 +143,7 @@ function cleanFieldsEdit(){
 }
 
 function renderCar(){
+    userSocket.emit('addReservation', currentCar);
     console.log("drawing car!");
     if(currentCar !== undefined){
         new Reservation(currentCar, 0);
@@ -173,20 +207,20 @@ function altVehiclesEdit(){
     }
 }
 
-function addStop() {
+/*function addStop() {
     console.log("we in addStop");
     let newStop = ` <div class="form-group">
 <label>Destination <span onclick = "deleteStop(this);" 
 id = "deleteX">x</span></label>
 <input type=text class="form-control route-stop">
 </div>`
-    $('#new-stops').append(newStop);
+    $('#stops').append(newStop);
 }
 
 function deleteStop(obj){
     let toDelete = obj.parentNode.parentNode;
     toDelete.parentNode.removeChild(toDelete);
-}
+}*/
 
 function newEditedReservation(){
     cancelReservation();
@@ -219,7 +253,7 @@ function newReservation(){
         $('#errorModal').modal();
     } else {
         let stops = [];
-        $('.route-stop').each(function() {
+        $('input[id^="route-stop"]').each(function() {
             stops.push($(this).val());
         });
 
@@ -306,8 +340,8 @@ function setDeleteCard(obj){
     idToDelete = obj.id;
 }
 class Reservation {
-    constructor(reservationData, i) {
-        this.addToDom(reservationData.rows[i]);
+    constructor(reservationData) {
+        this.addToDom(reservationData);
     }
     addToDom(r) {
         // console.log("r");

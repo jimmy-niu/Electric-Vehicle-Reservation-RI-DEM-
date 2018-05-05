@@ -41,8 +41,16 @@
 
         </div>
 
-        <div id="fun-fact">
-            <img src="media/polar_bear.png" alt="Polar bear">
+        <div class="carousel slide" data-ride="carousel" data-interval="10000">
+            <div class="carousel-item fun-fact active"><p>An electric vehicle has an expected range of 80 to 250+ miles!</p></div>
+            <div class="carousel-item fun-fact"><p>Plug-in hybrid electric vehicles offer 15-50 miles of all-electric driving and can be driven an additional 350-600 miles on the gas engine if needed.</p></div>
+            <div class="carousel-item fun-fact"><p>Fuel cell electric vehicles have a range of 300 to 350 miles!</p></div>
+            <div class="carousel-item fun-fact"><p>Fast charging stations recharge electric cars in about 30 minutes!</p></div>
+            <div class="carousel-item fun-fact"><p>90% of all charging is done at home and the workplace.</p></div>
+            <div class="carousel-item fun-fact"><p>Mobile applications can quickly locate the closest charging stations!</p></div>
+            <div class="carousel-item fun-fact"><p>Electric cars currently produce 54% less (lifetime) carbon pollution than gas-powered cars!</p></div>
+            <div class="carousel-item fun-fact"><p>Electric Vehicles typically produce far lower tailpipe emissions than gas-powered cars do!</p></div>
+            <div class="carousel-item fun-fact"><p>Electric cars typically accelerate far faster and more smoothly than gas-powered cars!</p></div>
         </div>
 
         <div id="content">
@@ -51,7 +59,7 @@
             <!-- Modal -->
             <div class="modal fade" id="new-res-form" tabindex="-1" role="dialog" aria-labelledby="new-res-label" aria-hidden="true">
                 <div id = "new-res-content" class="modal-dialog" role="document">
-                    <div class="modal-content">
+                    <div class="modal-content" id="new-res-modal">
                         <div class="modal-header">
                             <h5 class="modal-title" id="new-res-label">Reserve a DEM Vehicle</h5>
                             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -68,25 +76,25 @@
                                     <label for="end-date">Reservation End</label>
                                     <input class = "datePicker" id ="end-date" placeholder="Select Date.." type="text" value = "2018-05-1 3:00">
                                 </div>
-                                <div class="form-group">
-                                    <label>Pickup Location</label>
-                                    <input class="form-control route-stop" type="text" placeholder="Enter a location"/>
-                                    <!-- <input type=text class="form-control route-stop" value="Work"> -->
-                                </div>
                                 <div id="stops">
                                     <div class="form-group">
+                                        <label>Pickup Location</label>
+                                        <input class="form-control" id="route-stop-1" type="text" placeholder="Enter a location"/>
+                                        <!-- <input type=text class="form-control route-stop" value="Work"> -->
+                                    </div>
+                                    <div class="form-group">
                                         <label>Destination</label>
-                                        <input class="form-control route-stop" type="text" placeholder="Enter a location"/>
+                                        <input class="form-control" id="route-stop-2" type="text" placeholder="Enter a location"/>
                                         <!-- <input type=text class="form-control route-stop" value="Home"> -->
                                     </div>
                                     <div class="form-group">
                                         <label>Dropoff Location</label>
-                                        <input class="form-control route-stop" type="text" placeholder="Enter a location"/>
+                                        <input class="form-control" id="route-stop-3" type="text" placeholder="Enter a location"/>
                                         <!-- <input type=text class="form-control route-stop" value="Home"> -->
                                     </div>
-                                    <div id = "new-stops"></div>
                                 </div>
                                 <p><a href="#" id="add-stop"><small>Add a destination</small></a></p>
+                                <div id="mapCanvas" style="width: 400px; height: 300px"></div>
                                 <div class="form-group">
                                     <label>Extra Features</label>
                                     <div class="form-check">
@@ -525,25 +533,7 @@
             </div>
         </div>
         <script>
-            function initMap() {
-                var input1 = document.getElementsByClassName('route-stop');
-                var i;
-                for (i = 0; i < input1.length; i++) {
-                    autocomplete = new google.maps.places.Autocomplete(input1[i]);
-                    google.maps.event.addListener(autocomplete, 'place_changed', function(){
-                        var place = autocomplete.getPlace();
-                    })
-                }
-                //var input2 = document.getElementById('endInput');
-                //var autocomplete2 = new google.maps.places.Autocomplete(input2);
-                //autocomplete.addListener('placed_changed', () => console.log(autocomplete.getPlace()))
-            }
-            $(document).ready(function() {
-                $("#add-stop").click(function() {
-                    initMap();
-                });
-            });
-            
+                        
         // var start = document.getElementById('startInput');
         // var end = document.getElementById('endInput');
         // var startautocomplete = new google.maps.places.Autocomplete(start);
