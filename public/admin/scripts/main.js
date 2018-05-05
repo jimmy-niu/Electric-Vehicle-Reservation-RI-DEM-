@@ -59,7 +59,8 @@ function formSubmit(event){
         beforeSubmit: showRequest,  // pre-submit callback
         uploadProgress: showProgress,
         clearForm: true,
-        method: "POST"
+        method: "POST", 
+        data: {license: "awkward"}
     };
 
     console.log("should be submitting....");
