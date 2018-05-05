@@ -45,9 +45,12 @@ body {
     cursor: pointer;
 }
 
-#new-res-content{
-    max-height: 85vh;
-    overflow: auto;
+#new-res-modal {
+    height: 650px;
+}
+
+.modal-body {
+    overflow-y: scroll;
 }
 
 .btn-danger{
