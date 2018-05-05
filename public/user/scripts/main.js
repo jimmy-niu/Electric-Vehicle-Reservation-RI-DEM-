@@ -7,11 +7,56 @@ let currentCar = undefined;
 let firstReturnedCar = undefined;
 let alternateVehicles = [];
 
+var count = 3;
+function initMap() {
+    var i;
+    for (i = 1; i <= count; i++) {
+        var curr = document.getElementById('route-stop-' + i);
+        autocomplete = new google.maps.places.Autocomplete(curr);
+        /*google.maps.event.addListener(autocomplete, 'place_changed', function(){
+            var place = autocomplete.getPlace();
+        })*/
+    }
+    //var input2 = document.getElementById('endInput');
+    //var autocomplete2 = new google.maps.places.Autocomplete(input2);
+    //autocomplete.addListener('placed_changed', () => console.log(autocomplete.getPlace()))
+}
+function addStop(count) {
+    let newStop = ` <div class="form-group">
+        <label>Destination <span onclick = "deleteStop(this);" 
+        id = "deleteX">x</span></label>
+        <input type=text class="form-control" id="route-stop-` + count + `">
+        </div>`
+    $('#stops').append(newStop);
+}
+
+function deleteStop(obj){
+    let toDelete = obj.parentNode.parentNode;
+    toDelete.parentNode.removeChild(toDelete);
+}
 
 // Sets up the sockets.
 $(document).ready(function() {
+    var mapOptions = {
+        center: new google.maps.LatLng(51.219987, 4.396237),
+        zoom: 12,
+        mapTypeId: google.maps.MapTypeId.ROADMAP
+    };
+    var map = new google.maps.Map(document.getElementById("mapCanvas"), mapOptions);
+  
+    initMap(count);
+    $("#add-stop").click(function() {
+        count++;
+        addStop(count);
+        initMap(count);
+    });
+    
+    $("#new-res-form").on("shown.bs.modal", function () {
+        google.maps.event.trigger(map, "resize");
+    });
+
     $("#cancel-res").click(cancelReservation);
-    $("#add-stop").click(function() {addStop(); return false; });
+    //$("#add-stop").click(function() {addStop(); return false; });
     $("#submit-report").click(submitFeedback);
 
     userEmail = $("#user_email").html().replace("Welcome, ", "").replace(" <br>", "").replace("\n", "").trim();
@@ -28,7 +73,7 @@ $(document).ready(function() {
         //console.log(reservations);
     });
 
-    userSocket.on('newReservation', function(reservation){
+    userSocket.on('newReservation', function(reservation) {
         console.log('new reservation made');
         cleanFields();
         currentCar = reservation;
@@ -173,20 +218,20 @@ function altVehiclesEdit(){
     }
 }
 
-function addStop() {
+/*function addStop() {
     console.log("we in addStop");
     let newStop = ` <div class="form-group">
 <label>Destination <span onclick = "deleteStop(this);" 
 id = "deleteX">x</span></label>
 <input type=text class="form-control route-stop">
 </div>`
-    $('#new-stops').append(newStop);
+    $('#stops').append(newStop);
 }
 
 function deleteStop(obj){
     let toDelete = obj.parentNode.parentNode;
     toDelete.parentNode.removeChild(toDelete);
-}
+}*/
 
 function newEditedReservation(){
     cancelReservation();
@@ -219,7 +264,7 @@ function newReservation(){
         $('#errorModal').modal();
     } else {
         let stops = [];
-        $('.route-stop').each(function() {
+        $('input[id^="route-stop"]').each(function() {
             stops.push($(this).val());
         });
 
