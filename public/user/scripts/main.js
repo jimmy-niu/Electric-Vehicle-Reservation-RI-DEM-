@@ -75,25 +75,8 @@ $(document).ready(function() {
     });
 
     flatpickr(".datePicker", {enableTime: true, dateFormat: "Y-m-d H:i"});
-    let facts = readFacts();
-    let fact = facts[Math.floor(Math.random()*facts.length)];
-    $("#fun-fact").append("<p>"+fact+"</p>");
+    jQuery.fn.carousel.Constructor.TRANSITION_DURATION = 5000;
 });
-
-function readFacts() {
-    var rawFile = new XMLHttpRequest();
-    var list = Array();
-    rawFile.open("GET", 'media/facts.txt', false);
-    rawFile.onreadystatechange = function() {
-        if (rawFile.readyState === 4) {
-            if (rawFile.status === 200 || rawFile.status == 0) {
-                list = rawFile.responseText.split("\n");
-            }
-        }
-    }
-    rawFile.send(null);
-    return list;
-}
 
 function cleanFields(){
     $("#carMakeMText").html("Car Model: ");
