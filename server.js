@@ -208,14 +208,9 @@ function addEvent(title, bodytext, start, end) {
         ]*/
     };
 
-    var userInfo = {
-        email: "dem_test_u@outlook.com"
-    };
-
     var addEventParameters = {
         token: token,
-        event: newEvent,
-        user: userInfo
+        event: newEvent
     };
 
     outlook.calendar.createEvent(addEventParameters,
@@ -249,7 +244,7 @@ function removeEvent(subject, start, end) {
             //return result.value;
             result.value.forEach(function(event) {
                 if (event.Subject === subject && event.Start === start && event.End == end) {
-                    outlook.calendar.deleteEvent({token: token, user: userInfo, eventId: event.Id},
+                    outlook.calendar.deleteEvent({token: token, eventId: event.Id},
                                                  function(error, result) {
                         if (error) {
                             console.log(error)
@@ -272,8 +267,37 @@ function removeEvent(subject, start, end) {
     });
 }
 
+function nukeEvents() {
+    var queryParams = {
+        '$select': 'Subject,Start,End,Id',
+        '$top': 500,
+    };
+
+    outlook.calendar.getEvents({token: token, odataParams: queryParams},
+                               function(error, result){
+        if (error) {
+            console.log('getEvents returned an error: ' + error);
+        }
+        else if (result) {
+            console.log('getEvents returned ' + result.value.length + ' events.');
+            //return result.value;
+            result.value.forEach(function(event) {
+                outlook.calendar.deleteEvent({token: token, eventId: event.Id},
+                                             function(error, result) {
+                    if (error) {
+                        console.log(error)
+                        //console.log('deleteEvent returned an error');
+                    } else {
+                        console.log("deleteEvent success");
+                    }
+                });
+            });
+        }
+    });
+}
+
 //handles events when a regular user is connnected
-io.of('/user').on('connection', function(socket){
+io.of('/user').on('connection', function(socket) {
     socket.on('join', function(user, callback){
         console.time("Get Reservations Query"); // TIMER START
         conn.query('SELECT * FROM reservations WHERE user = ? ORDER BY start DESC', [user], function(error, data){
@@ -284,7 +308,7 @@ io.of('/user').on('connection', function(socket){
     //emitted when a user makes a new reservation
     socket.on('reservation', function(reservationInfo, callback){
         //console.log("got a reservation!");
-        //removeEvent("dem_test_u@outlook.com's upcoming DEM trip", "2018-05-12T16:00:00Z", "2018-05-23T16:00:00Z");
+        removeEvent("dem_test_u2@outlook.com's upcoming DEM trip", "2018-05-12T16:00:00Z", "2018-05-23T16:00:00Z");
         newReservation(socket, reservationInfo, false);
     });
 
@@ -413,6 +437,7 @@ app.get('/authorize',
             paths: ['./public/user/index.html'],
             silent: true
         })
+        nukeEvents();
         res.redirect('user/index.html');
     }
 });
