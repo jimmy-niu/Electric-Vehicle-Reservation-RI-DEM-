@@ -1,5 +1,4 @@
 let adminSocket = io.connect('http://localhost:8080/admin', {forceNew: true});
-
 let currentVehicle = 0;
 
 function toggle_hidden(id, object){
@@ -52,15 +51,17 @@ $(document).ready(function() {
     let options = {
         beforeSubmit: showRequest,  // pre-submit callback
         uploadProgress: showProgress,
-        clearForm: true,
-        method: "POST", 
-        data: {license: "awkward"}
+        resetForm: true,
+        data: {license: ""}
     };
-    
+
     // bind to the form's submit event
-    $('#frmUploader').submit(function(){
+    $('#frmUploader').unbind("submit").bind("submit", function(e){
+        e.preventDefault();
+        console.log(document.getElementById("imageInput"));
+        options.data.license = $("#licenseField").val();
         $(this).ajaxSubmit(options);
-        return false;
+        return true;
     });
 });
 
@@ -71,11 +72,13 @@ function showRequest(formData, jqForm, options) {
 }
 
 function showProgress(event, position, total, percentageComplete){
-    console.log(percentageComplete);
     if(percentageComplete === 100){
-        $("#imageInput").val('');
-        window.alert("done with upload!");
+        clearForms($("#frmUploader"));
     }
+}
+
+function clearForms(obj){
+    obj.trigger("reset");
 }
 
 function modifyUser() {
@@ -128,6 +131,7 @@ function addVehicle(){
             console.timeEnd("Add Vehicle");
         });
     }
+    cleanFields();
 }
 
 function editVehicle(id, vehicle){

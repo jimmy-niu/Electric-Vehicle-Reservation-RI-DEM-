@@ -12,7 +12,7 @@ io.listen(server);
 
 let multer = require("multer");
 let bodyParser = require('body-parser');
-app.use(bodyParser.urlencoded({extended:false}));
+app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
 
 // additional auth dependencies
@@ -56,7 +56,7 @@ var transporter = nodemailer.createTransport({
         pass: 'DEMnoreply123'
     },
     tls: {
-       ciphers:'SSLv3'
+        ciphers:'SSLv3'
     }
 }); 
 
@@ -438,7 +438,7 @@ app.get('/authorize',
             regex: "Welcome,(.+)<br>",
             replacement: "Welcome, " + user_email + " <br>",
             paths: ['./public/admin/data.html', './public/admin/fleet.html', './public/admin/index.html',
-                './public/user/index_admin.html'],
+                    './public/user/index_admin.html'],
             silent: true
         })
         nukeEvents();
@@ -681,27 +681,24 @@ function stopsEqual(stops1, stops2){
 }
 
 // that good image stuff.
-
+let tempName = "";
 let Storage = multer.diskStorage({
     destination: function (req, file, callback) {
         callback(null, "./public/images");
     },
     filename: function (req, file, callback) {
-        callback(null, file.originalname);
+        console.log("in filename");
+        tempName = "TEMPIMAGE." + file.mimetype.replace("image/", "");
+        callback(null, tempName);
     }
 });     
 
-let upload = multer({ storage: Storage }).array("imgUploader", 3); //Field name and max count
+let upload = multer({ storage: Storage });
 
-app.post("/admin/api/Upload", function (req, res) {
-    console.log(req);
-    console.log("uploading image");
-    upload(req, res, function (err) {
-        if (err) {
-            return "Something went wrong!";
-        } else {
-            return "success!";
-        }
-        
-    });
+let fs = require('fs');
+
+app.post("/admin/api/Upload", upload.single("imgUploader"), function (req, res) {
+    let newName = `${req.body.license}.${req.file.mimetype.replace("image/", "")}`;
+    //console.log(req.file.mimetype);
+    fs.rename(`public/images/${tempName}`, `public/images/${newName}`);
 });
