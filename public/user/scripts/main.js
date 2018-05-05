@@ -289,6 +289,7 @@ function editReservation(){
         userSocket.emit('edit', id, resData, function(){
 
         });
+        idToDelete = id;
     }
 }
 
