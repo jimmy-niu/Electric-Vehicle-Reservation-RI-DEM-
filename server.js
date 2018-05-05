@@ -410,7 +410,7 @@ app.get('/authorize',
             regex: "Welcome,(.+)<br>",
             replacement: "Welcome, " + user_email + " <br>",
             paths: ['./public/admin/data.html', './public/admin/fleet.html', './public/admin/index.html',
-                './public/user/index.html'],
+                './public/user/index_admin.html'],
             silent: true
         })
         res.redirect('admin/index.html');
