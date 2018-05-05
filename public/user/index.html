@@ -79,22 +79,21 @@
                                 <div id="stops">
                                     <div class="form-group">
                                         <label>Pickup Location</label>
-                                        <input class="form-control" id="route-stop-1" type="text" placeholder="Enter a location"/>
+                                        <input class="form-control route-stop" id="route-stop-1" type="text" placeholder="Enter a location"/>
                                         <!-- <input type=text class="form-control route-stop" value="Work"> -->
                                     </div>
                                     <div class="form-group">
                                         <label>Destination</label>
-                                        <input class="form-control" id="route-stop-2" type="text" placeholder="Enter a location"/>
+                                        <input class="form-control route-stop" id="route-stop-2" type="text" placeholder="Enter a location"/>
                                         <!-- <input type=text class="form-control route-stop" value="Home"> -->
                                     </div>
                                     <div class="form-group">
                                         <label>Dropoff Location</label>
-                                        <input class="form-control" id="route-stop-3" type="text" placeholder="Enter a location"/>
+                                        <input class="form-control route-stop" id="route-stop-3" type="text" placeholder="Enter a location"/>
                                         <!-- <input type=text class="form-control route-stop" value="Home"> -->
                                     </div>
                                 </div>
                                 <p><a href="#" id="add-stop"><small>Add a destination</small></a></p>
-                                <div id="mapCanvas" style="width: 400px; height: 300px"></div>
                                 <div class="form-group">
                                     <label>Extra Features</label>
                                     <div class="form-check">
@@ -242,7 +241,10 @@
                             <p id = "startMText">Start Time: </p>
                             <p id = "endMText">End Date: </p>
                             <p id = "stopsMText">Stops: </p>
+                            <p id = "mileageMText">Total mileage: </p>
+                            <p id = "durationMText">Total time on the road: </p>
                         </div>
+                        <div id="mapCanvas" style="width: 450px; height: 300px; margin-left:auto; margin-right:auto; margin-bottom: 10px"></div>
                         <div class="modal-footer" id="acceptDeclineButtons">
                             <button type="button" id="decline" class="btn btn-danger" data-toggle="modal" data-target="#declineModal" data-dismiss="modal">Decline</button>
                             <button type="button" id="confirm-res" class="btn btn-success" data-dismiss="modal" onclick = "renderCar();">Confirm Reservation</button>

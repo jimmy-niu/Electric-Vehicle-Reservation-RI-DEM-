@@ -8,50 +8,32 @@ let firstReturnedCar = undefined;
 let alternateVehicles = [];
 
 var count = 3;
-function initMap() {
-    var i;
-    for (i = 1; i <= count; i++) {
-        var curr = document.getElementById('route-stop-' + i);
-        autocomplete = new google.maps.places.Autocomplete(curr);
-        /*google.maps.event.addListener(autocomplete, 'place_changed', function(){
-            var place = autocomplete.getPlace();
-        })*/
-    }
-    //var input2 = document.getElementById('endInput');
-    //var autocomplete2 = new google.maps.places.Autocomplete(input2);
-    //autocomplete.addListener('placed_changed', () => console.log(autocomplete.getPlace()))
-}
-function addStop(count) {
-    let newStop = ` <div class="form-group">
-        <label>Destination <span onclick = "deleteStop(this);" 
-        id = "deleteX">x</span></label>
-        <input type=text class="form-control" id="route-stop-` + count + `">
-        </div>`
-    $('#stops').append(newStop);
-}
-
-function deleteStop(obj){
-    let toDelete = obj.parentNode.parentNode;
-    toDelete.parentNode.removeChild(toDelete);
-}
+var map = null;
+var autocompletes = {};
 
 // Sets up the sockets.
 $(document).ready(function() {
     var mapOptions = {
-        center: new google.maps.LatLng(51.219987, 4.396237),
-        zoom: 12,
+        center: new google.maps.LatLng(41.8267, -71.3977),
+        zoom: 15,
         mapTypeId: google.maps.MapTypeId.ROADMAP
     };
-    var map = new google.maps.Map(document.getElementById("mapCanvas"), mapOptions);
-  
-    initMap(count);
+    map = new google.maps.Map(document.getElementById("mapCanvas"), mapOptions);
+    
+    if (navigator.geolocation) {
+         navigator.geolocation.getCurrentPosition(function (position) {
+             initialLocation = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+             map.setCenter(initialLocation);
+         });
+    }
+    initMap(map);
     $("#add-stop").click(function() {
         count++;
         addStop(count);
         initMap(count);
     });
     
-    $("#new-res-form").on("shown.bs.modal", function () {
+    $("#resModal").on("shown.bs.modal", function () {
         google.maps.event.trigger(map, "resize");
     });
 
@@ -84,6 +66,8 @@ $(document).ready(function() {
         $("#startMText").html($("#startMText").html() + reservation.start);
         $("#endMText").html($("#endMText").html() + reservation.end);
         $("#stopsMText").html($("#stopsMText").html() + JSON.parse(reservation.stops));
+        $("#mileageMText").html($("#mileageMText").html() + JSON.parse(reservation.mileage));
+        $("#durationMText").html($("#durationMText").html() + JSON.parse(reservation.duration));
         $("#resModal").modal();
         console.log(reservation);
     });
@@ -124,12 +108,115 @@ $(document).ready(function() {
     jQuery.fn.carousel.Constructor.TRANSITION_DURATION = 5000;
 });
 
+
+function initMap(map) {
+    var i;
+    var inputs = document.getElementsByClassName('route-stop');
+    for (i = 0; i < inputs.length; i++) {
+        var autocomplete = new google.maps.places.Autocomplete(inputs[i]);
+        autocomplete.inputId = inputs[i].id;
+
+        google.maps.event.addListener(autocomplete, 'place_changed', function() {
+            var place = this.getPlace();
+            //alert(place.formatted_address)
+            //alert(this.inputId)
+            autocompletes[this.inputId] = place;
+        })
+        /*var marker = new google.maps.Marker({
+          map: map
+        });
+        autocomplete.addListener('place_changed', function() {
+          var place = autocomplete.getPlace();
+          f (!place.geometry) {
+            // User entered the name of a Place that was not suggested and
+            // pressed the Enter key, or the Place Details request failed.
+            window.alert("No details available for input: '" + place.name + "'");
+            return;
+          }
+          if (place.geometry.viewport) {
+            map.fitBounds(place.geometry.viewport);
+          } else {
+            map.setCenter(place.geometry.location);
+            map.setZoom(10);  // Why 17? Because it looks good.
+          }
+          marker.setPosition(place.geometry.location);
+          marker.setVisible(true);
+        }*/
+    //var input2 = document.getElementById('endInput');
+    //var autocomplete2 = new google.maps.places.Autocomplete(input2);
+    //autocomplete.addListener('placed_changed', () => console.log(autocomplete.getPlace()))
+    }
+    /*for (i = 0; i < autocompletes.length; i++) {
+        autocompletes[i].addListener('place_changed', function() {
+            var place = autocomplete.getPlace();
+            alert(place)
+        })
+    }*/
+}
+
+function getBoundsZoomLevel(bounds, mapDim) {
+    var WORLD_DIM = { height: 256, width: 256 };
+    var ZOOM_MAX = 21;
+
+    function latRad(lat) {
+        var sin = Math.sin(lat * Math.PI / 180);
+        var radX2 = Math.log((1 + sin) / (1 - sin)) / 2;
+        return Math.max(Math.min(radX2, Math.PI), -Math.PI) / 2;
+    }
+
+    function zoom(mapPx, worldPx, fraction) {
+        return Math.floor(Math.log(mapPx / worldPx / fraction) / Math.LN2);
+    }
+
+    var ne = bounds.getNorthEast();
+    var sw = bounds.getSouthWest();
+
+    var latFraction = (latRad(ne.lat()) - latRad(sw.lat())) / Math.PI;
+
+    var lngDiff = ne.lng() - sw.lng();
+    var lngFraction = ((lngDiff < 0) ? (lngDiff + 360) : lngDiff) / 360;
+
+    var latZoom = zoom(mapDim.height, WORLD_DIM.height, latFraction);
+    var lngZoom = zoom(mapDim.width, WORLD_DIM.width, lngFraction);
+
+    return Math.min(latZoom, lngZoom, ZOOM_MAX);
+}
+
+function addStop(count) {
+    let newStop = ` <div class="form-group">
+        <label>Destination <span onclick = "deleteStop(this);" 
+        id = "deleteX">x</span></label>
+        <input type=text class="form-control route-stop" id="route-stop-` + count + `">
+        </div>`
+    $('#stops').append(newStop);
+}
+
+function deleteStop(obj){
+    let toDelete = obj.parentNode.parentNode;
+    toDelete.parentNode.removeChild(toDelete);
+}
+
+function sortOnKeys(dict) {
+    var sorted = [];
+    for(var key in dict) {
+        sorted[sorted.length] = key;
+    }
+    sorted.sort();
+    var tempDict = {};
+    for(var i = 0; i < sorted.length; i++) {
+        tempDict[sorted[i]] = dict[sorted[i]];
+    }
+    return tempDict;
+}
+
 function cleanFields(){
     $("#carMakeMText").html("Car Model: ");
     $("#plateNumberMText").html("License Plate: ");
     $("#startMText").html("Start Time: ");
     $("#endMText").html("End Time: ");
     $("#stopsMText").html("Stops: ");
+    $("#mileageMText").html("Mileage: ");
+    $("#durationMText").html("Duration: ");
     $("#new-stops").empty();
 }
 
@@ -139,6 +226,8 @@ function cleanFieldsEdit(){
     $("#startMText-edit").html("Start Time: ");
     $("#endMText-edit").html("End Time: ");
     $("#stopsMText-edit").html("Stops: ");
+     $("#mileageMText-edit").html("Mileage: ");
+    $("#durationMText-edit").html("Duration: ");
     $("#new-stops-edit").empty();
 }
 
@@ -237,6 +326,57 @@ function newEditedReservationOverride(){
 
 function newReservation(){
     // let user = // ???
+    var totalDistance = 0;
+    var totalDuration = 0;
+    var bounds = new google.maps.LatLngBounds();
+    var ac_sorted = Object.values(sortOnKeys(autocompletes))
+
+    /*for (var i = 0; i < ac_sorted.length; i++) {
+        /*var marker = new google.maps.Marker({
+            position: ac_sorted[i].geometry.location,
+            map: map,
+            status: "active"
+        })
+        //alert(JSON.stringify(ac_sorted[key].geometry.location))
+        var coords = new google.maps.LatLng(ac_sorted[i].geometry.location.lat(), ac_sorted[i].geometry.location.lng())
+        bounds.extend(coords)
+    }
+    map.fitBounds(bounds);*/
+
+    map.setZoom(15);
+    var directionsService = new google.maps.DirectionsService;
+    var directionsDisplay = new google.maps.DirectionsRenderer;
+    directionsDisplay.setMap(map)
+
+    var waypoints = [];
+    for (var i = 1; i < ac_sorted.length - 1; i++) {
+        waypoints.push({
+            location: new google.maps.LatLng(ac_sorted[i].geometry.location.lat(), ac_sorted[i].geometry.location.lng()),
+            stopover: true
+        })
+    }
+    directionsService.route({
+        origin: new google.maps.LatLng(ac_sorted[0].geometry.location.lat(), ac_sorted[0].geometry.location.lng()),
+        destination: new google.maps.LatLng(ac_sorted[ac_sorted.length - 1].geometry.location.lat(), ac_sorted[ac_sorted.length - 1].geometry.location.lng()),
+        waypoints: waypoints,
+        travelMode: 'DRIVING'
+    }, function(response, status) {
+        if (status === 'OK') {
+            var totalDistance = 0;
+            var totalDuration = 0;
+            directionsDisplay.setDirections(response);
+            // calculate time and distance
+            var legs = response.routes[0].legs;
+            for(var i = 0; i < legs.length; i++) {
+                totalDistance += legs[i].distance.value;
+                totalDuration += legs[i].duration.value;
+            }
+        }
+    });
+
+
+    alert(JSON.stringify(info));
+
     let start = $("#start-date").val();
     let end = $("#end-date").val();
 
@@ -260,8 +400,8 @@ function newReservation(){
         let trunk = $("#trunk").prop('checked');
         let offroad = $("#offroading").prop('checked');
         let rack = $('#kayak').prop('checked');
-
-        let resData = {user: userEmail, start: start, end: end, stops: JSON.stringify(stops).split('},{').join('}, {'), override: false, justification: "", needsTrunk: trunk, needsOffRoad: offroad, needsRack: rack};
+        alert(totalDistance)
+        let resData = {user: userEmail, start: start, end: end, stops: JSON.stringify(stops).split('},{').join('}, {'), mileage: totalDistance * 1609.344, duration: totalDuration/60.0, override: false, justification: "", needsTrunk: trunk, needsOffRoad: offroad, needsRack: rack};
         userSocket.emit('reservation', resData, function(){
 
         });
