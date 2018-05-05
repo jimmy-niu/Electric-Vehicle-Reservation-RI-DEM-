@@ -327,6 +327,20 @@ io.of('/user').on('connection', function(socket) {
         newReservation(socket, reservationInfo, false);
     });
 
+    socket.on('addReservation', function(reservationInfo){
+         conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?)',[reservationInfo.user, reservationInfo.license, reservationInfo.model, reservationInfo.start, reservationInfo.end, reservationInfo.stops, reservationInfo.override, reservationInfo.justification],function(error, data){
+            conn.query('SELECT * FROM reservations WHERE id = ?', [data.lastInsertId], function(error, data){
+                //Send to user and admins
+                //socket.emit('newReservation', data);
+                io.of('/admin').emit("newReservation", data);
+                //Calendar event
+                var start = new Date(reservationInfo.start);
+                var end = new Date(reservationInfo.end);
+                addEvent(reservationInfo.user + "'s upcoming DEM trip", data.rows[0].model + " " + data.rows[0].license + "\n" + reservationInfo.stops, start.toISOString(), end.toISOString());
+            });
+        });
+    })
+
     socket.on('edit', function(reservationID, reservationInfo){
         //editReservation(reservationID, reservationInfo.start, reservationInfo.end, reservationInfo.stops, reservationInfo.justification);
         // conn.query('DELETE FROM reservations WHERE id = ?', [reservationID], function(error, data){
@@ -618,22 +632,26 @@ function newReservation(socket, reservationInfo, isEdit){
 
             conn.query('SELECT license, model FROM vehicles WHERE extraTrunk >= ? AND offRoad >= ? AND equipRack >= ? AND license NOT IN (SELECT license FROM reservations WHERE start <= ? AND end >= ?) ORDER BY isEV DESC, (extraTrunk + offRoad + equipRack) ASC', [needsTrunk, needsOffRoad, needsRack, reservationInfo.end, reservationInfo.start], function(error, data){
                 if(data.rows.length !== 0){
-                    socket.emit('alternateVehicles', data);
-                    conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?)',[reservationInfo.user, data.rows[0].license, data.rows[0].model, reservationInfo.start, reservationInfo.end, reservationInfo.stops, reservationInfo.override, reservationInfo.justification],function(error, data){
-                        conn.query('SELECT * FROM reservations WHERE id = ?', [data.lastInsertId], function(error, data){
-                            //Send to user and admins
-                            if(isEdit){
-                                socket.emit('editReservation', data);
-                            } else {
-                                socket.emit('newReservation', data);
-                            }
-                            io.of('/admin').emit("newReservation", data);
-                            //Calendar event
-                            var start = new Date(reservationInfo.start);
-                            var end = new Date(reservationInfo.end);
-                            addEvent(reservationInfo.user + "'s upcoming DEM trip", data.rows[0].model + " " + data.rows[0].license + "\n" + reservationInfo.stops, start.toISOString(), end.toISOString());
-                        });
-                    });
+                    console.log(reservationInfo)
+                    reservationInfo.model = data.rows[0].model;
+                    reservationInfo.license = data.rows[0].license;
+                    socket.emit('newReservation', data, reservationInfo);
+
+                    // conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?)',[reservationInfo.user, data.rows[0].license, data.rows[0].model, reservationInfo.start, reservationInfo.end, reservationInfo.stops, reservationInfo.override, reservationInfo.justification],function(error, data){
+                    //     conn.query('SELECT * FROM reservations WHERE id = ?', [data.lastInsertId], function(error, data){
+                    //         //Send to user and admins
+                    //         if(isEdit){
+                    //             socket.emit('editReservation', data);
+                    //         } else {
+                    //             socket.emit('newReservation', data);
+                    //         }
+                    //         io.of('/admin').emit("newReservation", data);
+                    //         //Calendar event
+                    //         var start = new Date(reservationInfo.start);
+                    //         var end = new Date(reservationInfo.end);
+                    //         addEvent(reservationInfo.user + "'s upcoming DEM trip", data.rows[0].model + " " + data.rows[0].license + "\n" + reservationInfo.stops, start.toISOString(), end.toISOString());
+                    //     });
+                    // });
                 } else {
                     socket.emit('noVehicle');
                 }
