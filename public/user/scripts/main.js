@@ -41,6 +41,7 @@ $(document).ready(function() {
         $("#resModal").modal();
         console.log(reservation);
     });
+
     userSocket.on('editReservation', function(reservation){
         console.log('edit reservation made');
         cleanFieldsEdit();
@@ -54,6 +55,7 @@ $(document).ready(function() {
         $("#resModal-edit").modal();
         console.log(reservation);
     });
+
     userSocket.on('reservationOverride', function(reservations){
         console.log("reservation vehicle override");
     });
@@ -73,6 +75,7 @@ $(document).ready(function() {
     });
 
     flatpickr(".datePicker", {enableTime: true, dateFormat: "Y-m-d H:i"});
+
     let facts = Array();
     facts.push("An electric vehicle has an expected range of 80 to 250+ miles!");
     facts.push("Plug-in hybrid electric vehicles offer 15-50 miles of all-electric driving and can be driven an additional 350-600 miles on the gas engine if needed.");
@@ -104,7 +107,7 @@ function cleanFieldsEdit(){
     $("#endMText-edit").html("End Time: ");
     $("#stopsMText-edit").html("Stops: ");
     $("#new-stops-edit").empty();
- }
+}
 
 function renderCar(){
     console.log("drawing car!");
@@ -120,7 +123,7 @@ function combineCards(){
     newCar.rows[0].model = currentCar.model;
     new Reservation(newCar, 0);
 
-    userSocket.emit('vehicleOverride', newCar.rows[0].id, newCar.rows[0].license, newCar.rows[0].model, $("#report-area").val());
+    userSocket.emit('vehicleOverride', newCar.rows[0].id, newCar.rows[0].license, newCar.rows[0].model, $("#reasoning-field").val());
 
     firstReturnedCar = undefined;
     currentCar = undefined;
@@ -154,20 +157,21 @@ function altVehicles(){
 
 function altVehiclesEdit(){
     if($("#reasoning-field-edit").val().trim().length > 0){
-        $("#appealModal-edit").modal('hide');-        $("#altModal-edit").modal();
+        $("#appealModal-edit").modal('hide');
+        $("#altModal-edit").modal();
         $("#justification-help-edit").addClass('d-none');
- 
-         $("#altVehiclesForm-edit").empty();
-         for(let i = 0; i < alternateVehicles.rowCount; i++){
-             let command = alternateVehicles.rows[i].model + " || " + alternateVehicles.rows[i].license + ` <input type = "radio" name="altVehiclesGroup" onclick = "setVehicle(${i})"><br>`
-             //console.log(command);
-             $("#altVehiclesForm-edit").append(command);
-         }
-         cleanFieldsEdit();
-     } else {
-         $("#justification-help-edit").removeClass('d-none');
-     }
- }
+
+        $("#altVehiclesForm-edit").empty();
+        for(let i = 0; i < alternateVehicles.rowCount; i++){
+            let command = alternateVehicles.rows[i].model + " || " + alternateVehicles.rows[i].license + ` <input type = "radio" name="altVehiclesGroup" onclick = "setVehicle(${i})"><br>`
+            //console.log(command);
+            $("#altVehiclesForm-edit").append(command);
+        }
+        cleanFieldsEdit();
+    } else {
+        $("#justification-help-edit").removeClass('d-none');
+    }
+}
 
 function addStop() {
     console.log("we in addStop");
@@ -178,7 +182,6 @@ id = "deleteX">x</span></label>
 </div>`
     $('#new-stops').append(newStop);
 }
-
 
 function deleteStop(obj){
     let toDelete = obj.parentNode.parentNode;
@@ -232,15 +235,9 @@ function newReservation(){
 }
 
 function cancelReservation(){
-    //console.log($(`"#${idToDelete}"`))
-    let start = $("." + idToDelete)[0].children[1].children[1].children[0].nextSibling.textContent.substring(2);
-    let end = $("." + idToDelete)[0].children[1].children[1].children[2].nextSibling.textContent.substring(2);
-    let carName = $("." + idToDelete)[0].children[1].children[0].firstChild.textContent.split(" ");
-    let license = carName[carName.length - 1]
-    userSocket.emit('cancel', idToDelete, userEmail, license, start, end, function(){
-    });
-
     $("." + idToDelete).remove();
+    userSocket.emit('cancel', idToDelete, userEmail,function(){
+    });
     //console.log(reservationID)
     //console.log("cancelled");
     cleanFields();
@@ -253,14 +250,15 @@ function cancelReservationProcess(){
 }
 
 function addIDToModal(reservationObj){
-    $("#reservation-id").html(reservationObj.id);
-    setDeleteCard(reservationObj);
-    cancelReservation();
+    $("#reservation-id-edit").html(reservationObj.id);
+    // console.log("try to delete")
+    // idToDelete = reservationObj.id;
+    // console.log(typeof idToDelete)
+    // cancelReservation();
 }
 
 function editReservation(){
     let id =  $("#reservation-id-edit").html();
-
     let start = $("#start-date-edit").val();
     let end = $("#end-date-edit").val();
 
