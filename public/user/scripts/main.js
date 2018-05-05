@@ -19,7 +19,7 @@ $(document).ready(function() {
 
     userSocket.emit('join',userEmail, function(reservations){
         for(var i = 0; i < reservations.rows.length; i++){
-            new Reservation(reservations, i);
+            new Reservation(reservations.rows[i]);
         }
     });
 
@@ -28,17 +28,32 @@ $(document).ready(function() {
         //console.log(reservations);
     });
 
-    userSocket.on('newReservation', function(reservation){
+    userSocket.on('newReservation', function(vehicles, reservation){
         console.log('new reservation made');
         cleanFields();
         currentCar = reservation;
+        alternateVehicles = vehicles;
         firstReturnedCar = reservation;
-        $("#carMakeMText").html($("#carMakeMText").html() + reservation.rows[0].model);
-        $("#plateNumberMText").html($("#plateNumberMText").html() + reservation.rows[0].license);
-        $("#startMText").html($("#startMText").html() + reservation.rows[0].start);
-        $("#endMText").html($("#endMText").html() + reservation.rows[0].end);
-        $("#stopsMText").html($("#stopsMText").html() + JSON.parse(reservation.rows[0].stops));
+        $("#carMakeMText").html($("#carMakeMText").html() + reservation.model);
+        $("#plateNumberMText").html($("#plateNumberMText").html() + reservation.license);
+        $("#startMText").html($("#startMText").html() + reservation.start);
+        $("#endMText").html($("#endMText").html() + reservation.end);
+        $("#stopsMText").html($("#stopsMText").html() + JSON.parse(reservation.stops));
         $("#resModal").modal();
+        console.log(reservation);
+    });
+
+    userSocket.on('editReservation', function(reservation){
+        console.log('edit reservation made');
+        cleanFieldsEdit();
+        currentCar = reservation;
+        firstReturnedCar = reservation;
+        $("#carMakeMText-edit").html($("#carMakeMText-edit").html() + reservation.rows[0].model);
+        $("#plateNumberMText-edit").html($("#plateNumberMText-edit").html() + reservation.rows[0].license);
+        $("#startMText-edit").html($("#startMText-edit").html() + reservation.rows[0].start);
+        $("#endMText-edit").html($("#endMText-edit").html() + reservation.rows[0].end);
+        $("#stopsMText-edit").html($("#stopsMText-edit").html() + JSON.parse(reservation.rows[0].stops));
+        $("#resModal-edit").modal();
         console.log(reservation);
     });
 
@@ -46,7 +61,7 @@ $(document).ready(function() {
         console.log("reservation vehicle override");
     });
 
-    userSocket.on('alternateVehicles', function(vehicles){
+    userSocket.on('alternateVehicles', function(vehicles, reservationInfo){
         alternateVehicles = vehicles;
     });
 
@@ -61,7 +76,7 @@ $(document).ready(function() {
     });
 
     flatpickr(".datePicker", {enableTime: true, dateFormat: "Y-m-d H:i"});
-
+    jQuery.fn.carousel.Constructor.TRANSITION_DURATION = 5000;
 });
 
 function cleanFields(){
@@ -73,7 +88,17 @@ function cleanFields(){
     $("#new-stops").empty();
 }
 
+function cleanFieldsEdit(){
+    $("#carMakeMText-edit").html("Car Model: ");
+    $("#plateNumberMText-edit").html("License Plate: ");
+    $("#startMText-edit").html("Start Time: ");
+    $("#endMText-edit").html("End Time: ");
+    $("#stopsMText-edit").html("Stops: ");
+    $("#new-stops-edit").empty();
+}
+
 function renderCar(){
+    userSocket.emit('addReservation', currentCar);
     console.log("drawing car!");
     if(currentCar !== undefined){
         new Reservation(currentCar, 0);
@@ -87,7 +112,7 @@ function combineCards(){
     newCar.rows[0].model = currentCar.model;
     new Reservation(newCar, 0);
 
-    userSocket.emit('vehicleOverride', newCar.rows[0].id, newCar.rows[0].license, newCar.rows[0].model, $("#report-area").val());
+    userSocket.emit('vehicleOverride', newCar.rows[0].id, newCar.rows[0].license, newCar.rows[0].model, $("#reasoning-field").val());
 
     firstReturnedCar = undefined;
     currentCar = undefined;
@@ -119,6 +144,24 @@ function altVehicles(){
     }
 }
 
+function altVehiclesEdit(){
+    if($("#reasoning-field-edit").val().trim().length > 0){
+        $("#appealModal-edit").modal('hide');
+        $("#altModal-edit").modal();
+        $("#justification-help-edit").addClass('d-none');
+
+        $("#altVehiclesForm-edit").empty();
+        for(let i = 0; i < alternateVehicles.rowCount; i++){
+            let command = alternateVehicles.rows[i].model + " || " + alternateVehicles.rows[i].license + ` <input type = "radio" name="altVehiclesGroup" onclick = "setVehicle(${i})"><br>`
+            //console.log(command);
+            $("#altVehiclesForm-edit").append(command);
+        }
+        cleanFieldsEdit();
+    } else {
+        $("#justification-help-edit").removeClass('d-none');
+    }
+}
+
 function addStop() {
     console.log("we in addStop");
     let newStop = ` <div class="form-group">
@@ -132,6 +175,19 @@ id = "deleteX">x</span></label>
 function deleteStop(obj){
     let toDelete = obj.parentNode.parentNode;
     toDelete.parentNode.removeChild(toDelete);
+}
+
+function newEditedReservation(){
+    cancelReservation();
+    renderCar();
+    cleanFieldsEdit();
+}
+
+function newEditedReservationOverride(){
+    console.log(idToDelete);
+    cancelReservation();
+    combineCards();
+    cleanFieldsEdit();
 }
 
 function newReservation(){
@@ -183,14 +239,15 @@ function cancelReservationProcess(){
 }
 
 function addIDToModal(reservationObj){
-    $("#reservation-id").html(reservationObj.id);
-    setDeleteCard(reservationObj);
-    cancelReservation();
+    $("#reservation-id-edit").html(reservationObj.id);
+    // console.log("try to delete")
+    // idToDelete = reservationObj.id;
+    // console.log(typeof idToDelete)
+    // cancelReservation();
 }
 
 function editReservation(){
     let id =  $("#reservation-id-edit").html();
-
     let start = $("#start-date-edit").val();
     let end = $("#end-date-edit").val();
 
@@ -219,6 +276,7 @@ function editReservation(){
         userSocket.emit('edit', id, resData, function(){
 
         });
+        idToDelete = id;
     }
 }
 
@@ -237,8 +295,8 @@ function setDeleteCard(obj){
     idToDelete = obj.id;
 }
 class Reservation {
-    constructor(reservationData, i) {
-        this.addToDom(reservationData.rows[i]);
+    constructor(reservationData) {
+        this.addToDom(reservationData);
     }
     addToDom(r) {
         // console.log("r");
