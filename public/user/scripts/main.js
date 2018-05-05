@@ -66,8 +66,6 @@ $(document).ready(function() {
         $("#startMText").html($("#startMText").html() + reservation.start);
         $("#endMText").html($("#endMText").html() + reservation.end);
         $("#stopsMText").html($("#stopsMText").html() + JSON.parse(reservation.stops));
-        $("#mileageMText").html($("#mileageMText").html() + JSON.parse(reservation.mileage));
-        $("#durationMText").html($("#durationMText").html() + JSON.parse(reservation.duration));
         $("#resModal").modal();
         console.log(reservation);
     });
@@ -215,8 +213,8 @@ function cleanFields(){
     $("#startMText").html("Start Time: ");
     $("#endMText").html("End Time: ");
     $("#stopsMText").html("Stops: ");
-    $("#mileageMText").html("Mileage: ");
-    $("#durationMText").html("Duration: ");
+    $("#distanceMText").html("Total distance: ");
+    $("#durationMText").html("Total duration: ");
     $("#new-stops").empty();
 }
 
@@ -226,8 +224,6 @@ function cleanFieldsEdit(){
     $("#startMText-edit").html("Start Time: ");
     $("#endMText-edit").html("End Time: ");
     $("#stopsMText-edit").html("Stops: ");
-     $("#mileageMText-edit").html("Mileage: ");
-    $("#durationMText-edit").html("Duration: ");
     $("#new-stops-edit").empty();
 }
 
@@ -371,11 +367,10 @@ function newReservation(){
                 totalDistance += legs[i].distance.value;
                 totalDuration += legs[i].duration.value;
             }
+            $("#distanceMText").html($("#distanceMText").html() + (totalDistance * 0.000621371).toFixed(2) + " miles");
+            $("#durationMText").html($("#durationMText").html() + (totalDuration / 60.0).toFixed(0) + " minutes");
         }
     });
-
-
-    alert(JSON.stringify(info));
 
     let start = $("#start-date").val();
     let end = $("#end-date").val();
@@ -400,8 +395,7 @@ function newReservation(){
         let trunk = $("#trunk").prop('checked');
         let offroad = $("#offroading").prop('checked');
         let rack = $('#kayak').prop('checked');
-        alert(totalDistance)
-        let resData = {user: userEmail, start: start, end: end, stops: JSON.stringify(stops).split('},{').join('}, {'), mileage: totalDistance * 1609.344, duration: totalDuration/60.0, override: false, justification: "", needsTrunk: trunk, needsOffRoad: offroad, needsRack: rack};
+        let resData = {user: userEmail, start: start, end: end, stops: JSON.stringify(stops).split('},{').join('}, {'), override: false, justification: "", needsTrunk: trunk, needsOffRoad: offroad, needsRack: rack};
         userSocket.emit('reservation', resData, function(){
 
         });
