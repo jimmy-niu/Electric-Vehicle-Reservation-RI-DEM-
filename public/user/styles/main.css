@@ -132,3 +132,7 @@ h3 {
     margin-right: auto;
     font-weight: bold;
 }
+
+#reportModal .modal-body {
+    overflow-y: auto;
+}
