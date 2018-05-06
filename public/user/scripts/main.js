@@ -431,7 +431,7 @@ function newReservation() {
     var bounds = new google.maps.LatLngBounds();
     var ac_sorted = Object.values(sortOnKeys(autocompletes))
 
-    alert(ac_sorted);
+    // alert(ac_sorted);
     /*for (var i = 0; i < ac_sorted.length; i++) {
         /*var marker = new google.maps.Marker({
             position: ac_sorted[i].geometry.location,
