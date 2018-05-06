@@ -4,54 +4,51 @@ let userSocket = io.connect('http://localhost:8080/user', {forceNew: true});
 let userEmail = "";
 
 let currentCar = undefined;
-let firstReturnedCar = undefined;
 let alternateVehicles = [];
+let isEditing = false;
+
+let reservationTimer = setInterval(function(){
+
+}, 60000);
 
 var count = 3;
-function initMap() {
-    var i;
-    for (i = 1; i <= count; i++) {
-        var curr = document.getElementById('route-stop-' + i);
-        autocomplete = new google.maps.places.Autocomplete(curr);
-        /*google.maps.event.addListener(autocomplete, 'place_changed', function(){
-            var place = autocomplete.getPlace();
-        })*/
-    }
-    //var input2 = document.getElementById('endInput');
-    //var autocomplete2 = new google.maps.places.Autocomplete(input2);
-    //autocomplete.addListener('placed_changed', () => console.log(autocomplete.getPlace()))
-}
-function addStop(count) {
-    let newStop = ` <div class="form-group">
-        <label>Destination <span onclick = "deleteStop(this);" 
-        id = "deleteX">x</span></label>
-        <input type=text class="form-control" id="route-stop-` + count + `">
-        </div>`
-    $('#stops').append(newStop);
-}
-
-function deleteStop(obj){
-    let toDelete = obj.parentNode.parentNode;
-    toDelete.parentNode.removeChild(toDelete);
-}
+var count_edit = 3;
+var map = null;
+var map_edit = null;
+var autocompletes = {};
+var autocompletes_edit = {};
 
 // Sets up the sockets.
 $(document).ready(function() {
     var mapOptions = {
-        center: new google.maps.LatLng(51.219987, 4.396237),
-        zoom: 12,
+        center: new google.maps.LatLng(41.8267, -71.3977),
+        zoom: 15,
         mapTypeId: google.maps.MapTypeId.ROADMAP
     };
-    var map = new google.maps.Map(document.getElementById("mapCanvas"), mapOptions);
-  
-    initMap(count);
+    map = new google.maps.Map(document.getElementById("mapCanvas"), mapOptions);
+    map_edit = new google.maps.Map(document.getElementById("mapCanvasEdit"), mapOptions);
+
+    if (navigator.geolocation) {
+         navigator.geolocation.getCurrentPosition(function (position) {
+             initialLocation = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+             map.setCenter(initialLocation);
+             map_edit.setCenter(initialLocation);
+         });
+    }
+    initMap(map);
     $("#add-stop").click(function() {
         count++;
         addStop(count);
         initMap(count);
     });
-    
-    $("#new-res-form").on("shown.bs.modal", function () {
+
+    $("#add-stop-edit").click(function() {
+        count_edit++;
+        addStopEdit(count);
+        initMap(count);
+    });
+
+    $("#resModal").on("shown.bs.modal", function () {
         google.maps.event.trigger(map, "resize");
     });
 
@@ -64,42 +61,46 @@ $(document).ready(function() {
 
     userSocket.emit('join',userEmail, function(reservations){
         for(var i = 0; i < reservations.rows.length; i++){
-            new Reservation(reservations.rows[i]);
+            if(Date.parse(reservations.rows[i].end) > Date.now()){
+                new Reservation(reservations.rows[i]);
+            } else {
+                new OldReservation(reservations.rows[i]);
+            }
         }
     });
 
     userSocket.on('reservationChange', function(reservations){
         console.log("reservation change");
-        //console.log(reservations);
+        $("." + idToDelete).remove();
+        cleanFields();
     });
 
-    userSocket.on('newReservation', function(vehicles, reservation){
+    userSocket.on('newReservation', function(vehicles, reservation, isEdit){
         console.log('new reservation made');
-        cleanFields();
         currentCar = reservation;
         alternateVehicles = vehicles;
-        firstReturnedCar = reservation;
-        $("#carMakeMText").html($("#carMakeMText").html() + reservation.model);
-        $("#plateNumberMText").html($("#plateNumberMText").html() + reservation.license);
-        $("#startMText").html($("#startMText").html() + reservation.start);
-        $("#endMText").html($("#endMText").html() + reservation.end);
-        $("#stopsMText").html($("#stopsMText").html() + JSON.parse(reservation.stops));
-        $("#resModal").modal();
-        console.log(reservation);
+        isEditing = isEdit;
+        cleanFields();
+        if(isEditing){
+            $("#carMakeMText-edit").html($("#carMakeMText-edit").html() + reservation.model);
+            $("#plateNumberMText-edit").html($("#plateNumberMText-edit").html() + reservation.license);
+            $("#startMText-edit").html($("#startMText-edit").html() + reservation.start);
+            $("#endMText-edit").html($("#endMText-edit").html() + reservation.end);
+            $("#stopsMText-edit").html($("#stopsMText-edit").html() + JSON.parse(reservation.stops));
+            $("#resModal-edit").modal();
+        } else {
+            $("#carMakeMText").html($("#carMakeMText").html() + reservation.model);
+            $("#plateNumberMText").html($("#plateNumberMText").html() + reservation.license);
+            $("#startMText").html($("#startMText").html() + reservation.start);
+            $("#endMText").html($("#endMText").html() + reservation.end);
+            $("#stopsMText").html($("#stopsMText").html() + JSON.parse(reservation.stops));
+            $("#resModal").modal();
+        }
     });
 
-    userSocket.on('editReservation', function(reservation){
-        console.log('edit reservation made');
-        cleanFieldsEdit();
-        currentCar = reservation;
-        firstReturnedCar = reservation;
-        $("#carMakeMText-edit").html($("#carMakeMText-edit").html() + reservation.rows[0].model);
-        $("#plateNumberMText-edit").html($("#plateNumberMText-edit").html() + reservation.rows[0].license);
-        $("#startMText-edit").html($("#startMText-edit").html() + reservation.rows[0].start);
-        $("#endMText-edit").html($("#endMText-edit").html() + reservation.rows[0].end);
-        $("#stopsMText-edit").html($("#stopsMText-edit").html() + JSON.parse(reservation.rows[0].stops));
-        $("#resModal-edit").modal();
-        console.log(reservation);
+    userSocket.on('reservationID', function(id){
+        currentCar.addClass('id');
+        console.log($("." + id))
     });
 
     userSocket.on('reservationOverride', function(reservations){
@@ -111,106 +112,226 @@ $(document).ready(function() {
     });
 
     userSocket.on('noVehicle', function(){
-        $("#messageMText").html("There is no vehicle available at that time that meets your needs.");
-        $('#errorModal').modal();
+        if(isEditing){
+            $("#messageMText-edit").html("There is no vehicle available at that time that meets your needs.");
+            $('#errorModal-edit').modal();
+        } else {
+            $("#messageMText").html("There is no vehicle available at that time that meets your needs.");
+            $('#errorModal').modal();
+        }
     });
 
     userSocket.on('isOverlap', function(){
-        $("#messageMText").html("You have an existing reservation that overlaps with the times you selected.");
-        $('#errorModal').modal();
+        if(isEditing){
+            $("#messageMText-edit").html("You have an existing reservation that overlaps with the times you selected.");
+            $('#errorModal-edit').modal();
+        } else {
+           $("#messageMText").html("You have an existing reservation that overlaps with the times you selected.");
+            $('#errorModal').modal();
+        }
     });
 
     flatpickr(".datePicker", {enableTime: true, dateFormat: "Y-m-d H:i"});
     jQuery.fn.carousel.Constructor.TRANSITION_DURATION = 5000;
 });
 
-function cleanFields(){
-    $("#carMakeMText").html("Car Model: ");
-    $("#plateNumberMText").html("License Plate: ");
-    $("#startMText").html("Start Time: ");
-    $("#endMText").html("End Time: ");
-    $("#stopsMText").html("Stops: ");
-    $("#new-stops").empty();
+
+function initMap(map) {
+    var i;
+    var inputs = document.getElementsByClassName('route-stop');
+    var inputs_edit = document.getElementsByClassName('route-stop-edit');
+    for (i = 0; i < inputs.length; i++) {
+        var autocomplete = new google.maps.places.Autocomplete(inputs[i]);
+        autocomplete.inputId = inputs[i].id;
+
+        autocomplete.addListener('place_changed', function() {
+            var place = this.getPlace();
+            //alert(place.formatted_address)
+            //alert(this.inputId)
+            autocompletes[this.inputId] = place;
+        })
+    }
+    for (i = 0; i < inputs_edit.length; i++) {
+        var autocomplete = new google.maps.places.Autocomplete(inputs_edit[i]);
+        autocomplete.inputId = inputs_edit[i].id;
+
+        autocomplete.addListener('place_changed', function() {
+            var place = this.getPlace();
+            //alert(place.formatted_address)
+            //alert(this.inputId)
+            autocompletes_edit[this.inputId] = place;
+        })
+    }
 }
 
-function cleanFieldsEdit(){
-    $("#carMakeMText-edit").html("Car Model: ");
-    $("#plateNumberMText-edit").html("License Plate: ");
-    $("#startMText-edit").html("Start Time: ");
-    $("#endMText-edit").html("End Time: ");
-    $("#stopsMText-edit").html("Stops: ");
-    $("#new-stops-edit").empty();
+function getBoundsZoomLevel(bounds, mapDim) {
+    var WORLD_DIM = { height: 256, width: 256 };
+    var ZOOM_MAX = 21;
+
+    function latRad(lat) {
+        var sin = Math.sin(lat * Math.PI / 180);
+        var radX2 = Math.log((1 + sin) / (1 - sin)) / 2;
+        return Math.max(Math.min(radX2, Math.PI), -Math.PI) / 2;
+    }
+
+    function zoom(mapPx, worldPx, fraction) {
+        return Math.floor(Math.log(mapPx / worldPx / fraction) / Math.LN2);
+    }
+
+    var ne = bounds.getNorthEast();
+    var sw = bounds.getSouthWest();
+
+    var latFraction = (latRad(ne.lat()) - latRad(sw.lat())) / Math.PI;
+
+    var lngDiff = ne.lng() - sw.lng();
+    var lngFraction = ((lngDiff < 0) ? (lngDiff + 360) : lngDiff) / 360;
+
+    var latZoom = zoom(mapDim.height, WORLD_DIM.height, latFraction);
+    var lngZoom = zoom(mapDim.width, WORLD_DIM.width, lngFraction);
+
+    return Math.min(latZoom, lngZoom, ZOOM_MAX);
+}
+
+function addStop(count) {
+    let newStop = ` <div class="form-group">
+        <label>Destination <span onclick = "deleteStop(this);"
+        id = "deleteX">x</span></label>
+        <input type=text class="form-control route-stop" id="route-stop-` + count + `">
+        </div>`
+    $('#stops').append(newStop);
+}
+
+function addStopEdit(count) {
+    let newStop = ` <div class="form-group">
+        <label>Destination <span onclick = "deleteStop(this);"
+        id = "deleteX">x</span></label>
+        <input type=text class="form-control route-stop-edit" id="route-stop-` + count + `">
+        </div>`
+    $('#stops').append(newStop);
+}
+
+function deleteStop(obj){
+    let toDelete = obj.parentNode.parentNode;
+    toDelete.parentNode.removeChild(toDelete);
+}
+
+function sortOnKeys(dict) {
+    var sorted = [];
+    for(var key in dict) {
+        sorted[sorted.length] = key;
+    }
+    sorted.sort();
+    var tempDict = {};
+    for(var i = 0; i < sorted.length; i++) {
+        tempDict[sorted[i]] = dict[sorted[i]];
+    }
+    return tempDict;
+}
+
+function cleanFields(){
+    if(isEditing){
+        console.log('clean edit')
+        $("#carMakeMText-edit").html("Car Model: ");
+        $("#plateNumberMText-edit").html("License Plate: ");
+        $("#startMText-edit").html("Start Time: ");
+        $("#endMText-edit").html("End Time: ");
+        $("#stopsMText-edit").html("Stops: ");
+        $("#new-stops-edit").empty();
+    } else {
+        $("#carMakeMText").html("Car Model: ");
+        $("#plateNumberMText").html("License Plate: ");
+        $("#startMText").html("Start Time: ");
+        $("#endMText").html("End Time: ");
+        $("#stopsMText").html("Stops: ");
+        $("#new-stops").empty();
+    }
+}
+
+function override(){
+    if(isEditing){
+        currentCar.justification = $("#reasoning-field-edit").val();
+    } else{
+        currentCar.justification = $("#reasoning-field").val();
+    }
+    currentCar.override = true;
+    renderCar();
 }
 
 function renderCar(){
-    userSocket.emit('addReservation', currentCar);
-    console.log("drawing car!");
-    if(currentCar !== undefined){
-        new Reservation(currentCar, 0);
+    if(isEditing){
+        let id = $("#reservation-id-edit").html();
+        console.log(id)
+        userSocket.emit('editReservation', currentCar, id, function(){
+            console.log('added')
+            currentCar.id = id;
+
+            $("." + idToDelete).remove();
+
+            new Reservation(currentCar);
+
+            currentCar = undefined;
+            $("#reasoning-field-edit").val("");
+
+            cleanFields();
+        });
+    } else {
+        userSocket.emit('addReservation', currentCar, function(id){
+            console.log('added')
+            currentCar.id = id;
+            new Reservation(currentCar);
+
+            currentCar = undefined;
+            $("#reasoning-field").val("");
+
+            cleanFields();
+        });
     }
-    cleanFields();
-}
-
-function combineCards(){
-    let newCar = firstReturnedCar;
-    newCar.rows[0].license = currentCar.license;
-    newCar.rows[0].model = currentCar.model;
-    new Reservation(newCar, 0);
-
-    userSocket.emit('vehicleOverride', newCar.rows[0].id, newCar.rows[0].license, newCar.rows[0].model, $("#reasoning-field").val());
-
-    firstReturnedCar = undefined;
-    currentCar = undefined;
-    cleanFields();
-    $("#reasoning-field").val("");
 }
 
 function setVehicle(index){
-    console.log(index);
-    currentCar = alternateVehicles.rows[index];
-    console.log(currentCar);
+    currentCar.license = alternateVehicles.rows[index].license;
+    currentCar.model = alternateVehicles.rows[index].model;
 }
 
 function altVehicles(){
-    if($("#reasoning-field").val().trim().length > 0){
-        $("#appealModal").modal('hide');
-        $("#altModal").modal();
-        $("#justification-help").addClass('d-none');
+    if(isEditing){
+        if($("#reasoning-field-edit").val().trim().length > 0){
+            $("#appealModal-edit").modal('hide');
+            $("#altModal-edit").modal();
+            $("#justification-help-edit").addClass('d-none');
 
-        $("#altVehiclesForm").empty();
-        for(let i = 0; i < alternateVehicles.rowCount; i++){
-            let command = alternateVehicles.rows[i].model + " || " + alternateVehicles.rows[i].license + ` <input type = "radio" name="altVehiclesGroup" onclick = "setVehicle(${i})"><br>`
-            //console.log(command);
-            $("#altVehiclesForm").append(command);
+            $("#altVehiclesForm-edit").empty();
+            for(let i = 0; i < alternateVehicles.rowCount; i++){
+                let command = alternateVehicles.rows[i].model + " || " + alternateVehicles.rows[i].license + ` <input type = "radio" name="altVehiclesGroup-edit" onclick = "setVehicle(${i})"><br>`
+                $("#altVehiclesForm-edit").append(command);
+            }
+            cleanFields();
+        } else {
+            $("#justification-help-edit").removeClass('d-none');
         }
-        cleanFields();
     } else {
-        $("#justification-help").removeClass('d-none');
+        if($("#reasoning-field").val().trim().length > 0){
+            $("#appealModal").modal('hide');
+            $("#altModal").modal();
+            $("#justification-help").addClass('d-none');
+
+            $("#altVehiclesForm").empty();
+            for(let i = 0; i < alternateVehicles.rowCount; i++){
+                let command = alternateVehicles.rows[i].model + " || " + alternateVehicles.rows[i].license + ` <input type = "radio" name="altVehiclesGroup" onclick = "setVehicle(${i})"><br>`
+                $("#altVehiclesForm").append(command);
+            }
+            cleanFields();
+        } else {
+            $("#justification-help").removeClass('d-none');
+        }
     }
 }
 
-function altVehiclesEdit(){
-    if($("#reasoning-field-edit").val().trim().length > 0){
-        $("#appealModal-edit").modal('hide');
-        $("#altModal-edit").modal();
-        $("#justification-help-edit").addClass('d-none');
-
-        $("#altVehiclesForm-edit").empty();
-        for(let i = 0; i < alternateVehicles.rowCount; i++){
-            let command = alternateVehicles.rows[i].model + " || " + alternateVehicles.rows[i].license + ` <input type = "radio" name="altVehiclesGroup" onclick = "setVehicle(${i})"><br>`
-            //console.log(command);
-            $("#altVehiclesForm-edit").append(command);
-        }
-        cleanFieldsEdit();
-    } else {
-        $("#justification-help-edit").removeClass('d-none');
-    }
-}
 
 /*function addStop() {
     console.log("we in addStop");
     let newStop = ` <div class="form-group">
-<label>Destination <span onclick = "deleteStop(this);" 
+<label>Destination <span onclick = "deleteStop(this);"
 id = "deleteX">x</span></label>
 <input type=text class="form-control route-stop">
 </div>`
@@ -222,21 +343,59 @@ function deleteStop(obj){
     toDelete.parentNode.removeChild(toDelete);
 }*/
 
-function newEditedReservation(){
-    cancelReservation();
-    renderCar();
-    cleanFieldsEdit();
-}
-
-function newEditedReservationOverride(){
-    console.log(idToDelete);
-    cancelReservation();
-    combineCards();
-    cleanFieldsEdit();
-}
-
-function newReservation(){
+function newReservation() {
     // let user = // ???
+    var totalDistance = 0;
+    var totalDuration = 0;
+    var bounds = new google.maps.LatLngBounds();
+    var ac_sorted = Object.values(sortOnKeys(autocompletes))
+
+    alert(ac_sorted);
+    /*for (var i = 0; i < ac_sorted.length; i++) {
+        /*var marker = new google.maps.Marker({
+            position: ac_sorted[i].geometry.location,
+            map: map,
+            status: "active"
+        })
+        //alert(JSON.stringify(ac_sorted[key].geometry.location))
+        var coords = new google.maps.LatLng(ac_sorted[i].geometry.location.lat(), ac_sorted[i].geometry.location.lng())
+        bounds.extend(coords)
+    }
+    map.fitBounds(bounds);*/
+
+    map.setZoom(15);
+    var directionsService = new google.maps.DirectionsService;
+    var directionsDisplay = new google.maps.DirectionsRenderer;
+    directionsDisplay.setMap(map)
+
+    var waypoints = [];
+    for (var i = 1; i < ac_sorted.length - 1; i++) {
+        waypoints.push({
+            location: new google.maps.LatLng(ac_sorted[i].geometry.location.lat(), ac_sorted[i].geometry.location.lng()),
+            stopover: true
+        })
+    }
+    directionsService.route({
+        origin: new google.maps.LatLng(ac_sorted[0].geometry.location.lat(), ac_sorted[0].geometry.location.lng()),
+        destination: new google.maps.LatLng(ac_sorted[ac_sorted.length - 1].geometry.location.lat(), ac_sorted[ac_sorted.length - 1].geometry.location.lng()),
+        waypoints: waypoints,
+        travelMode: 'DRIVING'
+    }, function(response, status) {
+        if (status === 'OK') {
+            var totalDistance = 0;
+            var totalDuration = 0;
+            directionsDisplay.setDirections(response);
+            // calculate time and distance
+            var legs = response.routes[0].legs;
+            for(var i = 0; i < legs.length; i++) {
+                totalDistance += legs[i].distance.value;
+                totalDuration += legs[i].duration.value;
+            }
+            $("#distanceMText").html($("#distanceMText").html() + (totalDistance * 0.000621371).toFixed(2) + " miles");
+            $("#durationMText").html($("#durationMText").html() + (totalDuration / 60.0).toFixed(0) + " minutes");
+        }
+    });
+
     let start = $("#start-date").val();
     let end = $("#end-date").val();
 
@@ -253,14 +412,13 @@ function newReservation(){
         $('#errorModal').modal();
     } else {
         let stops = [];
-        $('input[id^="route-stop"]').each(function() {
+        $('.route-stop').each(function() {
             stops.push($(this).val());
         });
 
         let trunk = $("#trunk").prop('checked');
         let offroad = $("#offroading").prop('checked');
         let rack = $('#kayak').prop('checked');
-
         let resData = {user: userEmail, start: start, end: end, stops: JSON.stringify(stops).split('},{').join('}, {'), override: false, justification: "", needsTrunk: trunk, needsOffRoad: offroad, needsRack: rack};
         userSocket.emit('reservation', resData, function(){
 
@@ -269,11 +427,14 @@ function newReservation(){
 }
 
 function cancelReservation(){
-    $("." + idToDelete).remove();
-    userSocket.emit('cancel', idToDelete, userEmail,function(){
+    let start = $("." + idToDelete)[0].children[1].children[1].children[0].nextSibling.textContent.substring(2);
+    let end = $("." + idToDelete)[0].children[1].children[1].children[2].nextSibling.textContent.substring(2);
+    let carName = $("." + idToDelete)[0].children[1].children[0].firstChild.textContent.split(" ");
+    let license = carName[carName.length - 1]
+    userSocket.emit('cancel', idToDelete, userEmail, license, start, end, function(){
     });
-    //console.log(reservationID)
-    //console.log("cancelled");
+
+    $("." + idToDelete).remove();
     cleanFields();
 }
 function cancelReservationProcess(){
@@ -285,13 +446,60 @@ function cancelReservationProcess(){
 
 function addIDToModal(reservationObj){
     $("#reservation-id-edit").html(reservationObj.id);
-    // console.log("try to delete")
-    // idToDelete = reservationObj.id;
-    // console.log(typeof idToDelete)
-    // cancelReservation();
+    idToDelete = reservationObj.id;
 }
 
 function editReservation(){
+    var totalDistance = 0;
+    var totalDuration = 0;
+    var bounds = new google.maps.LatLngBounds();
+    var ac_sorted = Object.values(sortOnKeys(autocompletes_edit))
+
+    /*for (var i = 0; i < ac_sorted.length; i++) {
+        /*var marker = new google.maps.Marker({
+            position: ac_sorted[i].geometry.location,
+            map: map,
+            status: "active"
+        })
+        //alert(JSON.stringify(ac_sorted[key].geometry.location))
+        var coords = new google.maps.LatLng(ac_sorted[i].geometry.location.lat(), ac_sorted[i].geometry.location.lng())
+        bounds.extend(coords)
+    }
+    map.fitBounds(bounds);*/
+
+    map_edit.setZoom(15);
+    var directionsService = new google.maps.DirectionsService;
+    var directionsDisplay = new google.maps.DirectionsRenderer;
+    directionsDisplay.setMap(map_edit)
+
+    var waypoints = [];
+    for (var i = 1; i < ac_sorted.length - 1; i++) {
+        waypoints.push({
+            location: new google.maps.LatLng(ac_sorted[i].geometry.location.lat(), ac_sorted[i].geometry.location.lng()),
+            stopover: true
+        })
+    }
+    directionsService.route({
+        origin: new google.maps.LatLng(ac_sorted[0].geometry.location.lat(), ac_sorted[0].geometry.location.lng()),
+        destination: new google.maps.LatLng(ac_sorted[ac_sorted.length - 1].geometry.location.lat(), ac_sorted[ac_sorted.length - 1].geometry.location.lng()),
+        waypoints: waypoints,
+        travelMode: 'DRIVING'
+    }, function(response, status) {
+        if (status === 'OK') {
+            var totalDistance = 0;
+            var totalDuration = 0;
+            directionsDisplay.setDirections(response);
+            // calculate time and distance
+            var legs = response.routes[0].legs;
+            for(var i = 0; i < legs.length; i++) {
+                totalDistance += legs[i].distance.value;
+                totalDuration += legs[i].duration.value;
+            }
+            $("#distanceMText-edit").html($("#distanceMText-edit").html() + (totalDistance * 0.000621371).toFixed(2) + " miles");
+            $("#durationMText-edit").html($("#durationMText-edit").html() + (totalDuration / 60.0).toFixed(0) + " minutes");
+        }
+    });
+
     let id =  $("#reservation-id-edit").html();
     let start = $("#start-date-edit").val();
     let end = $("#end-date-edit").val();
@@ -305,8 +513,8 @@ function editReservation(){
     //only makes reservation when start date is before end date, and
     //the reservation is in the present
     if(startDate >= endDate || startDate < today){
-        $("#messageMText").html("The dates you entered are invalid. Please go back and try again.");
-        $('#errorModal').modal();
+        $("#messageMText-edit").html("The dates you entered are invalid. Please go back and try again.");
+        $('#errorModal-edit').modal();
     } else {
         let stops = [];
         $('.route-stop-edit').each(function() {
@@ -317,8 +525,8 @@ function editReservation(){
         let offroad = $("#offroading-edit").prop('checked');
         let rack = $('#kayak-edit').prop('checked');
 
-        let resData = {user: userEmail, start: start, end: end, stops: JSON.stringify(stops).split('},{').join('}, {'), override: false, justification: "", needsTrunk: trunk, needsOffRoad: offroad, needsRack: rack};
-        userSocket.emit('edit', id, resData, function(){
+        let resData = {id: id, user: userEmail, start: start, end: end, stops: JSON.stringify(stops).split('},{').join('}, {'), override: false, justification: "", needsTrunk: trunk, needsOffRoad: offroad, needsRack: rack};
+        userSocket.emit('edit', resData, function(){
 
         });
         idToDelete = id;
@@ -331,7 +539,6 @@ function submitFeedback(reservationID){
     let serviceNeeded = $('#service-needed').is(":checked");
     let cleaningNeeded = $('#cleaning-needed').is(":checked");
     let notCharging = $('#not-charging').is(":checked");
-    // console.log(report);
     userSocket.emit('reportAdded', reservationID, report, serviceNeeded, cleaningNeeded, notCharging);
 }
 
@@ -339,26 +546,43 @@ let idToDelete = "";
 function setDeleteCard(obj){
     idToDelete = obj.id;
 }
+
 class Reservation {
     constructor(reservationData) {
         this.addToDom(reservationData);
     }
     addToDom(r) {
-        // console.log("r");
-        // console.log(r);
         let DOMobject = `<div class="card border-success mb-3 ${r.id}" style="width: 18rem;">
-<img class = "card-img-top" src="https://upload.wikimedia.org/wikipedia/commons/5/5f/DCA_Prius_1Gen_12_2011_3592.JPG" alt="prius placeholder image">
-<div class="card-body">
-<h5 class="card-title">${r.model} ${r.license}</h5>
-<p class="card-text"><strong>Start</strong>: ${r.start} <br>
-<strong>End</strong>: ${r.end} <br>
-<strong>Route</strong>: ${JSON.parse(r.stops)} </p>
-<span style = "display: none;" id = "res-id">${r.id}</span>
-<a href="#" id = "${r.id}" class="btn btn-primary edit" data-toggle="modal" data-target="#editModal" onclick = "addIDToModal(this);">Edit reservation</a>
-<a href="#" id = "${r.id}" class="btn btn-secondary" data-toggle="modal" data-target="#cancelModal" onclick = "setDeleteCard(this);">Cancel</a>
-</div>
-</div>`;
+                            <img class = "card-img-top" src="https://upload.wikimedia.org/wikipedia/commons/5/5f/DCA_Prius_1Gen_12_2011_3592.JPG" alt="prius placeholder image">
+                            <div class="card-body">
+                                <h5 class="card-title">${r.model} ${r.license}</h5>
+                                <p class="card-text"><strong>Start</strong>: ${r.start} <br>
+                                    <strong>End</strong>: ${r.end} <br>
+                                        <strong>Route</strong>: ${JSON.parse(r.stops)} </p>
+                                        <span style = "display: none;" id = "res-id">${r.id}</span>
+                                <a href="#" id = "${r.id}" class="btn btn-primary edit" data-toggle="modal" data-target="#editModal" onclick = "addIDToModal(this);">Edit reservation</a>
+                                <a href="#" id = "${r.id}" class="btn btn-secondary" data-toggle="modal" data-target="#cancelModal" onclick = "setDeleteCard(this);">Cancel</a>
+                            </div>
+                        </div>`;
         $('.cards').append(DOMobject);
+    }
+}
+
+class OldReservation {
+    constructor(reservationData) {
+        this.addToDom(reservationData);
+    }
+    addToDom(r) {
+        let DOMobject = `<div class="card border-danger mb-3" style="width: 18rem;">
+                            <img class = "card-img-top" src="https://media.ed.edmunds-media.com/ford/explorer/2017/oem/2017_ford_explorer_4dr-suv_platinum_rq_oem_1_815.jpg" alt="explorer placeholder image">
+                            <div class="card-body">
+                                <h5 class="card-title">${r.model} ${r.license}</h5>
+                                <p class="card-text"><strong>Start</strong>: ${r.start}<br>
+                                    <strong>End</strong>: ${r.end}</p>
+                                    <a href="#" class="btn btn-primary edit" data-toggle="modal" data-target="#reportModal">Make report </a>
+                            </div>
+                        </div>`;
+        $('#old-reservations').append(DOMobject);
     }
 }
 

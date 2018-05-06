@@ -48,8 +48,8 @@ app.use(session(
        );
 
 var transporter = nodemailer.createTransport({
-    host: "smtp-mail.outlook.com", // hostname
     pool: true,
+    host: "smtp-mail.outlook.com", // hostname
     secureConnection: false, // TLS requires secureConnection to be false
     port: 587, // port for secure SMTP
     auth: {
@@ -60,6 +60,35 @@ var transporter = nodemailer.createTransport({
         ciphers:'SSLv3'
     }
 });
+
+let mailOptions = {
+    from: 'dem_do-not-reply@outlook.com',
+    to: 'jenna_tishler@brown.edu',
+    subject: 'Test',
+    text: "Test"
+}
+
+let mailOptions2 = {
+    from: 'dem_do-not-reply@outlook.com',
+    to: 'jenna.tishler@gmail.com',
+    subject: 'Test',
+    text: "Test"
+}
+
+// let messages = [mailOptions, mailOptions2];
+// transporter.on('idle', function(){
+//     //send next message from the pending queue
+//     while (transporter.isIdle() && messages.length > 0) {
+//         console.log("email")
+//         transporter.sendMail (messages.shift(), function(error, info){
+//             if (error) {
+//                 console.log(error);
+//             } else {
+//                 console.log('Email sent: ' + info.response);
+//             }
+//         });
+//     }
+// });
 
 // let transporter = nodemailer.createTransport({
 //     service: 'gmail',
@@ -108,6 +137,7 @@ conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 
 conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',["Max Luebbers", "2254", "2016 FORD CMAX", "2018-05-21 11:00", "2018-05-21 15:00", JSON.stringify(["home", "work"]), false, "", false, false, false]);
 conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',["dem_test_u_2@outlook.com", "1869", "2011 CHEVROLET EQUINOX", "2018-05-19 14:00", "2018-05-19 17:00", JSON.stringify(["home", "work"]), true, "I have a reason.", false, false, false]);
 conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',["dem_test_u_2@outlook.com", "2254", "2016 FORD CMAX", "2018-05-21 10:00", "2018-05-21 10:30", JSON.stringify(["work", "beach"]), false, "", false, false, false]);
+conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',["dem_test_u@outlook.com", "704", "2015 FORD CMAX", "2017-05-19 11:00", "2017-05-20 11:00", JSON.stringify(["home", "work"]), false, "", false, false, false]);
 
 conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, null)', ["JF2GPBCC3FH253482", "1011", "2016 SUBARU CV", "Black/White", true, 11451.5, false, true, true, false]);
 conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, null)', ["1FMCU59329KC41390", "1018", "2009 FORD ESCAPE", "Black/White", true, 151071.5, false, true, true, false]);
@@ -318,9 +348,7 @@ function nukeEvents() {
 //handles events when a regular user is connnected
 io.of('/user').on('connection', function(socket) {
     socket.on('join', function(user, callback){
-        console.time("Get Reservations Query"); // TIMER START
         conn.query('SELECT * FROM reservations WHERE user = ? ORDER BY start DESC', [user], function(error, data){
-            console.timeEnd("Get Reservations Query"); // TIMER END
             callback(data);
         });
     });
@@ -330,21 +358,36 @@ io.of('/user').on('connection', function(socket) {
         newReservation(socket, reservationInfo, false);
     });
 
-    socket.on('addReservation', function(reservationInfo){
-         conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',[reservationInfo.user, reservationInfo.license, reservationInfo.model, reservationInfo.start, reservationInfo.end, reservationInfo.stops, reservationInfo.override, reservationInfo.justification, reservationInfo.needsTrunk, reservationInfo.needsOffRoad, reservationInfo.needsRack],function(error, data){
-            conn.query('SELECT * FROM reservations WHERE id = ?', [data.lastInsertId], function(error, data){
-                //Send to user and admins
-                //socket.emit('newReservation', data);
-                io.of('/admin').emit("newReservation", data);
+    socket.on('addReservation', function(reservationInfo, callback){
+        conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',[reservationInfo.user, reservationInfo.license, reservationInfo.model, reservationInfo.start, reservationInfo.end, reservationInfo.stops, reservationInfo.override, reservationInfo.justification, reservationInfo.needsTrunk, reservationInfo.needsOffRoad, reservationInfo.needsRack],function(error, data){
+            conn.query('SELECT * FROM reservations WHERE id = ?', [data.lastInsertId], function(error, resData){
+                callback(data.lastInsertId);
+                io.of('/admin').emit("newReservation", resData);
                 //Calendar event
                 var start = new Date(reservationInfo.start);
                 var end = new Date(reservationInfo.end);
-                addEvent(reservationInfo.user + "'s upcoming DEM trip", data.rows[0].model + " " + data.rows[0].license + "\n" + reservationInfo.stops, start.toISOString(), end.toISOString());
+                addEvent(reservationInfo.user + "'s upcoming DEM trip (" +reservationInfo.model + " " + reservationInfo.license + ")", reservationInfo.model + " " + reservationInfo.license + "\n" + reservationInfo.stops, start.toISOString(), end.toISOString());
+            });
+        });
+    });
+
+    socket.on('editReservation', function(reservationInfo, id, callback){
+        console.log('edit')
+        console.log(id)
+        conn.query('UPDATE reservations SET license = ?, model = ?, start = ?, end = ?, stops = ?, override = ?, justification = ?, needsTrunk = ?, needsOffRoad = ?, needsRack = ? WHERE id = ?',[reservationInfo.license, reservationInfo.model, reservationInfo.start, reservationInfo.end, reservationInfo.stops, reservationInfo.override, reservationInfo.justification, reservationInfo.needsTrunk, reservationInfo.needsOffRoad, reservationInfo.needsRack, id],function(error, data){
+            conn.query('SELECT * FROM reservations', function(error, data){
+                console.log(data)
+                callback();
+                io.of('/admin').emit("reservationChange", data);
+                //Calendar event
+                var start = new Date(reservationInfo.start);
+                var end = new Date(reservationInfo.end);
+                addEvent(reservationInfo.user + "'s upcoming DEM trip (" +reservationInfo.model + " " + reservationInfo.license + ")", reservationInfo.model + " " + reservationInfo.license + "\n" + reservationInfo.stops, start.toISOString(), end.toISOString());
             });
         });
     })
 
-    socket.on('edit', function(reservationID, reservationInfo){
+    socket.on('edit', function(reservationInfo){
         //editReservation(reservationID, reservationInfo.start, reservationInfo.end, reservationInfo.stops, reservationInfo.justification);
         // conn.query('DELETE FROM reservations WHERE id = ?', [reservationID], function(error, data){
 
@@ -608,12 +651,15 @@ function newReservation(socket, reservationInfo, isEdit){
     var canCarpool = false;
     var carpoolUsers = [reservationInfo.user];
     //this queries finds overlapping reservations
-    conn.query('SELECT user, start, end, stops FROM reservations WHERE (start >= ? AND start <= ?) OR (end >= ? AND end <= ?)', [reservationInfo.start, reservationInfo.end, reservationInfo.start, reservationInfo.end], function(error, data){
+    conn.query('SELECT id, user, start, end, stops FROM reservations WHERE (start >= ? AND start <= ?) OR (end >= ? AND end <= ?)', [reservationInfo.start, reservationInfo.end, reservationInfo.start, reservationInfo.end], function(error, data){
         console.log(data);
         for(var i = 0; i < data.rows.length; i++){
             //if reservations overlaps and is from same user
+            //unless is editing then allows overlap with same id
             if(data.rows[i].user === reservationInfo.user){
-                isOverlap = true;
+                if(!isEdit || data.rows[i].id != reservationInfo.id){
+                    isOverlap = true;
+                }
             }
             //if reservation is at exact times and is from different user
             else if (data.rows[i].start === reservationInfo.start && data.rows[i].end === reservationInfo.end){
@@ -640,7 +686,7 @@ function newReservation(socket, reservationInfo, isEdit){
                     console.log(reservationInfo)
                     reservationInfo.model = data.rows[0].model;
                     reservationInfo.license = data.rows[0].license;
-                    socket.emit('newReservation', data, reservationInfo);
+                    socket.emit('newReservation', data, reservationInfo, isEdit);
 
                     // conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?)',[reservationInfo.user, data.rows[0].license, data.rows[0].model, reservationInfo.start, reservationInfo.end, reservationInfo.stops, reservationInfo.override, reservationInfo.justification],function(error, data){
                     //     conn.query('SELECT * FROM reservations WHERE id = ?', [data.lastInsertId], function(error, data){
@@ -749,4 +795,3 @@ app.post("/admin/api/Upload", upload.single("imgUploader"), function (req, res) 
     //console.log(req.file.mimetype);
     fs.rename(`public/images/${tempName}`, `public/images/${newName}`);
 });
-
