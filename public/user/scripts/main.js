@@ -154,7 +154,7 @@ function initMap(map) {
         var autocomplete = new google.maps.places.Autocomplete(inputs[i]);
         autocomplete.inputId = inputs[i].id;
 
-        google.maps.event.addListener(autocomplete, 'place_changed', function() {
+        autocomplete.addListener('place_changed', function() {
             var place = this.getPlace();
             //alert(place.formatted_address)
             //alert(this.inputId)
@@ -424,13 +424,14 @@ function deleteStop(obj){
 //     cleanFieldsEdit();
 // }
 
-function newReservation(){
+function newReservation() {
     // let user = // ???
     var totalDistance = 0;
     var totalDuration = 0;
     var bounds = new google.maps.LatLngBounds();
     var ac_sorted = Object.values(sortOnKeys(autocompletes))
 
+    alert(ac_sorted);
     /*for (var i = 0; i < ac_sorted.length; i++) {
         /*var marker = new google.maps.Marker({
             position: ac_sorted[i].geometry.location,
