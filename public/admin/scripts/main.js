@@ -1,15 +1,6 @@
 let adminSocket = io.connect('http://localhost:8080/admin', {forceNew: true});
 let currentVehicle = 0;
 
-function toggle_hidden(id, object){
-    if(object.innerHTML.includes("▼")){
-        object.innerHTML = object.innerHTML.replace("▼", "▲");
-    } else {
-        object.innerHTML = object.innerHTML.replace("▲", "▼");
-    }
-    document.getElementById(id).classList.toggle('hidden');
-}
-
 // Sets up the sockets.
 $(document).ready(function() {
     adminSocket.emit('updatePage', function(){
@@ -17,26 +8,19 @@ $(document).ready(function() {
     });
 
     adminSocket.on('reservationChange', function(reservations){
-        console.log("entering reservation change");
-        console.log(reservations);
         $('#upcoming').empty();
         for(let i = 0; i < reservations.rowCount; i++){
             new Reservation(reservations.rows[i]);
         }
-        console.log("reservation changed");
     });
 
     adminSocket.on('newReservation', function(reservation){
-        console.log("entering new res");
-        console.log(reservation);
         for(let i = 0; i < reservation.rowCount; i++){
             new Reservation(reservation.rows[i]);
         }
-        console.log("new res appended");
     });
 
     adminSocket.on('vehicleChange', function(vehicles){
-        console.log(vehicles);
         for(let i = currentVehicle; i < vehicles.rowCount; i ++){
             new Vehicle(vehicles.rows[i]);
             currentVehicle ++;
@@ -44,36 +28,38 @@ $(document).ready(function() {
     });
 
     adminSocket.on('reportChange', function(reports){
+        // TODO: actually make this do something???
         console.log(reports);
     });
 
-
-    let options = {
-        beforeSubmit: showRequest,  // pre-submit callback
-        uploadProgress: showProgress,
-        resetForm: true,
-        data: {license: ""}
-    };
-
-    // bind to the form's submit event
-    $('#frmUploader').unbind("submit").bind("submit", function(e){
-        e.preventDefault();
-        console.log(document.getElementById("imageInput"));
-        options.data.license = $("#licenseField").val();
-        $(this).ajaxSubmit(options);
-        return true;
-    });
+    setUploader();
+    bindClickHandlers();
 });
 
-// pre-submit callback
-function showRequest(formData, jqForm, options) {
-    console.log("Is submitting file!");
-    return true;
+function bindClickHandlers(){
+    $("#upcoming_title").bind("click", function(){
+        toggle_hidden('upcoming'); 
+        toggle_hidden('upcoming_header');
+        toggleTitle(this);
+    });
+    
+    $("#fleet_title").bind("click", function(){
+        toggle_hidden('fleet_header'); 
+        toggle_hidden('current_fleet');
+        toggleTitle(this);
+    });
 }
 
-function showProgress(event, position, total, percentageComplete){
-    if(percentageComplete === 100){
-        clearForms($("#frmUploader"));
+function toggle_hidden(id){
+    document.getElementById(id).classList.toggle('hidden');
+}
+
+function toggleTitle(object){
+    let content = object.innerHTML;
+    if(content.includes("▼")){
+        object.innerHTML = content.replace("▼", "▲");
+    } else {
+        object.innerHTML = content.replace("▲", "▼");
     }
 }
 
@@ -96,7 +82,6 @@ function modifyUser() {
 
     }
 
-    console.log(email + " || " + isAdmin + " || " + isAdd);
     if(email != undefined && isAdd != undefined){
         if(isAdd  && isAdmin != undefined){
             adminSocket.emit('userAdded', email, isAdmin);
@@ -162,7 +147,11 @@ function setJustificationModal(text){
     $('#justificationModalText').append(text);
 }
 
-// Classes used to create DOM objects.
+/*
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ *  Classes used to make reservations. 
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ */
 class Reservation {
     constructor(reservationData){
         this.addToDOM(reservationData);
@@ -172,12 +161,13 @@ class Reservation {
         if(justification !== ''){
             justification = `<a href = "#justificationModal" class = "btn btn-large btn-primary drop-shadow" data-toggle="modal" onclick = "setJustificationModal('${r.justification}')">Click To See</a>`
         }
-
-        let DOMobject = `<div class = "col-entry reservation-user">${r.user}</div>` +
-            `<div class = "col-entry reservation-start ${r.license}">${r.start}</div>` +
-            `<div class = "col-entry reservation-end ${r.license}">${r.end}</div>` +
-            `<div class = "col-entry reservation-license ${r.license}">${r.license}</div>` +
-            `<div class = "col-entry reservation-pickup ${r.license}">${justification}</div>`;
+        console.log(r);
+        let DOMobject = `<div class = "col-entry reservation-user ${r.license}">${r.user}</div>`
+        + `<div class = "col-entry reservation-start ${r.license}">${r.start}</div>` 
+        + `<div class = "col-entry reservation-end ${r.license}">${r.end}</div>`
+        + `<div class = "col-entry carModel ${r.license}">${r.model}</div>`
+        + `<div class = "col-entry reservation-license ${r.license}">${r.license}</div>` 
+        + `<div class = "col-entry reservation-pickup> ${r.license}">${justification}</div>`;
 
         $('#upcoming').append(DOMobject);
     }
@@ -192,17 +182,44 @@ class Vehicle {
         if(v.isEV){
             carType = "Electric Vehicle";
         }
-        let DOMobject = `<div class = "col-entry ${v.license}">${v.license}</div>` +
-            `<div class = "col-entry ${v.license}">${v.color} ${v.model}</div>` +
-            `<div class = "col-entry ${v.license}">${v.miles} miles</div>` +
-            `<div class = "col-entry ${v.license}">${carType}</div>` +
-            `<div class = "col-entry ${v.license}"><span class="dropdown">` +
-            `<button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Change Status</button>` +
-            `<ul class="dropdown-menu">` +
-            `<a href="#editVehicle"><li><i class="fa fa-wrench"></i> Edit Car</li></a>` +
-            `<div onclick = 'deleteVehicle("${v.license}")'><li><i class="fa fa-archive"></i> Retire</li></div>` +
-            `</ul></span></div>`;
+        let DOMobject = `<div class = "col-entry ${v.license}">${v.license}</div>` + `<div class = "col-entry ${v.license}">${v.color} ${v.model}</div>`
+        + `<div class = "col-entry ${v.license}">${v.miles} miles</div>`
+        + `<div class = "col-entry ${v.license}">${carType}</div>`
+        + `<div class = "col-entry ${v.license}"><span class="dropdown">`
+        + `<button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Change Status</button>`
+        + `<ul class="dropdown-menu">`
+        + `<a href="#editVehicle"><li><i class="fa fa-wrench"></i> Edit Car</li></a>`
+        + `<div onclick = 'deleteVehicle("${v.license}")'><li><i class="fa fa-archive"></i> Retire</li></div>`
+        + `</ul></span></div>`;
+
         $('#current_fleet').append(DOMobject);
+    }
+}
+
+/*
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ *  Functions used for image uploading
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ */
+function setUploader(){
+    let options = {
+        uploadProgress: showProgress,
+        resetForm: true,
+        data: {license: ""}
+    };
+
+    // bind to the form's submit event
+    $('#frmUploader').unbind("submit").bind("submit", function(e){
+        e.preventDefault();
+        options.data.license = $("#licenseField").val();
+        $(this).ajaxSubmit(options);
+        return true;
+    });
+}
+
+function showProgress(event, position, total, percentageComplete){
+    if(percentageComplete === 100){
+        clearForms($("#frmUploader"));
     }
 }
 

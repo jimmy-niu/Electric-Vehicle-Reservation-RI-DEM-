@@ -5,7 +5,8 @@ let http =require('http');
 let nodemailer = require('nodemailer');
 let server = http.createServer(app);
 
-let perf = require('./test/perf-test.js');
+// Uncomment for testing.
+// let perf = require('./test/perf-test.js');
 
 let io = require('socket.io')(server, {wsEngine: 'ws'}); //fix Windows10 issue
 io.listen(server);
@@ -363,10 +364,9 @@ io.of('/user').on('connection', function(socket) {
             conn.query('SELECT * FROM reservations WHERE id = ?', [data.lastInsertId], function(error, resData){
                 callback(data.lastInsertId);
                 io.of('/admin').emit("newReservation", resData);
-                //Calendar event
                 var start = new Date(reservationInfo.start);
                 var end = new Date(reservationInfo.end);
-                addEvent(reservationInfo.user + "'s upcoming DEM trip", reservationInfo.model + " " + reservationInfo.license + "\n" + reservationInfo.stops, start.toISOString(), end.toISOString());
+                addEvent(reservationInfo.user + "'s upcoming DEM trip (" +reservationInfo.model + " " + reservationInfo.license + ")", reservationInfo.model + " " + reservationInfo.license + "\n" + reservationInfo.stops, start.toISOString(), end.toISOString());
             });
         });
     });
@@ -382,7 +382,7 @@ io.of('/user').on('connection', function(socket) {
                 //Calendar event
                 var start = new Date(reservationInfo.start);
                 var end = new Date(reservationInfo.end);
-                addEvent(reservationInfo.user + "'s upcoming DEM trip", reservationInfo.model + " " + reservationInfo.license + "\n" + reservationInfo.stops, start.toISOString(), end.toISOString());
+                addEvent(reservationInfo.user + "'s upcoming DEM trip (" +reservationInfo.model + " " + reservationInfo.license + ")", reservationInfo.model + " " + reservationInfo.license + "\n" + reservationInfo.stops, start.toISOString(), end.toISOString());
             });
         });
     })
