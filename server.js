@@ -60,6 +60,21 @@ var transporter = nodemailer.createTransport({
     }
 });
 
+// let mailOptions = {
+//                 from: 'dem_do-not-reply@outlook.com',
+//                 to: 'jenna_tishler@brown.edu',
+//                 subject: 'New Report Added',
+//                 html: 
+// };
+
+// transporter.sendMail(mailOptions, function(error, info){
+//     if (error) {
+//         console.log(error);
+//     } else {
+//         console.log('Email sent: ' + info.response);
+//     }
+// });
+
 // let transporter = nodemailer.createTransport({
 //     service: 'gmail',
 //     auth: {

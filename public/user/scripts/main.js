@@ -4,7 +4,6 @@ let userSocket = io.connect('http://localhost:8080/user', {forceNew: true});
 let userEmail = "";
 
 let currentCar = undefined;
-//let firstReturnedCar = undefined;
 let alternateVehicles = [];
 let isEditing = false;
 
@@ -74,7 +73,6 @@ $(document).ready(function() {
         console.log("reservation change");
         $("." + idToDelete).remove();
         cleanFields();
-        //console.log(reservations);
     });
 
     userSocket.on('newReservation', function(vehicles, reservation, isEdit){
@@ -82,7 +80,6 @@ $(document).ready(function() {
         currentCar = reservation;
         alternateVehicles = vehicles;
         isEditing = isEdit;
-        //firstReturnedCar = reservation;
         cleanFields();
         if(isEditing){
             $("#carMakeMText-edit").html($("#carMakeMText-edit").html() + reservation.model);
@@ -99,31 +96,12 @@ $(document).ready(function() {
             $("#stopsMText").html($("#stopsMText").html() + JSON.parse(reservation.stops));
             $("#resModal").modal();
         }
-        // if(isEditing){
-        //     $('new-res-label').html('Edit Your Reservation');
-        // } else {
-        //     $('new-res-label').html('Reserve a DEM Vehicle');
-        // }
     });
 
     userSocket.on('reservationID', function(id){
         currentCar.addClass('id');
         console.log($("." + id))
     });
-
-    // userSocket.on('editReservation', function(reservation){
-    //     console.log('edit reservation made');
-    //     cleanFieldsEdit();
-    //     currentCar = reservation;
-    //     //firstReturnedCar = reservation;
-    //     $("#carMakeMText-edit").html($("#carMakeMText-edit").html() + reservation.rows[0].model);
-    //     $("#plateNumberMText-edit").html($("#plateNumberMText-edit").html() + reservation.rows[0].license);
-    //     $("#startMText-edit").html($("#startMText-edit").html() + reservation.rows[0].start);
-    //     $("#endMText-edit").html($("#endMText-edit").html() + reservation.rows[0].end);
-    //     $("#stopsMText-edit").html($("#stopsMText-edit").html() + JSON.parse(reservation.rows[0].stops));
-    //     $("#resModal-edit").modal();
-    //     console.log(reservation);
-    // });
 
     userSocket.on('reservationOverride', function(reservations){
         console.log("reservation vehicle override");
@@ -269,43 +247,6 @@ function cleanFields(){
     }
 }
 
-// function renderCar(){
-//     if(isEditing){
-//         let id = $("#reservation-id-edit").html();
-//         userSocket.emit('editReservation', currentCar, id, function(id){
-//             currentCar.id = id;
-
-//             console.log("drawing car!");
-//             if(currentCar !== undefined){
-//                 new Reservation(currentCar);
-//             }
-
-
-//             if(isEditing){
-//                 cancelReservation();
-//             }
-
-//             cleanFields();
-//         });
-//     } else {
-//         userSocket.emit('addReservation', currentCar, isEditing, function(id){
-//             currentCar.id = id;
-
-//             console.log("drawing car!");
-//             if(currentCar !== undefined){
-//                 new Reservation(currentCar);
-//             }
-
-
-//             if(isEditing){
-//                 cancelReservation();
-//             }
-
-//             cleanFields();
-//         });
-//     }
-// }
-
 function override(){
     if(isEditing){
         currentCar.justification = $("#reasoning-field-edit").val();
@@ -317,13 +258,6 @@ function override(){
 }
 
 function renderCar(){
-    // let newCar = firstReturnedCar;
-    // newCar.rows[0].license = currentCar.license;
-    // newCar.rows[0].model = currentCar.model;
-    //console.log('combine')
-    //userSocket.emit('vehicleOverride', newCar.rows[0].id, newCar.rows[0].license, newCar.rows[0].model, $("#reasoning-field").val());
-    //console.log(isEditing)
-
     if(isEditing){
         let id = $("#reservation-id-edit").html();
         console.log(id)
@@ -355,11 +289,8 @@ function renderCar(){
 }
 
 function setVehicle(index){
-    console.log(alternateVehicles.rows[index]);
-    //currentCar = alternateVehicles.rows[index];
     currentCar.license = alternateVehicles.rows[index].license;
     currentCar.model = alternateVehicles.rows[index].model;
-    console.log(currentCar);
 }
 
 function altVehicles(){
@@ -372,7 +303,6 @@ function altVehicles(){
             $("#altVehiclesForm-edit").empty();
             for(let i = 0; i < alternateVehicles.rowCount; i++){
                 let command = alternateVehicles.rows[i].model + " || " + alternateVehicles.rows[i].license + ` <input type = "radio" name="altVehiclesGroup-edit" onclick = "setVehicle(${i})"><br>`
-                //console.log(command);
                 $("#altVehiclesForm-edit").append(command);
             }
             cleanFields();
@@ -388,7 +318,6 @@ function altVehicles(){
             $("#altVehiclesForm").empty();
             for(let i = 0; i < alternateVehicles.rowCount; i++){
                 let command = alternateVehicles.rows[i].model + " || " + alternateVehicles.rows[i].license + ` <input type = "radio" name="altVehiclesGroup" onclick = "setVehicle(${i})"><br>`
-                //console.log(command);
                 $("#altVehiclesForm").append(command);
             }
             cleanFields();
@@ -413,19 +342,6 @@ function deleteStop(obj){
     let toDelete = obj.parentNode.parentNode;
     toDelete.parentNode.removeChild(toDelete);
 }*/
-
-// function newEditedReservation(){
-//     cancelReservation();
-//     renderCar();
-//     cleanFieldsEdit();
-// }
-
-// function newEditedReservationOverride(){
-//     console.log(idToDelete);
-//     cancelReservation();
-//     combineCards();
-//     cleanFieldsEdit();
-// }
 
 function newReservation() {
     // let user = // ???
@@ -530,11 +446,7 @@ function cancelReservationProcess(){
 
 function addIDToModal(reservationObj){
     $("#reservation-id-edit").html(reservationObj.id);
-    //isEditing = true;
-    // console.log("try to delete")
     idToDelete = reservationObj.id;
-    // console.log(typeof idToDelete)
-    // cancelReservation();
 }
 
 function editReservation(){
@@ -627,7 +539,6 @@ function submitFeedback(reservationID){
     let serviceNeeded = $('#service-needed').is(":checked");
     let cleaningNeeded = $('#cleaning-needed').is(":checked");
     let notCharging = $('#not-charging').is(":checked");
-    // console.log(report);
     userSocket.emit('reportAdded', reservationID, report, serviceNeeded, cleaningNeeded, notCharging);
 }
 
