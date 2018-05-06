@@ -5,7 +5,8 @@ let http =require('http');
 let nodemailer = require('nodemailer');
 let server = http.createServer(app);
 
-let perf = require('./test/perf-test.js');
+// Uncomment for testing.
+// let perf = require('./test/perf-test.js');
 
 let io = require('socket.io')(server, {wsEngine: 'ws'}); //fix Windows10 issue
 io.listen(server);

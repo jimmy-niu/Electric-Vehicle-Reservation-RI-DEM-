@@ -4,6 +4,11 @@ body{
     margin: 0px;
 }
 
+.content{
+    padding: 2vh 2vw 2vh 2vw; 
+    background-color: white;
+}
+
 .header{
     display: flex;
     justify-content: space-between;
@@ -17,7 +22,6 @@ body{
     justify-content: flex-start;
     align-items: flex-end; 
 }
-
 
 #logo{
     height: 8vh;
@@ -35,6 +39,7 @@ body{
     text-align: right;
     float: right !important;
 }
+
 .Nav-Buttons{
     display: flex;
     justify-content: flex-start;
@@ -61,16 +66,30 @@ h2{
     font-size: 3vh;
 }
 
-.content{
-/*    border: 1px solid black;*/
-    padding: 2vh 2vw 2vh 2vw; 
-    background-color: white;
+
+/*****************************************************************/
+/* Table-Related Rules */
+/*****************************************************************/
+
+:root{
+    --reservation_columns: 20% 15% 15% 15% 15% 20%;
+    --fleet_columns: 20% 20% 20% 20% 20%;;
 }
+
 
 .table{
     display: grid;
     padding: 2vh 2vw 1vh 2vw;
-    grid-template-columns: 15% 20% 20% 25% 20%;
+    grid-template-columns: var(--reservation_columns);
+    max-height: 80%;
+    overflow: auto;
+}
+
+.reservation_header {
+    margin-bottom: none;
+    display: grid;
+    padding: 2vh 2vw 0vh 2vw;
+    grid-template-columns: var(--reservation_columns);
     max-height: 80%;
     overflow: auto;
 }
@@ -78,10 +97,20 @@ h2{
 .fleet_table{
     display: grid;
     padding: 2vh 2vw 1vh 2vw;
-    grid-template-columns: 20% 20% 20% 20% 20%;
+    grid-template-columns: var(--fleet_columns);
     max-height: 80%;
     overflow: auto;
 }
+
+.fleet_header {
+    margin-bottom: none;
+    display: grid;
+    padding: 2vh 2vw 0vh 2vw;
+    grid-template-columns: var(--fleet_columns);
+    max-height: 80%;
+    overflow: auto;
+}
+
 .table-header{
     display: flex;
     justify-content: space-around;
@@ -98,12 +127,12 @@ h2{
 .table-title:hover{
     text-shadow: 2px 2px rgb(220, 220, 220);
 }
+
 .table-header-entry{
-    border-bottom: 2px solid black;
     text-decoration: underline;
     font-weight: bold;
     text-align: center;
-    padding-bottom: 1vh;
+    margin-bottom: 0px;
 }
 
 .col-entry{
@@ -112,21 +141,10 @@ h2{
     overflow-wrap: break-word;
 }
 
-.fleet_grid {
-    margin-left: 1.5vw !important;
-}
-.red{
-    background-color: red;
-}
 
-.red:hover{
-    background-color: rgba(255, 0, 0, 0.75);
-    box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
-}
-
-.justi{
-    grid-column: 1 / span 5; 
-}
+/*****************************************************************/
+/* Bootstrap and Misc Rules */
+/*****************************************************************/
 
 .drop-shadow{
     box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
@@ -149,6 +167,7 @@ h2{
 .btn{
     margin-top: 1vh;
 }
+
 .row {
     margin: 0;
 }
