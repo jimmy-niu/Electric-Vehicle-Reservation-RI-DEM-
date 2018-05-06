@@ -351,7 +351,7 @@ io.of('/user').on('connection', function(socket) {
                 //Calendar event
                 var start = new Date(reservationInfo.start);
                 var end = new Date(reservationInfo.end);
-                addEvent(reservationInfo.user + "'s upcoming DEM trip", reservationInfo.model + " " + reservationInfo.license + "\n" + reservationInfo.stops, start.toISOString(), end.toISOString());
+                addEvent(reservationInfo.user + "'s upcoming DEM trip (" +reservationInfo.model + " " + reservationInfo.license + ")", reservationInfo.model + " " + reservationInfo.license + "\n" + reservationInfo.stops, start.toISOString(), end.toISOString());
             });
         });
     });
@@ -367,7 +367,7 @@ io.of('/user').on('connection', function(socket) {
                 //Calendar event
                 var start = new Date(reservationInfo.start);
                 var end = new Date(reservationInfo.end);
-                addEvent(reservationInfo.user + "'s upcoming DEM trip", reservationInfo.model + " " + reservationInfo.license + "\n" + reservationInfo.stops, start.toISOString(), end.toISOString());
+                addEvent(reservationInfo.user + "'s upcoming DEM trip (" +reservationInfo.model + " " + reservationInfo.license + ")", reservationInfo.model + " " + reservationInfo.license + "\n" + reservationInfo.stops, start.toISOString(), end.toISOString());
             });
         });
     })
