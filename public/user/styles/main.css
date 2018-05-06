@@ -21,12 +21,13 @@ body {
     background-size: auto 80%;
     background-position: 1% center;
     background-color: #5cb9e4;
+    overflow-x: hidden;
+    overflow-y: hidden;
 }
 
 .fun-fact {
     height: 50px;
-    margin-left: 80px;
-    padding: 13px;
+    padding: 13px 80px;
 }
 
 .carousel-inner .carousel-item {
@@ -45,12 +46,9 @@ body {
     cursor: pointer;
 }
 
-#new-res-modal {
-    height: 650px;
-}
-
 .modal-body {
     overflow-y: scroll;
+    max-height: 550px;
 }
 
 .btn-danger{
@@ -59,11 +57,6 @@ body {
 
 .btn-success{
     font-weight: 600 !important;
-}
-
-#altVehiclesForm{
-    max-height: 40vh;
-    overflow: auto;
 }
 
 #first-part{
@@ -130,4 +123,8 @@ h3 {
 #decline {
     margin-right: auto;
     font-weight: bold;
+}
+
+#reportModal .modal-body {
+    overflow-y: auto;
 }

@@ -7,9 +7,16 @@ let currentCar = undefined;
 let alternateVehicles = [];
 let isEditing = false;
 
-let reservationTimer = setInterval(function(){
+let reservationTimer = setInterval(function(reservations){
+    let i = 0;
+    while($('.upcomingReservation').get(i) !== undefined){
 
-}, 60000);
+        console.log($('.upcomingReservation').eq(i).find('.end-time').html());
+        i ++;
+
+    }
+
+}, 3000);
 
 var count = 3;
 var count_edit = 3;
@@ -549,12 +556,12 @@ class Reservation {
         this.addToDom(reservationData);
     }
     addToDom(r) {
-        let DOMobject = `<div class="card border-success mb-3 ${r.id}" style="width: 18rem;">
+        let DOMobject = `<div class="card border-success mb-3 ${r.id} upcomingReservation" style="width: 18rem;">
                             <img class = "card-img-top" src="https://upload.wikimedia.org/wikipedia/commons/5/5f/DCA_Prius_1Gen_12_2011_3592.JPG" alt="prius placeholder image">
                             <div class="card-body">
                                 <h5 class="card-title">${r.model} ${r.license}</h5>
-                                <p class="card-text"><strong>Start</strong>: ${r.start} <br>
-                                    <strong>End</strong>: ${r.end} <br>
+                                <p class="card-text"><strong>Start</strong>: <span class="start-time">${r.start}</span> <br>
+                                    <strong>End</strong>:<span class="end-time"> ${r.end}</span> <br>
                                         <strong>Route</strong>: ${JSON.parse(r.stops)} </p>
                                         <span style = "display: none;" id = "res-id">${r.id}</span>
                                 <a href="#" id = "${r.id}" class="btn btn-primary edit" data-toggle="modal" data-target="#editModal" onclick = "addIDToModal(this);">Edit reservation</a>
