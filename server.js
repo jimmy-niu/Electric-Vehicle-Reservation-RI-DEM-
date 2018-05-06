@@ -776,7 +776,8 @@ function reassignReservations(license){
 let tempName = "";
 let Storage = multer.diskStorage({
     destination: function (req, file, callback) {
-        callback(null, "./public/images");
+        callback(null, "./public/admin/media/vehicle_images");
+        callback(null, "./public/user/media/vehicle_images");
     },
     filename: function (req, file, callback) {
         console.log("in filename");
@@ -791,6 +792,8 @@ let fs = require('fs');
 
 app.post("/admin/api/Upload", upload.single("imgUploader"), function (req, res) {
     let newName = `${req.body.license}.${req.file.mimetype.replace("image/", "")}`;
-    //console.log(req.file.mimetype);
-    fs.rename(`public/images/${tempName}`, `public/images/${newName}`);
+    
+    fs.rename(`public/user/media/vehicle_images/${tempName}`, `public/user/media/vehicle_images/${newName}`);
+    
+    fs.rename(`public/admin/media/vehicle_images/${tempName}`, `public/admin/media/vehicle_images/${newName}`);
 });

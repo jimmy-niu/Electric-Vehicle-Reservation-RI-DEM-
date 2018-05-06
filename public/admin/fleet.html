@@ -57,7 +57,9 @@
                 <div id = "current_fleet" class = "fleet_table"></div>
             </div>
         </div>
-
+        
+        <img src = "./media/vehicle_images/orange.jpeg">
+        
 
         <!-- Modals here -->
 
@@ -84,7 +86,7 @@
                         <form id="frmUploader" enctype="multipart/form-data" method="POST" action="api/Upload/">
                             <input id = "imageInput" type="file" accept = ".png, .jpg, .jpeg" name="imgUploader">
                             <input type="submit" name="submit" id="btnSubmit" value="Upload"/>
-                        </form>  
+                        </form>
                         <hr>
 
                         <form>
@@ -105,9 +107,8 @@
                             <br> <br>
                             Equipment Rack: <input type = "checkbox" id="equipChoice">
                         </form>
-
                     </div>
-
+                    
                     <div class="modal-footer">
                         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
 
@@ -116,7 +117,5 @@
                 </div>
             </div>
         </div>
-        <script src="../../test/perf-test.js"></script>
     </body>
-
 </html>

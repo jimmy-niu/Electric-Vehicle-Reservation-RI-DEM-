@@ -63,6 +63,10 @@ function toggleTitle(object){
     }
 }
 
+function insertVehicleImage(id, imgSrc){
+    let img = `<img src = "${imgSrc}"`
+    $(`#${id}`).append()
+}
 function clearForms(obj){
     obj.trigger("reset");
 }
