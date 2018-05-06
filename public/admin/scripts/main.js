@@ -42,7 +42,7 @@ function bindClickHandlers(){
         toggle_hidden('upcoming_header');
         toggleTitle(this);
     });
-    
+
     $("#fleet_title").bind("click", function(){
         toggle_hidden('fleet_header'); 
         toggle_hidden('current_fleet');
@@ -67,6 +67,7 @@ function insertVehicleImage(id, imgSrc){
     let img = `<img src = "${imgSrc}"`
     $(`#${id}`).append()
 }
+
 function clearForms(obj){
     obj.trigger("reset");
 }
@@ -206,25 +207,23 @@ class Vehicle {
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  */
 function setUploader(){
-    let options = {
-        uploadProgress: showProgress,
-        resetForm: true,
-        data: {license: ""}
-    };
-
     // bind to the form's submit event
     $('#frmUploader').unbind("submit").bind("submit", function(e){
         e.preventDefault();
+
+        let options = {
+            resetForm: true,
+            data: {license: ""},
+            success: function(data){
+                console.log("inside the thingy!");
+                console.log(data);
+                console.log("we done!");
+                clearForms($("#frmUploader"));
+            }
+        };
         options.data.license = $("#licenseField").val();
         $(this).ajaxSubmit(options);
-        return true;
     });
-}
-
-function showProgress(event, position, total, percentageComplete){
-    if(percentageComplete === 100){
-        clearForms($("#frmUploader"));
-    }
 }
 
 /*
