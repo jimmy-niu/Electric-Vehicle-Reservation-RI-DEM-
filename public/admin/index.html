@@ -30,7 +30,7 @@
                     <a href = "/logout" style = "font-size: 2vh; color: #D7A342">Logout</a>
                     <a href = "../admin_u/index_admin.html" style = "font-size: 1vh; color: #D7A342">Change to user view</a>
                 </div>
-                
+
             </div>
         </div>
         <div style = "padding: 1vh 2vw 1vh 2vw;">
@@ -101,16 +101,16 @@
 
         </div>
         <div class = "content drop-shadow">
-            <h2 onclick = "toggle_hidden('upcoming', this)" class = "table-title">Upcoming Reservations: ▼</h2>
-            <div class = "headerBar table">
-                <div class = "table-header-entry">Name</div>
+            <h2 id = "upcoming_title" class = "table-title">Upcoming Reservations: ▼</h2>
+            <div id = "upcoming_header" class = "reservation_header">
+                <div class = "table-header-entry">User</div>
                 <div class = "table-header-entry">Start Time</div>
                 <div class = "table-header-entry">End Time</div>
+                <div class = "table-header-entry">Model</div>
                 <div class = "table-header-entry">License Plate</div>
                 <div class = "table-header-entry">Override Justification</div>
             </div>
             <div id = "upcoming" class = "table">
-                
             </div>
         </div>
     </body>

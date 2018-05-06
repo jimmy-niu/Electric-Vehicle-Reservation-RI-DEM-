@@ -44,14 +44,17 @@
             </div>
 
             <div class = "content drop-shadow">
-                <h2 class = "table-title" onclick = "toggle_hidden('current_fleet', this)">Current Fleet: ▼</h2>
-                <div id = "current_fleet" class = "fleet_table">
+                <h2 id = "fleet_title" class = "table-title">Current Fleet: ▼</h2>
+                
+                <div id = "fleet_header" class = "fleet_header">
                     <div class = "table-header-entry">License</div>
                     <div class = "table-header-entry">Model</div>
                     <div class = "table-header-entry">Mileage</div>
                     <div class = "table-header-entry">Car Type</div>
                     <div class = "table-header-entry">Change Status</div>
                 </div>
+                
+                <div id = "current_fleet" class = "fleet_table"></div>
             </div>
         </div>
 
