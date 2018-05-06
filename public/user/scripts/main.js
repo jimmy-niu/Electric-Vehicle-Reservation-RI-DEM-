@@ -472,8 +472,8 @@ function editReservation(){
         let offroad = $("#offroading-edit").prop('checked');
         let rack = $('#kayak-edit').prop('checked');
 
-        let resData = {user: userEmail, start: start, end: end, stops: JSON.stringify(stops).split('},{').join('}, {'), override: false, justification: "", needsTrunk: trunk, needsOffRoad: offroad, needsRack: rack};
-        userSocket.emit('edit', id, resData, function(){
+        let resData = {id: id, user: userEmail, start: start, end: end, stops: JSON.stringify(stops).split('},{').join('}, {'), override: false, justification: "", needsTrunk: trunk, needsOffRoad: offroad, needsRack: rack};
+        userSocket.emit('edit', resData, function(){
 
         });
         idToDelete = id;

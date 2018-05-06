@@ -47,8 +47,8 @@ app.use(session(
        );
 
 var transporter = nodemailer.createTransport({
-    host: "smtp-mail.outlook.com", // hostname
     pool: true,
+    host: "smtp-mail.outlook.com", // hostname
     secureConnection: false, // TLS requires secureConnection to be false
     port: 587, // port for secure SMTP
     auth: {
@@ -60,18 +60,32 @@ var transporter = nodemailer.createTransport({
     }
 });
 
-// let mailOptions = {
-//                 from: 'dem_do-not-reply@outlook.com',
-//                 to: 'jenna_tishler@brown.edu',
-//                 subject: 'New Report Added',
-//                 html: 
-// };
+let mailOptions = {
+    from: 'dem_do-not-reply@outlook.com',
+    to: 'jenna_tishler@brown.edu',
+    subject: 'Test',
+    text: "Test"
+}
 
-// transporter.sendMail(mailOptions, function(error, info){
-//     if (error) {
-//         console.log(error);
-//     } else {
-//         console.log('Email sent: ' + info.response);
+let mailOptions2 = {
+    from: 'dem_do-not-reply@outlook.com',
+    to: 'jenna.tishler@gmail.com',
+    subject: 'Test',
+    text: "Test"
+}
+
+// let messages = [mailOptions, mailOptions2];
+// transporter.on('idle', function(){
+//     //send next message from the pending queue
+//     while (transporter.isIdle() && messages.length > 0) {
+//         console.log("email")
+//         transporter.sendMail (messages.shift(), function(error, info){
+//             if (error) {
+//                 console.log(error);
+//             } else {
+//                 console.log('Email sent: ' + info.response);
+//             }
+//         });
 //     }
 // });
 
@@ -372,7 +386,7 @@ io.of('/user').on('connection', function(socket) {
         });
     })
 
-    socket.on('edit', function(reservationID, reservationInfo){
+    socket.on('edit', function(reservationInfo){
         //editReservation(reservationID, reservationInfo.start, reservationInfo.end, reservationInfo.stops, reservationInfo.justification);
         // conn.query('DELETE FROM reservations WHERE id = ?', [reservationID], function(error, data){
 
@@ -636,12 +650,15 @@ function newReservation(socket, reservationInfo, isEdit){
     var canCarpool = false;
     var carpoolUsers = [reservationInfo.user];
     //this queries finds overlapping reservations
-    conn.query('SELECT user, start, end, stops FROM reservations WHERE (start >= ? AND start <= ?) OR (end >= ? AND end <= ?)', [reservationInfo.start, reservationInfo.end, reservationInfo.start, reservationInfo.end], function(error, data){
+    conn.query('SELECT id, user, start, end, stops FROM reservations WHERE (start >= ? AND start <= ?) OR (end >= ? AND end <= ?)', [reservationInfo.start, reservationInfo.end, reservationInfo.start, reservationInfo.end], function(error, data){
         console.log(data);
         for(var i = 0; i < data.rows.length; i++){
             //if reservations overlaps and is from same user
+            //unless is editing then allows overlap with same id
             if(data.rows[i].user === reservationInfo.user){
-                isOverlap = true;
+                if(!isEdit || data.rows[i].id != reservationInfo.id){
+                    isOverlap = true;
+                }
             }
             //if reservation is at exact times and is from different user
             else if (data.rows[i].start === reservationInfo.start && data.rows[i].end === reservationInfo.end){
