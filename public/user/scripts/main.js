@@ -7,16 +7,6 @@ let currentCar = undefined;
 let alternateVehicles = [];
 let isEditing = false;
 
-let reservationTimer = setInterval(function(reservations){
-    let i = 0;
-    while($('.upcomingReservation').get(i) !== undefined){
-
-        console.log($('.upcomingReservation').eq(i).find('.end-time').html());
-        i ++;
-
-    }
-
-}, 3000);
 
 var count = 3;
 var count_edit = 3;
@@ -142,6 +132,30 @@ $(document).ready(function() {
 
     flatpickr(".datePicker", {enableTime: true, dateFormat: "Y-m-d H:i"});
     jQuery.fn.carousel.Constructor.TRANSITION_DURATION = 5000;
+
+
+    let reservationTimer = setInterval(function(){
+        let i = 0;
+        while($('.upcomingReservation').get(i) !== undefined){
+            let a = $('.upcomingReservation').eq(i).find('.card-end').html().toString().trim();
+            let n = new Date(Date.now());
+            let b = n.getFullYear() + "-" + ("0"+(n.getMonth() + 1)).slice(-2) + "-" + ("0" + n.getDate()).slice(-2) + " " + ("0" + (n.getHours())).slice(-2) + ":" + ("0" + n.getMinutes()).slice(-2);
+            console.log(a);
+            console.log(b);
+            if(a < b){
+                console.log("hello");
+                let r = {model: $('.upcomingReservation').eq(i).find('.card-model').html(), license: $('.upcomingReservation').eq(i).find('.card-license').html(),
+                         start: $('.upcomingReservation').eq(i).find('.card-start').html(), end: $('.upcomingReservation').eq(i).find('.card-end').html()}
+                $('.upcomingReservation').eq(i).remove();
+                new OldReservation(r);
+
+            }
+            i ++;
+
+        }
+
+    }, 3000);
+
 });
 
 
@@ -559,9 +573,9 @@ class Reservation {
         let DOMobject = `<div class="card border-success mb-3 ${r.id} upcomingReservation" style="width: 18rem;">
                             <img class = "card-img-top" src="https://upload.wikimedia.org/wikipedia/commons/5/5f/DCA_Prius_1Gen_12_2011_3592.JPG" alt="prius placeholder image">
                             <div class="card-body">
-                                <h5 class="card-title">${r.model} ${r.license}</h5>
-                                <p class="card-text"><strong>Start</strong>: <span class="start-time">${r.start}</span> <br>
-                                    <strong>End</strong>:<span class="end-time"> ${r.end}</span> <br>
+                                <h5 class="card-title"><span class="card-model">${r.model}</span><span class="card-license">${r.license}</span></h5>
+                                <p class="card-text"><strong>Start</strong>: <span class="card-start">${r.start}</span> <br>
+                                    <strong>End</strong>:<span class="card-end"> ${r.end}</span> <br>
                                         <strong>Route</strong>: ${JSON.parse(r.stops)} </p>
                                         <span style = "display: none;" id = "res-id">${r.id}</span>
                                 <a href="#" id = "${r.id}" class="btn btn-primary edit" data-toggle="modal" data-target="#editModal" onclick = "addIDToModal(this);">Edit reservation</a>
@@ -586,7 +600,7 @@ class OldReservation {
                                     <a href="#" class="btn btn-primary edit" data-toggle="modal" data-target="#reportModal">Make report </a>
                             </div>
                         </div>`;
-        $('#old-reservations').append(DOMobject);
+        $('#old-reservations').prepend(DOMobject);
     }
 }
 
