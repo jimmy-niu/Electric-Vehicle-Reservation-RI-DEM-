@@ -15,12 +15,16 @@ body {
     padding: 2vh 2vw 2vh 2vw;
 }
 
-.carousel {
+#fact-container {
     background-image: url("../media/polar_bear.png");
     background-repeat: no-repeat;
     background-size: auto 80%;
     background-position: 1% center;
     background-color: #5cb9e4;
+    padding-left: 60px;
+}
+
+.carousel {
     overflow-x: hidden;
     overflow-y: hidden;
 }
