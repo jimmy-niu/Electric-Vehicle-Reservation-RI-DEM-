@@ -21,12 +21,13 @@ body {
     background-size: auto 80%;
     background-position: 1% center;
     background-color: #5cb9e4;
+    overflow-x: hidden;
+    overflow-y: hidden;
 }
 
 .fun-fact {
     height: 50px;
-    margin-left: 80px;
-    padding: 13px;
+    padding: 13px 80px;
 }
 
 .carousel-inner .carousel-item {
