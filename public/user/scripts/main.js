@@ -4,7 +4,6 @@ let userSocket = io.connect('http://localhost:8080/user', {forceNew: true});
 let userEmail = "";
 
 let currentCar = undefined;
-//let firstReturnedCar = undefined;
 let alternateVehicles = [];
 let isEditing = false;
 
@@ -13,8 +12,11 @@ let reservationTimer = setInterval(function(){
 }, 60000);
 
 var count = 3;
+var count_edit = 3;
 var map = null;
+var map_edit = null;
 var autocompletes = {};
+var autocompletes_edit = {};
 
 // Sets up the sockets.
 $(document).ready(function() {
@@ -24,17 +26,25 @@ $(document).ready(function() {
         mapTypeId: google.maps.MapTypeId.ROADMAP
     };
     map = new google.maps.Map(document.getElementById("mapCanvas"), mapOptions);
+    map_edit = new google.maps.Map(document.getElementById("mapCanvasEdit"), mapOptions);
 
     if (navigator.geolocation) {
          navigator.geolocation.getCurrentPosition(function (position) {
              initialLocation = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
              map.setCenter(initialLocation);
+             map_edit.setCenter(initialLocation);
          });
     }
     initMap(map);
     $("#add-stop").click(function() {
         count++;
         addStop(count);
+        initMap(count);
+    });
+
+    $("#add-stop-edit").click(function() {
+        count_edit++;
+        addStopEdit(count);
         initMap(count);
     });
 
@@ -63,7 +73,6 @@ $(document).ready(function() {
         console.log("reservation change");
         $("." + idToDelete).remove();
         cleanFields();
-        //console.log(reservations);
     });
 
     userSocket.on('newReservation', function(vehicles, reservation, isEdit){
@@ -71,7 +80,6 @@ $(document).ready(function() {
         currentCar = reservation;
         alternateVehicles = vehicles;
         isEditing = isEdit;
-        //firstReturnedCar = reservation;
         cleanFields();
         if(isEditing){
             $("#carMakeMText-edit").html($("#carMakeMText-edit").html() + reservation.model);
@@ -88,31 +96,12 @@ $(document).ready(function() {
             $("#stopsMText").html($("#stopsMText").html() + JSON.parse(reservation.stops));
             $("#resModal").modal();
         }
-        // if(isEditing){
-        //     $('new-res-label').html('Edit Your Reservation');
-        // } else {
-        //     $('new-res-label').html('Reserve a DEM Vehicle');
-        // }
     });
 
     userSocket.on('reservationID', function(id){
         currentCar.addClass('id');
         console.log($("." + id))
     });
-
-    // userSocket.on('editReservation', function(reservation){
-    //     console.log('edit reservation made');
-    //     cleanFieldsEdit();
-    //     currentCar = reservation;
-    //     //firstReturnedCar = reservation;
-    //     $("#carMakeMText-edit").html($("#carMakeMText-edit").html() + reservation.rows[0].model);
-    //     $("#plateNumberMText-edit").html($("#plateNumberMText-edit").html() + reservation.rows[0].license);
-    //     $("#startMText-edit").html($("#startMText-edit").html() + reservation.rows[0].start);
-    //     $("#endMText-edit").html($("#endMText-edit").html() + reservation.rows[0].end);
-    //     $("#stopsMText-edit").html($("#stopsMText-edit").html() + JSON.parse(reservation.rows[0].stops));
-    //     $("#resModal-edit").modal();
-    //     console.log(reservation);
-    // });
 
     userSocket.on('reservationOverride', function(reservations){
         console.log("reservation vehicle override");
@@ -150,6 +139,7 @@ $(document).ready(function() {
 function initMap(map) {
     var i;
     var inputs = document.getElementsByClassName('route-stop');
+    var inputs_edit = document.getElementsByClassName('route-stop-edit');
     for (i = 0; i < inputs.length; i++) {
         var autocomplete = new google.maps.places.Autocomplete(inputs[i]);
         autocomplete.inputId = inputs[i].id;
@@ -160,36 +150,18 @@ function initMap(map) {
             //alert(this.inputId)
             autocompletes[this.inputId] = place;
         })
-        /*var marker = new google.maps.Marker({
-          map: map
-        });
-        autocomplete.addListener('place_changed', function() {
-          var place = autocomplete.getPlace();
-          f (!place.geometry) {
-            // User entered the name of a Place that was not suggested and
-            // pressed the Enter key, or the Place Details request failed.
-            window.alert("No details available for input: '" + place.name + "'");
-            return;
-          }
-          if (place.geometry.viewport) {
-            map.fitBounds(place.geometry.viewport);
-          } else {
-            map.setCenter(place.geometry.location);
-            map.setZoom(10);  // Why 17? Because it looks good.
-          }
-          marker.setPosition(place.geometry.location);
-          marker.setVisible(true);
-        }*/
-    //var input2 = document.getElementById('endInput');
-    //var autocomplete2 = new google.maps.places.Autocomplete(input2);
-    //autocomplete.addListener('placed_changed', () => console.log(autocomplete.getPlace()))
     }
-    /*for (i = 0; i < autocompletes.length; i++) {
-        autocompletes[i].addListener('place_changed', function() {
-            var place = autocomplete.getPlace();
-            alert(place)
+    for (i = 0; i < inputs_edit.length; i++) {
+        var autocomplete = new google.maps.places.Autocomplete(inputs_edit[i]);
+        autocomplete.inputId = inputs_edit[i].id;
+
+        autocomplete.addListener('place_changed', function() {
+            var place = this.getPlace();
+            //alert(place.formatted_address)
+            //alert(this.inputId)
+            autocompletes_edit[this.inputId] = place;
         })
-    }*/
+    }
 }
 
 function getBoundsZoomLevel(bounds, mapDim) {
@@ -225,6 +197,15 @@ function addStop(count) {
         <label>Destination <span onclick = "deleteStop(this);"
         id = "deleteX">x</span></label>
         <input type=text class="form-control route-stop" id="route-stop-` + count + `">
+        </div>`
+    $('#stops').append(newStop);
+}
+
+function addStopEdit(count) {
+    let newStop = ` <div class="form-group">
+        <label>Destination <span onclick = "deleteStop(this);"
+        id = "deleteX">x</span></label>
+        <input type=text class="form-control route-stop-edit" id="route-stop-` + count + `">
         </div>`
     $('#stops').append(newStop);
 }
@@ -266,43 +247,6 @@ function cleanFields(){
     }
 }
 
-// function renderCar(){
-//     if(isEditing){
-//         let id = $("#reservation-id-edit").html();
-//         userSocket.emit('editReservation', currentCar, id, function(id){
-//             currentCar.id = id;
-
-//             console.log("drawing car!");
-//             if(currentCar !== undefined){
-//                 new Reservation(currentCar);
-//             }
-
-
-//             if(isEditing){
-//                 cancelReservation();
-//             }
-
-//             cleanFields();
-//         });
-//     } else {
-//         userSocket.emit('addReservation', currentCar, isEditing, function(id){
-//             currentCar.id = id;
-
-//             console.log("drawing car!");
-//             if(currentCar !== undefined){
-//                 new Reservation(currentCar);
-//             }
-
-
-//             if(isEditing){
-//                 cancelReservation();
-//             }
-
-//             cleanFields();
-//         });
-//     }
-// }
-
 function override(){
     if(isEditing){
         currentCar.justification = $("#reasoning-field-edit").val();
@@ -314,13 +258,6 @@ function override(){
 }
 
 function renderCar(){
-    // let newCar = firstReturnedCar;
-    // newCar.rows[0].license = currentCar.license;
-    // newCar.rows[0].model = currentCar.model;
-    //console.log('combine')
-    //userSocket.emit('vehicleOverride', newCar.rows[0].id, newCar.rows[0].license, newCar.rows[0].model, $("#reasoning-field").val());
-    //console.log(isEditing)
-
     if(isEditing){
         let id = $("#reservation-id-edit").html();
         console.log(id)
@@ -352,11 +289,8 @@ function renderCar(){
 }
 
 function setVehicle(index){
-    console.log(alternateVehicles.rows[index]);
-    //currentCar = alternateVehicles.rows[index];
     currentCar.license = alternateVehicles.rows[index].license;
     currentCar.model = alternateVehicles.rows[index].model;
-    console.log(currentCar);
 }
 
 function altVehicles(){
@@ -369,7 +303,6 @@ function altVehicles(){
             $("#altVehiclesForm-edit").empty();
             for(let i = 0; i < alternateVehicles.rowCount; i++){
                 let command = alternateVehicles.rows[i].model + " || " + alternateVehicles.rows[i].license + ` <input type = "radio" name="altVehiclesGroup-edit" onclick = "setVehicle(${i})"><br>`
-                //console.log(command);
                 $("#altVehiclesForm-edit").append(command);
             }
             cleanFields();
@@ -385,7 +318,6 @@ function altVehicles(){
             $("#altVehiclesForm").empty();
             for(let i = 0; i < alternateVehicles.rowCount; i++){
                 let command = alternateVehicles.rows[i].model + " || " + alternateVehicles.rows[i].license + ` <input type = "radio" name="altVehiclesGroup" onclick = "setVehicle(${i})"><br>`
-                //console.log(command);
                 $("#altVehiclesForm").append(command);
             }
             cleanFields();
@@ -410,19 +342,6 @@ function deleteStop(obj){
     let toDelete = obj.parentNode.parentNode;
     toDelete.parentNode.removeChild(toDelete);
 }*/
-
-// function newEditedReservation(){
-//     cancelReservation();
-//     renderCar();
-//     cleanFieldsEdit();
-// }
-
-// function newEditedReservationOverride(){
-//     console.log(idToDelete);
-//     cancelReservation();
-//     combineCards();
-//     cleanFieldsEdit();
-// }
 
 function newReservation() {
     // let user = // ???
@@ -493,7 +412,7 @@ function newReservation() {
         $('#errorModal').modal();
     } else {
         let stops = [];
-        $('input[id^="route-stop"]').each(function() {
+        $('.route-stop').each(function() {
             stops.push($(this).val());
         });
 
@@ -527,14 +446,60 @@ function cancelReservationProcess(){
 
 function addIDToModal(reservationObj){
     $("#reservation-id-edit").html(reservationObj.id);
-    //isEditing = true;
-    // console.log("try to delete")
     idToDelete = reservationObj.id;
-    // console.log(typeof idToDelete)
-    // cancelReservation();
 }
 
 function editReservation(){
+    var totalDistance = 0;
+    var totalDuration = 0;
+    var bounds = new google.maps.LatLngBounds();
+    var ac_sorted = Object.values(sortOnKeys(autocompletes_edit))
+
+    /*for (var i = 0; i < ac_sorted.length; i++) {
+        /*var marker = new google.maps.Marker({
+            position: ac_sorted[i].geometry.location,
+            map: map,
+            status: "active"
+        })
+        //alert(JSON.stringify(ac_sorted[key].geometry.location))
+        var coords = new google.maps.LatLng(ac_sorted[i].geometry.location.lat(), ac_sorted[i].geometry.location.lng())
+        bounds.extend(coords)
+    }
+    map.fitBounds(bounds);*/
+
+    map_edit.setZoom(15);
+    var directionsService = new google.maps.DirectionsService;
+    var directionsDisplay = new google.maps.DirectionsRenderer;
+    directionsDisplay.setMap(map_edit)
+
+    var waypoints = [];
+    for (var i = 1; i < ac_sorted.length - 1; i++) {
+        waypoints.push({
+            location: new google.maps.LatLng(ac_sorted[i].geometry.location.lat(), ac_sorted[i].geometry.location.lng()),
+            stopover: true
+        })
+    }
+    directionsService.route({
+        origin: new google.maps.LatLng(ac_sorted[0].geometry.location.lat(), ac_sorted[0].geometry.location.lng()),
+        destination: new google.maps.LatLng(ac_sorted[ac_sorted.length - 1].geometry.location.lat(), ac_sorted[ac_sorted.length - 1].geometry.location.lng()),
+        waypoints: waypoints,
+        travelMode: 'DRIVING'
+    }, function(response, status) {
+        if (status === 'OK') {
+            var totalDistance = 0;
+            var totalDuration = 0;
+            directionsDisplay.setDirections(response);
+            // calculate time and distance
+            var legs = response.routes[0].legs;
+            for(var i = 0; i < legs.length; i++) {
+                totalDistance += legs[i].distance.value;
+                totalDuration += legs[i].duration.value;
+            }
+            $("#distanceMText-edit").html($("#distanceMText-edit").html() + (totalDistance * 0.000621371).toFixed(2) + " miles");
+            $("#durationMText-edit").html($("#durationMText-edit").html() + (totalDuration / 60.0).toFixed(0) + " minutes");
+        }
+    });
+
     let id =  $("#reservation-id-edit").html();
     let start = $("#start-date-edit").val();
     let end = $("#end-date-edit").val();
@@ -574,7 +539,6 @@ function submitFeedback(reservationID){
     let serviceNeeded = $('#service-needed').is(":checked");
     let cleaningNeeded = $('#cleaning-needed').is(":checked");
     let notCharging = $('#not-charging').is(":checked");
-    // console.log(report);
     userSocket.emit('reportAdded', reservationID, report, serviceNeeded, cleaningNeeded, notCharging);
 }
 

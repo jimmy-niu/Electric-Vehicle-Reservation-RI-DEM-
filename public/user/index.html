@@ -24,7 +24,7 @@
             <div id = "first-part">
                 <img id="logo" src="./media/ri-dem-logo.png" alt="DEM logo">
                 <div id = "title" >
-                    <span style = "font-size: 6vh;">V</span>ehicle Reservations
+                    <span style = "font-size: 6vh;">Vehicle Reservations</span>
                 </div>
             </div>
 
@@ -32,7 +32,7 @@
 
             <div>
                 <div id = "user">
-                    <span id = "user_email">Welcome, dem_test_u@outlook.com <br>
+                    <span id = "user_email">Welcome, dem_test_u_2@outlook.com <br>
                     </span>
                     <a href = "/logout" style = "font-size: 2vh; color: #D7A342">Logout</a>
                 </div>
@@ -167,18 +167,18 @@
                                 </div>
                                 <div class="form-group">
                                     <label>Pickup Location</label>
-                                    <input class="form-control route-stop-edit" type="text" placeholder="Enter a location"/>
+                                    <input class="form-control route-stop-edit" id="route-stop-1" type="text" placeholder="Enter a location"/>
                                     <!-- <input type=text class="form-control route-stop" value="Work"> -->
                                 </div>
                                 <div id="stops-edit">
                                     <div class="form-group">
                                         <label>Destination</label>
-                                        <input class="form-control route-stop-edit" type="text" placeholder="Enter a location"/>
+                                        <input class="form-control route-stop-edit" id="route-stop-2" type="text" placeholder="Enter a location"/>
                                         <!-- <input type=text class="form-control route-stop" value="Home"> -->
                                     </div>
                                     <div class="form-group">
                                         <label>Dropoff Location</label>
-                                        <input class="form-control route-stop-edit" type="text" placeholder="Enter a location"/>
+                                        <input class="form-control route-stop-edit" id="route-stop-3"type="text" placeholder="Enter a location"/>
                                         <!-- <input type=text class="form-control route-stop" value="Home"> -->
                                     </div>
                                     <div id = "new-stops-edit"></div>
@@ -276,7 +276,10 @@
                             <p id = "startMText-edit">Start Time: </p>
                             <p id = "endMText-edit">End Date: </p>
                             <p id = "stopsMText-edit">Stops: </p>
+                            <p id = "distanceMText-edit">Total distance: </p>
+                            <p id = "durationMText-edit">Total duration: </p>
                         </div>
+                        <div id="mapCanvasEdit" style="width: 450px; height: 300px; margin-left:auto; margin-right:auto; margin-bottom: 10px"></div>
                         <div class="modal-footer" id="acceptDeclineButtons-edit">
                             <button type="button" id="decline-edit" class="btn btn-danger" data-toggle="modal" data-target="#declineModal-edit" data-dismiss="modal">Decline</button>
                             <button type="button" id="confirm-res-edit" class="btn btn-success" data-dismiss="modal" onclick = "renderCar();">Confirm Reservation</button>
