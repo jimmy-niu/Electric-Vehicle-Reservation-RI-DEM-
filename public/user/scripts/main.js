@@ -75,9 +75,11 @@ $(document).ready(function() {
         cleanFields();
     });
 
-    userSocket.on('newReservation', function(vehicles, reservation, isEdit){
+    userSocket.on('newReservation', function(vehicles, reservation, isEdit, canCarpool, carpoolUsers){
         console.log('new reservation made');
         currentCar = reservation;
+        currentCar.canCarpool = canCarpool;
+        currentCar.carpoolUsers = carpoolUsers;
         alternateVehicles = vehicles;
         isEditing = isEdit;
         cleanFields();
@@ -462,38 +464,38 @@ function editReservation(){
     }
     map.fitBounds(bounds);*/
 
-    map_edit.setZoom(15);
-    var directionsService = new google.maps.DirectionsService;
-    var directionsDisplay = new google.maps.DirectionsRenderer;
-    directionsDisplay.setMap(map_edit)
+    // map_edit.setZoom(15);
+    // var directionsService = new google.maps.DirectionsService;
+    // var directionsDisplay = new google.maps.DirectionsRenderer;
+    // directionsDisplay.setMap(map_edit)
 
-    var waypoints = [];
-    for (var i = 1; i < ac_sorted.length - 1; i++) {
-        waypoints.push({
-            location: new google.maps.LatLng(ac_sorted[i].geometry.location.lat(), ac_sorted[i].geometry.location.lng()),
-            stopover: true
-        })
-    }
-    directionsService.route({
-        origin: new google.maps.LatLng(ac_sorted[0].geometry.location.lat(), ac_sorted[0].geometry.location.lng()),
-        destination: new google.maps.LatLng(ac_sorted[ac_sorted.length - 1].geometry.location.lat(), ac_sorted[ac_sorted.length - 1].geometry.location.lng()),
-        waypoints: waypoints,
-        travelMode: 'DRIVING'
-    }, function(response, status) {
-        if (status === 'OK') {
-            var totalDistance = 0;
-            var totalDuration = 0;
-            directionsDisplay.setDirections(response);
-            // calculate time and distance
-            var legs = response.routes[0].legs;
-            for(var i = 0; i < legs.length; i++) {
-                totalDistance += legs[i].distance.value;
-                totalDuration += legs[i].duration.value;
-            }
-            $("#distanceMText-edit").html($("#distanceMText-edit").html() + (totalDistance * 0.000621371).toFixed(2) + " miles");
-            $("#durationMText-edit").html($("#durationMText-edit").html() + (totalDuration / 60.0).toFixed(0) + " minutes");
-        }
-    });
+    // var waypoints = [];
+    // for (var i = 1; i < ac_sorted.length - 1; i++) {
+    //     waypoints.push({
+    //         location: new google.maps.LatLng(ac_sorted[i].geometry.location.lat(), ac_sorted[i].geometry.location.lng()),
+    //         stopover: true
+    //     })
+    // }
+    // directionsService.route({
+    //     origin: new google.maps.LatLng(ac_sorted[0].geometry.location.lat(), ac_sorted[0].geometry.location.lng()),
+    //     destination: new google.maps.LatLng(ac_sorted[ac_sorted.length - 1].geometry.location.lat(), ac_sorted[ac_sorted.length - 1].geometry.location.lng()),
+    //     waypoints: waypoints,
+    //     travelMode: 'DRIVING'
+    // }, function(response, status) {
+    //     if (status === 'OK') {
+    //         var totalDistance = 0;
+    //         var totalDuration = 0;
+    //         directionsDisplay.setDirections(response);
+    //         // calculate time and distance
+    //         var legs = response.routes[0].legs;
+    //         for(var i = 0; i < legs.length; i++) {
+    //             totalDistance += legs[i].distance.value;
+    //             totalDuration += legs[i].duration.value;
+    //         }
+    //         $("#distanceMText-edit").html($("#distanceMText-edit").html() + (totalDistance * 0.000621371).toFixed(2) + " miles");
+    //         $("#durationMText-edit").html($("#durationMText-edit").html() + (totalDuration / 60.0).toFixed(0) + " minutes");
+    //     }
+    // });
 
     let id =  $("#reservation-id-edit").html();
     let start = $("#start-date-edit").val();
