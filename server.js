@@ -48,6 +48,7 @@ app.use(session(
 
 var transporter = nodemailer.createTransport({
     pool: true,
+    maxConnections: 10,
     host: "smtp-mail.outlook.com", // hostname
     secureConnection: false, // TLS requires secureConnection to be false
     port: 587, // port for secure SMTP
@@ -60,19 +61,19 @@ var transporter = nodemailer.createTransport({
     }
 });
 
-let mailOptions = {
-    from: 'dem_do-not-reply@outlook.com',
-    to: 'jenna_tishler@brown.edu',
-    subject: 'Test',
-    text: "Test"
-}
+// let mailOptions = {
+//     from: 'dem_do-not-reply@outlook.com',
+//     to: 'jenna_tishler@brown.edu',
+//     subject: 'Test',
+//     text: "Test"
+// }
 
-let mailOptions2 = {
-    from: 'dem_do-not-reply@outlook.com',
-    to: 'jenna.tishler@gmail.com',
-    subject: 'Test',
-    text: "Test"
-}
+// let mailOptions2 = {
+//     from: 'dem_do-not-reply@outlook.com',
+//     to: 'jenna.tishler@gmail.com',
+//     subject: 'Test',
+//     text: "Test"
+// }
 
 // let messages = [mailOptions, mailOptions2];
 // transporter.on('idle', function(){
@@ -131,7 +132,7 @@ conn.query('CREATE TABLE IF NOT EXISTS reservations(id INTEGER PRIMARY KEY AUTOI
 conn.query('CREATE TABLE IF NOT EXISTS reports(id INTEGER PRIMARY KEY AUTOINCREMENT, reservation INTEGER, report TEXT, needsService BOOLEAN, needsCleaning BOOLEAN, notCharging BOOLEAN)');
 
 //test data
-conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',["Jenna Tishler", "1322", "2015 FORD CMAX", "2018-05-18 11:00", "2018-05-18 15:00", JSON.stringify(["Work", "Home"]), false, "", false, false, false]);
+conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',["jenna.tishler@gmail.com", "1322", "2015 FORD CMAX", "2018-05-09 01:00", "2018-05-09 03:00", JSON.stringify(["563 North Main Street, Providence, RI, USA", "565 Atwells Avenue, Providence, RI, USA", "563 North Main Street, Providence, RI, USA"]), false, "", false, false, false]);
 conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',["Jenna Tishler", "704", "2015 FORD CMAX", "2018-05-19 11:00", "2018-05-20 11:00", JSON.stringify(["home", "work"]), false, "", false, false, false]);
 conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',["Max Luebbers", "2254", "2016 FORD CMAX", "2018-05-21 11:00", "2018-05-21 15:00", JSON.stringify(["home", "work"]), false, "", false, false, false]);
 conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',["dem_test_u_2@outlook.com", "1869", "2011 CHEVROLET EQUINOX", "2018-05-19 14:00", "2018-05-19 17:00", JSON.stringify(["home", "work"]), true, "I have a reason.", false, false, false]);
@@ -662,7 +663,7 @@ function newReservation(socket, reservationInfo, isEdit){
             }
             //if reservation is at exact times and is from different user
             else if (data.rows[i].start === reservationInfo.start && data.rows[i].end === reservationInfo.end){
-                if (stopsEqual(data.rows[i].stops, reservationInfo.stops)){
+                if (data.rows[i].stops === reservationInfo.stops){
                     canCarpool = true;
                     carpoolUsers.push(data.rows[i].user);
                 }
@@ -675,33 +676,14 @@ function newReservation(socket, reservationInfo, isEdit){
         else {
             //alerts users via email that they have reservations at the same time w/ same stops
             if(canCarpool){
-                console.log("You can carpool!");
-                //email users or pop up?
+                carpoolNotification(carpoolUsers);
             }
 
             conn.query('SELECT license, model FROM vehicles WHERE extraTrunk >= ? AND offRoad >= ? AND equipRack >= ? AND license NOT IN (SELECT license FROM reservations WHERE start <= ? AND end >= ?) ORDER BY isEV DESC, featureScore ASC, miles ASC', [needsTrunk, needsOffRoad, needsRack, reservationInfo.end, reservationInfo.start], function(error, data){
-                console.log(data);
                 if(data.rows.length !== 0){
-                    console.log(reservationInfo)
                     reservationInfo.model = data.rows[0].model;
                     reservationInfo.license = data.rows[0].license;
                     socket.emit('newReservation', data, reservationInfo, isEdit);
-
-                    // conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?)',[reservationInfo.user, data.rows[0].license, data.rows[0].model, reservationInfo.start, reservationInfo.end, reservationInfo.stops, reservationInfo.override, reservationInfo.justification],function(error, data){
-                    //     conn.query('SELECT * FROM reservations WHERE id = ?', [data.lastInsertId], function(error, data){
-                    //         //Send to user and admins
-                    //         if(isEdit){
-                    //             socket.emit('editReservation', data);
-                    //         } else {
-                    //             socket.emit('newReservation', data);
-                    //         }
-                    //         io.of('/admin').emit("newReservation", data);
-                    //         //Calendar event
-                    //         var start = new Date(reservationInfo.start);
-                    //         var end = new Date(reservationInfo.end);
-                    //         addEvent(reservationInfo.user + "'s upcoming DEM trip", data.rows[0].model + " " + data.rows[0].license + "\n" + reservationInfo.stops, start.toISOString(), end.toISOString());
-                    //     });
-                    // });
                 } else {
                     socket.emit('noVehicle');
                 }
@@ -735,17 +717,38 @@ function submitFeedback(reservationID, report){
     });
 }
 
-function stopsEqual(stops1, stops2){
-    if(stops1.length !== stops2.length){
-        return false;
-    } else {
-        for(var i = 0; i < stops1.length; i++){
-            if(stops1[i] !== stops2[i]){
-                return false;
-            }
+function carpoolNotification(carpoolUsers){
+    carpoolUsers = ["jimmyniu@brown.edu", "emily_kasbohm@brown.edu"];
+    console.log("You can carpool!");
+    let mailOptionsList = [];
+    for(let i = 0; i < carpoolUsers.length; i++){
+        let mailOptions = {
+            from: 'dem_do-not-reply@outlook.com',
+            to: carpoolUsers[i],
+            subject: 'Carpool Notifcation',
+            text: "You are receiving this email because you and at least one other " +
+             "user have made reservations at the same exact time with the same route." +
+             "We strongly encourage you to talk to them and arrange a carpool. By " + 
+             "carpooling just twice a week, 1,600 pounds of greenhouse gases can be " +
+             "kept out of the air each year. Here is a list of the people you can " +
+             "carpool with:" + JSON.stringify(carpoolUsers)
         }
+        mailOptionsList.push(mailOptions);
     }
-    return true;
+
+    transporter.on('idle', function(){
+        //send next message from the pending queue
+        while (transporter.isIdle() && mailOptionsList.length > 0) {
+            console.log("email")
+            transporter.sendMail (mailOptionsList.shift(), function(error, info){
+                if (error) {
+                    console.log(error);
+                } else {
+                    console.log('Email sent: ' + info.response);
+                }
+            });
+        }
+    });
 }
 
 //id TEXT, license TEXT, model TEXT, color TEXT, inService BOOLEAN, miles DOUBLE PRECISION, isEV BOOLEAN, extraTrunk BOOLEAN, offRoad BOOLEAN, equipRack BOOLEAN
