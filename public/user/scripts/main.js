@@ -7,6 +7,10 @@ let currentCar = undefined;
 let firstReturnedCar = undefined;
 let alternateVehicles = [];
 
+let reservationTimer = setInterval(function(){
+
+}, 60000);
+
 var count = 3;
 var map = null;
 var autocompletes = {};
@@ -19,7 +23,7 @@ $(document).ready(function() {
         mapTypeId: google.maps.MapTypeId.ROADMAP
     };
     map = new google.maps.Map(document.getElementById("mapCanvas"), mapOptions);
-    
+
     if (navigator.geolocation) {
          navigator.geolocation.getCurrentPosition(function (position) {
              initialLocation = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
@@ -32,7 +36,7 @@ $(document).ready(function() {
         addStop(count);
         initMap(count);
     });
-    
+
     $("#resModal").on("shown.bs.modal", function () {
         google.maps.event.trigger(map, "resize");
     });
@@ -46,7 +50,11 @@ $(document).ready(function() {
 
     userSocket.emit('join',userEmail, function(reservations){
         for(var i = 0; i < reservations.rows.length; i++){
-            new Reservation(reservations.rows[i]);
+            if(Date.parse(reservations.rows[i].end) > Date.now()){
+                new Reservation(reservations.rows[i]);
+            } else {
+                new OldReservation(reservations.rows[i]);
+            }
         }
     });
 
@@ -182,7 +190,7 @@ function getBoundsZoomLevel(bounds, mapDim) {
 
 function addStop(count) {
     let newStop = ` <div class="form-group">
-        <label>Destination <span onclick = "deleteStop(this);" 
+        <label>Destination <span onclick = "deleteStop(this);"
         id = "deleteX">x</span></label>
         <input type=text class="form-control route-stop" id="route-stop-` + count + `">
         </div>`
@@ -295,7 +303,7 @@ function altVehiclesEdit(){
 /*function addStop() {
     console.log("we in addStop");
     let newStop = ` <div class="form-group">
-<label>Destination <span onclick = "deleteStop(this);" 
+<label>Destination <span onclick = "deleteStop(this);"
 id = "deleteX">x</span></label>
 <input type=text class="form-control route-stop">
 </div>`
@@ -473,26 +481,43 @@ let idToDelete = "";
 function setDeleteCard(obj){
     idToDelete = obj.id;
 }
+
 class Reservation {
     constructor(reservationData) {
         this.addToDom(reservationData);
     }
     addToDom(r) {
-        // console.log("r");
-        // console.log(r);
         let DOMobject = `<div class="card border-success mb-3 ${r.id}" style="width: 18rem;">
-<img class = "card-img-top" src="https://upload.wikimedia.org/wikipedia/commons/5/5f/DCA_Prius_1Gen_12_2011_3592.JPG" alt="prius placeholder image">
-<div class="card-body">
-<h5 class="card-title">${r.model} ${r.license}</h5>
-<p class="card-text"><strong>Start</strong>: ${r.start} <br>
-<strong>End</strong>: ${r.end} <br>
-<strong>Route</strong>: ${JSON.parse(r.stops)} </p>
-<span style = "display: none;" id = "res-id">${r.id}</span>
-<a href="#" id = "${r.id}" class="btn btn-primary edit" data-toggle="modal" data-target="#editModal" onclick = "addIDToModal(this);">Edit reservation</a>
-<a href="#" id = "${r.id}" class="btn btn-secondary" data-toggle="modal" data-target="#cancelModal" onclick = "setDeleteCard(this);">Cancel</a>
-</div>
-</div>`;
+                            <img class = "card-img-top" src="https://upload.wikimedia.org/wikipedia/commons/5/5f/DCA_Prius_1Gen_12_2011_3592.JPG" alt="prius placeholder image">
+                            <div class="card-body">
+                                <h5 class="card-title">${r.model} ${r.license}</h5>
+                                <p class="card-text"><strong>Start</strong>: ${r.start} <br>
+                                    <strong>End</strong>: ${r.end} <br>
+                                        <strong>Route</strong>: ${JSON.parse(r.stops)} </p>
+                                        <span style = "display: none;" id = "res-id">${r.id}</span>
+                                <a href="#" id = "${r.id}" class="btn btn-primary edit" data-toggle="modal" data-target="#editModal" onclick = "addIDToModal(this);">Edit reservation</a>
+                                <a href="#" id = "${r.id}" class="btn btn-secondary" data-toggle="modal" data-target="#cancelModal" onclick = "setDeleteCard(this);">Cancel</a>
+                            </div>
+                        </div>`;
         $('.cards').append(DOMobject);
+    }
+}
+
+class OldReservation {
+    constructor(reservationData) {
+        this.addToDom(reservationData);
+    }
+    addToDom(r) {
+        let DOMobject = `<div class="card border-danger mb-3" style="width: 18rem;">
+                            <img class = "card-img-top" src="https://media.ed.edmunds-media.com/ford/explorer/2017/oem/2017_ford_explorer_4dr-suv_platinum_rq_oem_1_815.jpg" alt="explorer placeholder image">
+                            <div class="card-body">
+                                <h5 class="card-title">${r.model} ${r.license}</h5>
+                                <p class="card-text"><strong>Start</strong>: ${r.start}<br>
+                                    <strong>End</strong>: ${r.end}</p>
+                                    <a href="#" class="btn btn-primary edit" data-toggle="modal" data-target="#reportModal">Make report </a>
+                            </div>
+                        </div>`;
+        $('#old-reservations').append(DOMobject);
     }
 }
 
