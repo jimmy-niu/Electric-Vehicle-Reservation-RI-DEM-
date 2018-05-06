@@ -4,8 +4,9 @@ let userSocket = io.connect('http://localhost:8080/user', {forceNew: true});
 let userEmail = "";
 
 let currentCar = undefined;
-let firstReturnedCar = undefined;
+//let firstReturnedCar = undefined;
 let alternateVehicles = [];
+let isEditing = false;
 
 let reservationTimer = setInterval(function(){
 
@@ -60,37 +61,58 @@ $(document).ready(function() {
 
     userSocket.on('reservationChange', function(reservations){
         console.log("reservation change");
+        $("." + idToDelete).remove();
+        cleanFields();
         //console.log(reservations);
     });
 
-    userSocket.on('newReservation', function(vehicles, reservation){
+    userSocket.on('newReservation', function(vehicles, reservation, isEdit){
         console.log('new reservation made');
-        cleanFields();
         currentCar = reservation;
         alternateVehicles = vehicles;
-        firstReturnedCar = reservation;
-        $("#carMakeMText").html($("#carMakeMText").html() + reservation.model);
-        $("#plateNumberMText").html($("#plateNumberMText").html() + reservation.license);
-        $("#startMText").html($("#startMText").html() + reservation.start);
-        $("#endMText").html($("#endMText").html() + reservation.end);
-        $("#stopsMText").html($("#stopsMText").html() + JSON.parse(reservation.stops));
-        $("#resModal").modal();
-        console.log(reservation);
+        isEditing = isEdit;
+        //firstReturnedCar = reservation;
+        cleanFields();
+        if(isEditing){
+            $("#carMakeMText-edit").html($("#carMakeMText-edit").html() + reservation.model);
+            $("#plateNumberMText-edit").html($("#plateNumberMText-edit").html() + reservation.license);
+            $("#startMText-edit").html($("#startMText-edit").html() + reservation.start);
+            $("#endMText-edit").html($("#endMText-edit").html() + reservation.end);
+            $("#stopsMText-edit").html($("#stopsMText-edit").html() + JSON.parse(reservation.stops));
+            $("#resModal-edit").modal();
+        } else {
+            $("#carMakeMText").html($("#carMakeMText").html() + reservation.model);
+            $("#plateNumberMText").html($("#plateNumberMText").html() + reservation.license);
+            $("#startMText").html($("#startMText").html() + reservation.start);
+            $("#endMText").html($("#endMText").html() + reservation.end);
+            $("#stopsMText").html($("#stopsMText").html() + JSON.parse(reservation.stops));
+            $("#resModal").modal();
+        }
+        // if(isEditing){
+        //     $('new-res-label').html('Edit Your Reservation');
+        // } else {
+        //     $('new-res-label').html('Reserve a DEM Vehicle');
+        // }
     });
 
-    userSocket.on('editReservation', function(reservation){
-        console.log('edit reservation made');
-        cleanFieldsEdit();
-        currentCar = reservation;
-        firstReturnedCar = reservation;
-        $("#carMakeMText-edit").html($("#carMakeMText-edit").html() + reservation.rows[0].model);
-        $("#plateNumberMText-edit").html($("#plateNumberMText-edit").html() + reservation.rows[0].license);
-        $("#startMText-edit").html($("#startMText-edit").html() + reservation.rows[0].start);
-        $("#endMText-edit").html($("#endMText-edit").html() + reservation.rows[0].end);
-        $("#stopsMText-edit").html($("#stopsMText-edit").html() + JSON.parse(reservation.rows[0].stops));
-        $("#resModal-edit").modal();
-        console.log(reservation);
+    userSocket.on('reservationID', function(id){
+        currentCar.addClass('id');
+        console.log($("." + id))
     });
+
+    // userSocket.on('editReservation', function(reservation){
+    //     console.log('edit reservation made');
+    //     cleanFieldsEdit();
+    //     currentCar = reservation;
+    //     //firstReturnedCar = reservation;
+    //     $("#carMakeMText-edit").html($("#carMakeMText-edit").html() + reservation.rows[0].model);
+    //     $("#plateNumberMText-edit").html($("#plateNumberMText-edit").html() + reservation.rows[0].license);
+    //     $("#startMText-edit").html($("#startMText-edit").html() + reservation.rows[0].start);
+    //     $("#endMText-edit").html($("#endMText-edit").html() + reservation.rows[0].end);
+    //     $("#stopsMText-edit").html($("#stopsMText-edit").html() + JSON.parse(reservation.rows[0].stops));
+    //     $("#resModal-edit").modal();
+    //     console.log(reservation);
+    // });
 
     userSocket.on('reservationOverride', function(reservations){
         console.log("reservation vehicle override");
@@ -101,13 +123,23 @@ $(document).ready(function() {
     });
 
     userSocket.on('noVehicle', function(){
-        $("#messageMText").html("There is no vehicle available at that time that meets your needs.");
-        $('#errorModal').modal();
+        if(isEditing){
+            $("#messageMText-edit").html("There is no vehicle available at that time that meets your needs.");
+            $('#errorModal-edit').modal();
+        } else {
+            $("#messageMText").html("There is no vehicle available at that time that meets your needs.");
+            $('#errorModal').modal();
+        }
     });
 
     userSocket.on('isOverlap', function(){
-        $("#messageMText").html("You have an existing reservation that overlaps with the times you selected.");
-        $('#errorModal').modal();
+        if(isEditing){
+            $("#messageMText-edit").html("You have an existing reservation that overlaps with the times you selected.");
+            $('#errorModal-edit').modal();
+        } else {
+           $("#messageMText").html("You have an existing reservation that overlaps with the times you selected.");
+            $('#errorModal').modal();
+        }
     });
 
     flatpickr(".datePicker", {enableTime: true, dateFormat: "Y-m-d H:i"});
@@ -216,89 +248,153 @@ function sortOnKeys(dict) {
 }
 
 function cleanFields(){
-    $("#carMakeMText").html("Car Model: ");
-    $("#plateNumberMText").html("License Plate: ");
-    $("#startMText").html("Start Time: ");
-    $("#endMText").html("End Time: ");
-    $("#stopsMText").html("Stops: ");
-    $("#distanceMText").html("Total distance: ");
-    $("#durationMText").html("Total duration: ");
-    $("#new-stops").empty();
+    if(isEditing){
+        console.log('clean edit')
+        $("#carMakeMText-edit").html("Car Model: ");
+        $("#plateNumberMText-edit").html("License Plate: ");
+        $("#startMText-edit").html("Start Time: ");
+        $("#endMText-edit").html("End Time: ");
+        $("#stopsMText-edit").html("Stops: ");
+        $("#new-stops-edit").empty();
+    } else {
+        $("#carMakeMText").html("Car Model: ");
+        $("#plateNumberMText").html("License Plate: ");
+        $("#startMText").html("Start Time: ");
+        $("#endMText").html("End Time: ");
+        $("#stopsMText").html("Stops: ");
+        $("#new-stops").empty();
+    }
 }
 
-function cleanFieldsEdit(){
-    $("#carMakeMText-edit").html("Car Model: ");
-    $("#plateNumberMText-edit").html("License Plate: ");
-    $("#startMText-edit").html("Start Time: ");
-    $("#endMText-edit").html("End Time: ");
-    $("#stopsMText-edit").html("Stops: ");
-    $("#new-stops-edit").empty();
+// function renderCar(){
+//     if(isEditing){
+//         let id = $("#reservation-id-edit").html();
+//         userSocket.emit('editReservation', currentCar, id, function(id){
+//             currentCar.id = id;
+
+//             console.log("drawing car!");
+//             if(currentCar !== undefined){
+//                 new Reservation(currentCar);
+//             }
+
+
+//             if(isEditing){
+//                 cancelReservation();
+//             }
+
+//             cleanFields();
+//         });
+//     } else {
+//         userSocket.emit('addReservation', currentCar, isEditing, function(id){
+//             currentCar.id = id;
+
+//             console.log("drawing car!");
+//             if(currentCar !== undefined){
+//                 new Reservation(currentCar);
+//             }
+
+
+//             if(isEditing){
+//                 cancelReservation();
+//             }
+
+//             cleanFields();
+//         });
+//     }
+// }
+
+function override(){
+    if(isEditing){
+        currentCar.justification = $("#reasoning-field-edit").val();
+    } else{
+        currentCar.justification = $("#reasoning-field").val();
+    }
+    currentCar.override = true;
+    renderCar();
 }
 
 function renderCar(){
-    userSocket.emit('addReservation', currentCar);
-    console.log("drawing car!");
-    if(currentCar !== undefined){
-        new Reservation(currentCar, 0);
+    // let newCar = firstReturnedCar;
+    // newCar.rows[0].license = currentCar.license;
+    // newCar.rows[0].model = currentCar.model;
+    //console.log('combine')
+    //userSocket.emit('vehicleOverride', newCar.rows[0].id, newCar.rows[0].license, newCar.rows[0].model, $("#reasoning-field").val());
+    //console.log(isEditing)
+
+    if(isEditing){
+        let id = $("#reservation-id-edit").html();
+        console.log(id)
+        userSocket.emit('editReservation', currentCar, id, function(){
+            console.log('added')
+            currentCar.id = id;
+
+            $("." + idToDelete).remove();
+
+            new Reservation(currentCar);
+
+            currentCar = undefined;
+            $("#reasoning-field-edit").val("");
+
+            cleanFields();
+        });
+    } else {
+        userSocket.emit('addReservation', currentCar, function(id){
+            console.log('added')
+            currentCar.id = id;
+            new Reservation(currentCar);
+
+            currentCar = undefined;
+            $("#reasoning-field").val("");
+
+            cleanFields();
+        });
     }
-    cleanFields();
-}
-
-function combineCards(){
-    let newCar = firstReturnedCar;
-    newCar.rows[0].license = currentCar.license;
-    newCar.rows[0].model = currentCar.model;
-    new Reservation(newCar, 0);
-
-    userSocket.emit('vehicleOverride', newCar.rows[0].id, newCar.rows[0].license, newCar.rows[0].model, $("#reasoning-field").val());
-
-    firstReturnedCar = undefined;
-    currentCar = undefined;
-    cleanFields();
-    $("#reasoning-field").val("");
 }
 
 function setVehicle(index){
-    console.log(index);
-    currentCar = alternateVehicles.rows[index];
+    console.log(alternateVehicles.rows[index]);
+    //currentCar = alternateVehicles.rows[index];
+    currentCar.license = alternateVehicles.rows[index].license;
+    currentCar.model = alternateVehicles.rows[index].model;
     console.log(currentCar);
 }
 
 function altVehicles(){
-    if($("#reasoning-field").val().trim().length > 0){
-        $("#appealModal").modal('hide');
-        $("#altModal").modal();
-        $("#justification-help").addClass('d-none');
+    if(isEditing){
+        if($("#reasoning-field-edit").val().trim().length > 0){
+            $("#appealModal-edit").modal('hide');
+            $("#altModal-edit").modal();
+            $("#justification-help-edit").addClass('d-none');
 
-        $("#altVehiclesForm").empty();
-        for(let i = 0; i < alternateVehicles.rowCount; i++){
-            let command = alternateVehicles.rows[i].model + " || " + alternateVehicles.rows[i].license + ` <input type = "radio" name="altVehiclesGroup" onclick = "setVehicle(${i})"><br>`
-            //console.log(command);
-            $("#altVehiclesForm").append(command);
+            $("#altVehiclesForm-edit").empty();
+            for(let i = 0; i < alternateVehicles.rowCount; i++){
+                let command = alternateVehicles.rows[i].model + " || " + alternateVehicles.rows[i].license + ` <input type = "radio" name="altVehiclesGroup-edit" onclick = "setVehicle(${i})"><br>`
+                //console.log(command);
+                $("#altVehiclesForm-edit").append(command);
+            }
+            cleanFields();
+        } else {
+            $("#justification-help-edit").removeClass('d-none');
         }
-        cleanFields();
     } else {
-        $("#justification-help").removeClass('d-none');
+        if($("#reasoning-field").val().trim().length > 0){
+            $("#appealModal").modal('hide');
+            $("#altModal").modal();
+            $("#justification-help").addClass('d-none');
+
+            $("#altVehiclesForm").empty();
+            for(let i = 0; i < alternateVehicles.rowCount; i++){
+                let command = alternateVehicles.rows[i].model + " || " + alternateVehicles.rows[i].license + ` <input type = "radio" name="altVehiclesGroup" onclick = "setVehicle(${i})"><br>`
+                //console.log(command);
+                $("#altVehiclesForm").append(command);
+            }
+            cleanFields();
+        } else {
+            $("#justification-help").removeClass('d-none');
+        }
     }
 }
 
-function altVehiclesEdit(){
-    if($("#reasoning-field-edit").val().trim().length > 0){
-        $("#appealModal-edit").modal('hide');
-        $("#altModal-edit").modal();
-        $("#justification-help-edit").addClass('d-none');
-
-        $("#altVehiclesForm-edit").empty();
-        for(let i = 0; i < alternateVehicles.rowCount; i++){
-            let command = alternateVehicles.rows[i].model + " || " + alternateVehicles.rows[i].license + ` <input type = "radio" name="altVehiclesGroup" onclick = "setVehicle(${i})"><br>`
-            //console.log(command);
-            $("#altVehiclesForm-edit").append(command);
-        }
-        cleanFieldsEdit();
-    } else {
-        $("#justification-help-edit").removeClass('d-none');
-    }
-}
 
 /*function addStop() {
     console.log("we in addStop");
@@ -315,18 +411,18 @@ function deleteStop(obj){
     toDelete.parentNode.removeChild(toDelete);
 }*/
 
-function newEditedReservation(){
-    cancelReservation();
-    renderCar();
-    cleanFieldsEdit();
-}
+// function newEditedReservation(){
+//     cancelReservation();
+//     renderCar();
+//     cleanFieldsEdit();
+// }
 
-function newEditedReservationOverride(){
-    console.log(idToDelete);
-    cancelReservation();
-    combineCards();
-    cleanFieldsEdit();
-}
+// function newEditedReservationOverride(){
+//     console.log(idToDelete);
+//     cancelReservation();
+//     combineCards();
+//     cleanFieldsEdit();
+// }
 
 function newReservation(){
     // let user = // ???
@@ -411,11 +507,14 @@ function newReservation(){
 }
 
 function cancelReservation(){
-    $("." + idToDelete).remove();
-    userSocket.emit('cancel', idToDelete, userEmail,function(){
+    let start = $("." + idToDelete)[0].children[1].children[1].children[0].nextSibling.textContent.substring(2);
+    let end = $("." + idToDelete)[0].children[1].children[1].children[2].nextSibling.textContent.substring(2);
+    let carName = $("." + idToDelete)[0].children[1].children[0].firstChild.textContent.split(" ");
+    let license = carName[carName.length - 1]
+    userSocket.emit('cancel', idToDelete, userEmail, license, start, end, function(){
     });
-    //console.log(reservationID)
-    //console.log("cancelled");
+
+    $("." + idToDelete).remove();
     cleanFields();
 }
 function cancelReservationProcess(){
@@ -427,8 +526,9 @@ function cancelReservationProcess(){
 
 function addIDToModal(reservationObj){
     $("#reservation-id-edit").html(reservationObj.id);
+    //isEditing = true;
     // console.log("try to delete")
-    // idToDelete = reservationObj.id;
+    idToDelete = reservationObj.id;
     // console.log(typeof idToDelete)
     // cancelReservation();
 }
@@ -447,8 +547,8 @@ function editReservation(){
     //only makes reservation when start date is before end date, and
     //the reservation is in the present
     if(startDate >= endDate || startDate < today){
-        $("#messageMText").html("The dates you entered are invalid. Please go back and try again.");
-        $('#errorModal').modal();
+        $("#messageMText-edit").html("The dates you entered are invalid. Please go back and try again.");
+        $('#errorModal-edit').modal();
     } else {
         let stops = [];
         $('.route-stop-edit').each(function() {
