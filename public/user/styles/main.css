@@ -21,28 +21,14 @@ body {
     background-size: auto 80%;
     background-position: 1% center;
     background-color: #5cb9e4;
-    padding-left: 60px;
+    height: 50px;
+    font-weight: bold;
+    color: white;
 }
 
 .carousel {
-    overflow-x: hidden;
-    overflow-y: hidden;
-}
-
-.fun-fact {
-    height: 50px;
-    padding: 13px 80px;
-}
-
-.carousel-inner .carousel-item {
-    transition: -webkit-transform 4s ease;
-    transition: transform 4s ease;
-    transition: transform 4s ease, -webkit-transform 4s ease;
-  }
-
-.fun-fact p {
-    font-weight: bold;
-    color: white;
+    margin-left: 80px;
+    padding-top: 12px;
 }
 
 #deleteX {
