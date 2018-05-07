@@ -222,7 +222,6 @@ function editVehicle(){
                        isEV: carType, extraTrunk: trunk, offRoad: offRoad, equipRack: equipmentRack};
         adminSocket.emit('vehicleEdited', vehicle);
     }
-    //cleanFields();
 }
 
 function deleteVehicle(license){
