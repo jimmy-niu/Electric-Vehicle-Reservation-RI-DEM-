@@ -70,6 +70,10 @@ $(document).ready(function() {
         cleanFields();
     });
 
+    userSocket.on('reassignReservation', function(data){
+         console.log("reservations reassigned");
+    });
+
     userSocket.on('newReservation', function(vehicles, reservation, isEdit, canCarpool, carpoolUsers){
         console.log('new reservation made');
         currentCar = reservation;
@@ -155,8 +159,7 @@ $(document).ready(function() {
     flatpickr(".datePicker", {
         enableTime: true,
         dateFormat: "Y-m-d H:i",
-        minDate: "today",
-        // defaultDate: "today",
+        minDate: "today"
     });
 
     jQuery.fn.carousel.Constructor.TRANSITION_DURATION = 5000;
