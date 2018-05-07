@@ -391,7 +391,7 @@ function altVehicles(){
                 let command = alternateVehicles.rows[i].model + " || " + alternateVehicles.rows[i].license + ` <input type = "radio" name="altVehiclesGroup-edit" onclick = "setVehicle(${i})"><br>`
                 $("#altVehiclesForm-edit").append(command);
             }
-            //cleanFields();
+            cleanFields();
         } else {
             $("#justification-help-edit").removeClass('d-none');
         }
@@ -406,7 +406,7 @@ function altVehicles(){
                 let command = alternateVehicles.rows[i].model + " || " + alternateVehicles.rows[i].license + ` <input type = "radio" name="altVehiclesGroup" onclick = "setVehicle(${i})"><br>`
                 $("#altVehiclesForm").append(command);
             }
-            //cleanFields();
+            cleanFields();
         } else {
             $("#justification-help").removeClass('d-none');
         }
