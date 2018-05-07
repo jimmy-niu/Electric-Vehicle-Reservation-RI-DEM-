@@ -250,16 +250,6 @@ function addEvent(title, bodytext, start, end) {
         },
         "Start": start, //"2018-04-28T00:00:00.000Z",
         "End": end, //"2018-04-28T00:30:00.000Z"
-        /*,
-        "Attendees": [
-            {
-                "EmailAddress": {
-                    "Address": email,
-                    "Name": name
-                },
-                "Type": "Required"
-            }
-        ]*/
     };
 
     var addEventParameters = {
