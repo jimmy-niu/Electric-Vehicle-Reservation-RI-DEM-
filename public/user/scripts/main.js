@@ -140,8 +140,8 @@ $(document).ready(function() {
             let a = $('.upcomingReservation').eq(i).find('.card-end').html().toString().trim();
             let n = new Date(Date.now());
             let b = n.getFullYear() + "-" + ("0"+(n.getMonth() + 1)).slice(-2) + "-" + ("0" + n.getDate()).slice(-2) + " " + ("0" + (n.getHours())).slice(-2) + ":" + ("0" + n.getMinutes()).slice(-2);
-            console.log(a);
-            console.log(b);
+//            console.log(a);
+//            console.log(b);
             if(a < b){
                 console.log("hello");
                 let r = {model: $('.upcomingReservation').eq(i).find('.card-model').html(), license: $('.upcomingReservation').eq(i).find('.card-license').html(),
@@ -314,6 +314,7 @@ function renderCar(){
 function setVehicle(index){
     currentCar.license = alternateVehicles.rows[index].license;
     currentCar.model = alternateVehicles.rows[index].model;
+    currentCar.image = alternateVehicles.rows[index].image;
 }
 
 function altVehicles(){
@@ -570,8 +571,9 @@ class Reservation {
         this.addToDom(reservationData);
     }
     addToDom(r) {
+        let imageFilePath = "./media/vehicle_images/"
         let DOMobject = `<div class="card border-success mb-3 ${r.id} upcomingReservation" style="width: 18rem;">
-                            <img class = "card-img-top" src="https://upload.wikimedia.org/wikipedia/commons/5/5f/DCA_Prius_1Gen_12_2011_3592.JPG" alt="prius placeholder image">
+                            <img class = "card-img-top" src="${imageFilePath + r.image}">
                             <div class="card-body">
                                 <h5 class="card-title"><span class="card-model">${r.model}</span><span class="card-license">${r.license}</span></h5>
                                 <p class="card-text"><strong>Start</strong>: <span class="card-start">${r.start}</span> <br>
