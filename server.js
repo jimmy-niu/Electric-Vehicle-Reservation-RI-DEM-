@@ -544,36 +544,64 @@ app.get('/auth/outlook',
         function(req, res) {
 });
 
-app.get('/admin/download/users', function(req, res){
-    exportUsers(function(){
-        res.download(__dirname + '/public/admin/temp/users.csv',function(){
-            fs.unlink(__dirname + '/public/admin/temp/users.csv');
+app.get('/admin/download/users', 
+    function(req, res) {
+    var user_email = req.user._json.EmailAddress;
+    if (adminEmails.includes(user_email)) {
+        exportUsers(function(){
+            res.download(__dirname + '/public/admin/temp/users.csv',function(){
+                fs.unlink(__dirname + '/public/admin/temp/users.csv');
+            });
         });
-    });
+    } else {
+        console.log("not authorized");
+        res.redirect("/");
+    }
 });
 
-app.get('/admin/download/vehicles', function(req, res){
-    exportVehicles(function(){
-        res.download(__dirname + '/public/admin/temp/vehicles.csv',function(){
-            fs.unlink(__dirname + '/public/admin/temp/vehicles.csv');
+app.get('/admin/download/vehicles',
+    function(req, res) {
+    var user_email = req.user._json.EmailAddress;
+    if (adminEmails.includes(user_email)) {
+        exportVehicles(function(){
+            res.download(__dirname + '/public/admin/temp/vehicles.csv',function(){
+                fs.unlink(__dirname + '/public/admin/temp/vehicles.csv');
+            });
         });
-    });
+    } else {
+        console.log("not authorized");
+        res.redirect("/");
+    }
 });
 
-app.get('/admin/download/reservations', function(req, res){
-    exportReservations(function(){
-        res.download(__dirname + '/public/admin/temp/reservations.csv',function(){
-            fs.unlink(__dirname + '/public/admin/temp/reservations.csv');
+app.get('/admin/download/reservations',
+    function(req, res) {
+    var user_email = req.user._json.EmailAddress;
+    if (adminEmails.includes(user_email)) {
+        exportReservations(function(){
+            res.download(__dirname + '/public/admin/temp/reservations.csv',function(){
+                fs.unlink(__dirname + '/public/admin/temp/reservations.csv');
+            });
         });
-    });
+    } else {
+        console.log("not authorized");
+        res.redirect("/");
+    }
 });
 
-app.get('/admin/download/reports', function(req, res){
-    exportReports(function(){
-        res.download(__dirname + '/public/admin/temp/reports.csv',function(){
-            fs.unlink(__dirname + '/public/admin/temp/reports.csv');
+app.get('/admin/download/reports', 
+    function(req, res) {
+    var user_email = req.user._json.EmailAddress;
+    if (adminEmails.includes(user_email)) {
+        exportReports(function(){
+            res.download(__dirname + '/public/admin/temp/reports.csv',function(){
+                fs.unlink(__dirname + '/public/admin/temp/reports.csv');
+            });
         });
-    });
+    } else {
+        console.log("not authorized");
+        res.redirect("/");
+    }
 });
 
 app.get('/logout', function(req, res) {
