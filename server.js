@@ -190,10 +190,10 @@ conn.query('INSERT INTO users VALUES(null, ?, ?)', ["jenna_tishler@brown.edu", t
 
 
 //exportCSV([{a: 0, b:4, c:3},{a: 0, b:4, c:3},{a: 0, b:4, c:3},{a: 0, b:4, c:3}], '/public/temp/h.csv');
-exportUsers();
-exportVehicles();
-exportReservations();
-exportReports();
+// exportUsers();
+// exportVehicles();
+// exportReservations();
+// exportReports();
 
 /*Sets up the server on port 8080.*/
 server.listen(8080, function(){
@@ -551,6 +551,38 @@ app.get('/auth/outlook',
         function(req, res) {
 });
 
+app.get('/admin/download/users', function(req, res){
+    exportUsers(function(){
+        res.download(__dirname + '/public/temp/users.csv',function(){
+            fs.unlink(__dirname + '/public/temp/users.csv');
+        });
+    });
+});
+
+app.get('/admin/download/vehicles', function(req, res){
+    exportVehicles(function(){
+        res.download(__dirname + '/public/temp/vehicles.csv',function(){
+            fs.unlink(__dirname + '/public/temp/vehicles.csv');
+        });
+    });
+});
+
+app.get('/admin/download/reservations', function(req, res){
+    exportReservations(function(){
+        res.download(__dirname + '/public/temp/reservations.csv',function(){
+            fs.unlink(__dirname + '/public/temp/reservations.csv');
+        });
+    });
+});
+
+app.get('/admin/download/reports', function(req, res){
+    exportReports(function(){
+        res.download(__dirname + '/public/temp/reports.csv',function(){
+            fs.unlink(__dirname + '/public/temp/reports.csv');
+        });
+    });
+});
+
 app.get('/logout', function(req, res) {
     let user_email = "";
     if(req.user !== undefined){
@@ -869,7 +901,7 @@ app.post("/admin/api/Upload", upload.single("imgUploader"), function (req, res) 
 // //Reports
 // conn.query('CREATE TABLE IF NOT EXISTS reports(id INTEGER PRIMARY KEY AUTOINCREMENT, reservation INTEGER, report TEXT, needsService BOOLEAN, needsCleaning BOOLEAN, notCharging BOOLEAN)');
 
-function exportUsers(){
+function exportUsers(callback){
     conn.query('SELECT * FROM users', function(error, data){
         let users = data.rows;
         let options = {fields:[{name:'id', label:'ID'},
@@ -882,15 +914,17 @@ function exportUsers(){
                     return console.log(err);
                 }
                 console.log("The file was saved!");
+                callback();
             });
             if(err) {
                 return console.log(err);
             }
         });
     });
+
 }
 
-function exportVehicles(){
+function exportVehicles(callback){
     conn.query('SELECT * FROM vehicles', function(error, data){
         let vehicles = data.rows;
         let options = {fields:[{name:'id', label:'ID'},
@@ -910,6 +944,7 @@ function exportVehicles(){
                     return console.log(err);
                 }
                 console.log("The file was saved!");
+                callback();
             });
             if(err) {
                 return console.log(err);
@@ -918,7 +953,7 @@ function exportVehicles(){
     });
 }
 
-function exportReservations(){
+function exportReservations(callback){
     conn.query('SELECT * FROM reservations', function(error, data){
         let reservations = data.rows;
         let options = {fields:[{name:'id', label:'ID'},
@@ -940,6 +975,7 @@ function exportReservations(){
                     return console.log(err);
                 }
                 console.log("The file was saved!");
+                callback();
             });
             if(err) {
                 return console.log(err);
@@ -948,7 +984,7 @@ function exportReservations(){
     });
 }
 
-function exportReports(){
+function exportReports(callback){
     conn.query('SELECT * FROM reports', function(error, data){
         let reports = data.rows;
         let options = {fields:[{name:'id', label:'ID'},
@@ -964,6 +1000,7 @@ function exportReports(){
                     return console.log(err);
                 }
                 console.log("The file was saved!");
+                callback();
             });
             if(err) {
                 return console.log(err);
