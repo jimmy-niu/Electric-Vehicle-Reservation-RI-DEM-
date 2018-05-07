@@ -38,13 +38,13 @@ $(document).ready(function() {
 
 function bindClickHandlers(){
     $("#upcoming_title").bind("click", function(){
-        toggle_hidden('upcoming'); 
+        toggle_hidden('upcoming');
         toggle_hidden('upcoming_header');
         toggleTitle(this);
     });
 
     $("#fleet_title").bind("click", function(){
-        toggle_hidden('fleet_header'); 
+        toggle_hidden('fleet_header');
         toggle_hidden('current_fleet');
         toggleTitle(this);
     });
@@ -158,7 +158,7 @@ function setJustificationModal(text){
 
 /*
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- *  Classes used to make reservations. 
+ *  Classes used to make reservations.
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  */
 class Reservation {
@@ -172,10 +172,10 @@ class Reservation {
         }
         console.log(r);
         let DOMobject = `<div class = "col-entry reservation-user ${r.license}">${r.user}</div>`
-        + `<div class = "col-entry reservation-start ${r.license}">${r.start}</div>` 
+        + `<div class = "col-entry reservation-start ${r.license}">${r.start}</div>`
         + `<div class = "col-entry reservation-end ${r.license}">${r.end}</div>`
         + `<div class = "col-entry carModel ${r.license}">${r.model}</div>`
-        + `<div class = "col-entry reservation-license ${r.license}">${r.license}</div>` 
+        + `<div class = "col-entry reservation-license ${r.license}">${r.license}</div>`
         + `<div class = "col-entry reservation-pickup> ${r.license}">${justification}</div>`;
 
         $('#upcoming').append(DOMobject);
@@ -197,13 +197,14 @@ class Vehicle {
         + `<div class = "col-entry ${v.license}"><span class="dropdown">`
         + `<button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Change Status</button>`
         + `<ul class="dropdown-menu">`
-        + `<a href="#editVehicle"><li><i class="fa fa-wrench"></i> Edit Car</li></a>`
-        + `<div onclick = 'deleteVehicle("${v.license}")'><li><i class="fa fa-archive"></i> Retire</li></div>`
+            + `<a href="#editVehicle"><li><i class="fa fa-wrench"></i> Edit Car</li></a>`
+            + `<div onclick = 'deleteVehicle("${v.license}")'><li><i class="fa fa-archive"></i> Retire</li></div>`
         + `</ul></span></div>`;
 
         $('#current_fleet').append(DOMobject);
     }
 }
+
 
 /*
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
