@@ -32,7 +32,9 @@
 
             <div>
                 <div id = "user">
-                    <span id = "user_email">Welcome, dem_test_u_2@outlook.com <br>
+
+                    <span id = "user_email">Welcome, %user% <br>
+
                     </span>
                     <a href = "/logout" style = "font-size: 2vh; color: #D7A342">Logout</a>
                 </div>
@@ -89,12 +91,12 @@
                                         <!-- <input type=text class="form-control route-stop" value="Home"> -->
                                     </div>
                                 </div>
-                                <p><a href="#" id="add-stop"><small>Add a destination</small></a></p>
                                 <div class="form-group">
                                     <label>Dropoff Location</label>
                                     <input class="form-control route-stop" id="route-stop-3" type="text" placeholder="Enter a location"/>
                                     <!-- <input type=text class="form-control route-stop" value="Home"> -->
                                 </div>
+                                <p><a href="#" id="add-stop"><small>Add a destination</small></a></p>
                                 <div class="form-group">
                                     <label>Extra Features</label>
                                     <div class="form-check">
@@ -134,11 +136,11 @@
                             <form>
                                 <div class="form-group">
                                     <label for="start-date-edit">Reservation Start</label>
-                                    <input class = "datePicker" id ="start-date-edit" placeholder="Select Date.." type="text" value = "2018-05-09 1:00">
+                                    <input class = "datePicker" id ="start-date-edit" placeholder="Select Date.." type="text">
                                 </div>
                                 <div class="form-group">
                                     <label for="end-date-edit">Reservation End</label>
-                                    <input class = "datePicker" id ="end-date-edit" placeholder="Select Date.." type="text" value = "2018-05-09 3:00">
+                                    <input class = "datePicker" id ="end-date-edit" placeholder="Select Date.." type="text">
                                 </div>
                                 <div class="form-group">
                                     <label>Pickup Location</label>
@@ -151,14 +153,14 @@
                                         <input class="form-control route-stop-edit" id="route-stop-2" type="text" placeholder="Enter a location"/>
                                         <!-- <input type=text class="form-control route-stop" value="Home"> -->
                                     </div>
+                                    <div id = "new-stops-edit"></div>
+                                </div>
+                                <p><a href="#" id="add-stop-edit"><small>Add a destination</small></a></p>
                                     <div class="form-group">
                                         <label>Dropoff Location</label>
                                         <input class="form-control route-stop-edit" id="route-stop-3"type="text" placeholder="Enter a location"/>
                                         <!-- <input type=text class="form-control route-stop" value="Home"> -->
                                     </div>
-                                    <div id = "new-stops-edit"></div>
-                                </div>
-                                <p><a href="#" id="add-stop-edit"><small>Add a destination</small></a></p>
                                 <div class="form-group">
                                     <label>Extra Features</label>
                                     <div class="form-check">
@@ -194,16 +196,13 @@
                             </button>
                         </div>
                         <div id="carModal" class="modal-body">
-                            <p id = "carMakeMText">Car Model: </p>
-                            <p id = "plateNumberMText">Plate Number: </p>
-                            <p id = "startMText">Start Time: </p>
-                            <p id = "endMText">End Date: </p>
-                            <p id = "stopsMText">Stops: </p>
-                            
-                            <p id = "distanceMText">Total distance </span></p>
-                            
-                            <p id = "durationMText">Total duration: </span></p>
-                            
+                            <p id = "carMakeMText"><span class="reservation-label">Car Model</span>: </p>
+                            <p id = "plateNumberMText"><span class="reservation-label">Plate Number</span>: </p>
+                            <p id = "startMText"><span class="reservation-label">Start Time</span>: </p>
+                            <p id = "endMText"><span class="reservation-label">End Date</span>: </p>
+                            <p id = "stopsMText"><span class="reservation-label">Stops</span>: </p>
+                            <p id = "distanceMText"><span class="reservation-label">Total distance</span>: </p>
+                            <p id = "durationMText"><span class="reservation-label">Total duration</span>: </p>
                             <div id="mapCanvas" style="width: 450px; height: 300px; margin-left:auto; margin-right:auto; margin-bottom: 10px"></div>
                         </div>
                         <div class="modal-footer" id="acceptDeclineButtons">
@@ -224,13 +223,13 @@
                             </button>
                         </div>
                         <div id="carModal-edit" class="modal-body">
-                            <p id = "carMakeMText-edit">Car Model: </p>
-                            <p id = "plateNumberMText-edit">Plate Number: </p>
-                            <p id = "startMText-edit">Start Time: </p>
-                            <p id = "endMText-edit">End Date: </p>
-                            <p id = "stopsMText-edit">Stops: </p>
-                            <p id = "distanceMText-edit">Total distance: </p>
-                            <p id = "durationMText-edit">Total duration: </p>
+                            <p id = "carMakeMText-edit"><span class="reservation-label">Car Model</span>: </p>
+                            <p id = "plateNumberMText-edit"><span class="reservation-label">Plate Number</span>: </p>
+                            <p id = "startMText-edit"><span class="reservation-label">Start Time</span>: </p>
+                            <p id = "endMText-edit"><span class="reservation-label">End Date</span>: </p>
+                            <p id = "stopsMText-edit"><span class="reservation-label">Stops</span>: </p>
+                            <p id = "distanceMText-edit"><span class="reservation-label">Total distance</span>: </p>
+                            <p id = "durationMText-edit"><span class="reservation-label">Total duration</span>: </p>
                             <div id="mapCanvasEdit" style="width: 450px; height: 300px; margin-left:auto; margin-right:auto; margin-bottom: 10px"></div>
                         </div>
                         <div class="modal-footer" id="acceptDeclineButtons-edit">
@@ -377,7 +376,7 @@
                             </button>
                         </div>
                         <div class="modal-body">
-                            <p>Please select a vehicle.</p>
+                            <p id="select-alt-vehicle">Please select a vehicle.</p>
                             <form id = "altVehiclesForm">
                             </form>
                         </div>
@@ -399,7 +398,7 @@
                             </button>
                         </div>
                         <div class="modal-body">
-                            <p>Please select a vehicle.</p>
+                            <p id="select-alt-vehicle-edit">Please select a vehicle.</p>
                             <form id = "altVehiclesForm-edit">
                             </form>
                         </div>
@@ -410,6 +409,26 @@
                     </div>
                 </div>
             </div> 
+
+            <div class="modal fade" id="carpoolModal" tabindex="-2" role="dialog" aria-labelledby="carpoolModalLabel" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="carpoolModalLabel">Carpool Alert!</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <p>Your reservation matches in time and date with the following users. We strongly encourage you to talk to them and arrange a carpool. By carpooling just twice a week, 1,600 pounds of greenhouse gases can be kept out of the air each year.</p>
+                            <ul class="list-group" id="carpoolUsersList"></ul>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" id="carpoolButton" class="btn btn-success" data-dismiss="modal">Thanks!</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
             <h3>Upcoming Reservations</h3>
             <div class="cards row">

@@ -35,6 +35,26 @@ $(document).ready(function() {
         //console.log(reports);
     });
 
+    $('#export-users').click(function(e){
+        e.preventDefault();
+        window.location.href = 'download/users';
+    });
+
+    $('#export-vehicles').click(function(e){
+        e.preventDefault();
+        window.location.href = 'download/vehicles';
+    });
+
+    $('#export-reservations').click(function(e){
+        e.preventDefault();
+        window.location.href = 'download/reservations';
+    });
+
+    $('#export-reports').click(function(e){
+        e.preventDefault();
+        window.location.href = 'download/reports';
+    });
+
     setUploader();
     bindClickHandlers();
 });
@@ -282,6 +302,27 @@ function finishedUpload(data){
     console.log(data);
     $('#imageFileName').val(data);
     window.alert("Image uploaded successfully!");
+}
+
+/*
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ *  CSV Export
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ */
+
+// function exportUsers(){
+//     adminSocket.emit('exportUsers', function(){
+//
+//     });
+// }
+function exportVehicles(){
+    //adminSocket.emit('exportVehicles');
+}
+function exportReservations(){
+    //adminSocket.emit('exportReservations');
+}
+function exportReports(){
+    //adminSocket.emit('exportReports');
 }
 
 /*

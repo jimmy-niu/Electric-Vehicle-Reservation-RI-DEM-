@@ -130,3 +130,7 @@ h3 {
     margin-right: auto;
     font-weight: bold;
 }
+
+.reservation-label {
+    font-weight: bold;
+}

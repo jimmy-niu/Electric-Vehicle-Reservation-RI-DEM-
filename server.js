@@ -25,14 +25,18 @@ let outlook = require('node-outlook');
 let index = require('./public/index');
 // let auth = require('./auth');
 var dotenv = require('dotenv').config();
-var methodOverride = require('method-override')
-var passport = require('passport')
-var util = require('util')
+var methodOverride = require('method-override');
+var passport = require('passport');
+var util = require('util');
 var OutlookStrategy = require('passport-outlook').Strategy;
 var replace = require("replace");
 
 let anyDB = require('any-db');
 let conn = anyDB.createConnection('sqlite3://DEM.db');
+
+let jsoncsv = require('json-csv');
+
+let fs = require('fs');
 
 let engines = require('consolidate');
 app.engine('html', require('hogan-express'));
@@ -47,20 +51,20 @@ app.use(session(
     })
        );
 
-// var transporter = nodemailer.createTransport({
-//     pool: true,
-//     maxConnections: 10,
-//     host: "smtp-mail.outlook.com", // hostname
-//     secureConnection: false, // TLS requires secureConnection to be false
-//     port: 587, // port for secure SMTP
-//     auth: {
-//         user: 'dem_do-not-reply@outlook.com',
-//         pass: 'DEMnoreply123'
-//     },
-//     tls: {
-//         ciphers:'SSLv3'
-//     }
-// });
+var transporter = nodemailer.createTransport({
+    pool: true,
+    maxConnections: 10,
+    host: "smtp-mail.outlook.com", // hostname
+    secureConnection: false, // TLS requires secureConnection to be false
+    port: 587, // port for secure SMTP
+    auth: {
+        user: 'dem_do-not-reply@outlook.com',
+        pass: 'DEMnoreply123'
+    },
+    tls: {
+        ciphers:'SSLv3'
+    }
+});
 
 // let mailOptions = {
 //     from: 'dem_do-not-reply@outlook.com',
@@ -133,15 +137,15 @@ conn.query('CREATE TABLE IF NOT EXISTS reservations(id INTEGER PRIMARY KEY AUTOI
 conn.query('CREATE TABLE IF NOT EXISTS reports(id INTEGER PRIMARY KEY AUTOINCREMENT, reservation INTEGER, report TEXT, needsService BOOLEAN, needsCleaning BOOLEAN, notCharging BOOLEAN)');
 
 //test data
-conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',["jenna.tishler@gmail.com", "1322", "2015 FORD CMAX", "2018-05-09 01:00", "2018-05-09 03:00", JSON.stringify(["563 North Main Street, Providence, RI, USA", "565 Atwells Avenue, Providence, RI, USA", "563 North Main Street, Providence, RI, USA"]), false, "", false, false, false, "noPicture.png"]);
+conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',["jenna.tishler@gmail.com", "1322", "2015 FORD CMAX", "2018-05-21 11:00", "2018-05-21 15:00", JSON.stringify(["563 North Main Street, Providence, RI, USA", "565 Atwells Avenue, Providence, RI, USA", "563 North Main Street, Providence, RI, USA"]), false, "", false, false, false, "noPicture.png"]);
 conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',["jenna_tishler@brown.edu", "704", "2015 FORD CMAX", "2018-05-10 01:00", "2018-05-10 03:00", JSON.stringify(["home", "work", "home"]), false, "", false, false, false, "noPicture.png"]);
-conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',["Max Luebbers", "2254", "2016 FORD CMAX", "2018-05-21 11:00", "2018-05-21 15:00", JSON.stringify(["home", "work"]), false, "", false, false, false, "noPicture.png"]);
-conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',["dem_test_u_2@outlook.com", "1869", "2011 CHEVROLET EQUINOX", "2018-05-19 14:00", "2018-05-19 17:00", JSON.stringify(["home", "work"]), true, "I have a reason.", false, false, false, "noPicture.png"]);
+conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',["emily_kasbohm@brown.edu", "2254", "2016 FORD CMAX", "2018-05-21 11:00", "2018-05-21 15:00", JSON.stringify(["563 North Main Street, Providence, RI, USA", "565 Atwells Avenue, Providence, RI, USA", "563 North Main Street, Providence, RI, USA"]), false, "", false, false, false, "noPicture.png"]);
+conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',["dem_test_u_2@outlook.com", "1869", "2011 CHEVROLET EQUINOX", "2018-05-06 14:00", "2018-05-06 17:00", JSON.stringify(["home", "work"]), true, "I have a reason.", false, false, false, "noPicture.png"]);
 conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',["dem_test_u_2@outlook.com", "2254", "2016 FORD CMAX", "2018-05-21 10:00", "2018-05-21 10:30", JSON.stringify(["work", "beach"]), false, "", false, false, false, "noPicture.png"]);
 conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',["dem_test_u@outlook.com", "704", "2015 FORD CMAX", "2017-05-19 11:00", "2017-05-20 11:00", JSON.stringify(["home", "work"]), false, "", false, false, false, "noPicture.png"]);
 conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',["dem_test_u@outlook.com", "1322", "2015 FORD CMAX", "2011-05-18 11:00", "2011-05-18 15:00", JSON.stringify(["Work", "Home"]), false, "", false, false, false, "noPicture.png"]);
 conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',["dem_test_u@outlook.com", "704", "2015 FORD CMAX", "2010-05-19 11:00", "2010-05-20 11:00", JSON.stringify(["home", "work"]), false, "", false, false, false, "noPicture.png"]);
-conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',["dem_test_u@outlook.com", "2254", "2016 FORD CMAX", "2013-05-21 11:00", "2013-05-21 15:00", JSON.stringify(["home", "work"]), false, "", false, false, false, "noPicture.png"]);
+conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',["dem_test_u@outlook.com", "2254", "2016 FORD CMAX", "2013-05-21 11:00", "2013-05-21 15:00", JSON.stringify(["563 North Main Street, Providence, RI, USA", "565 Atwells Avenue, Providence, RI, USA", "563 North Main Street, Providence, RI, USA"]), false, "", false, false, false, "noPicture.png"]);
 
 conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, null, ?)', ["JF2GPBCC3FH253482", "1011", "2016 SUBARU CV", "Black/White", true, 11451.5, false, true, true, false, "noPicture.png"]);
 conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, null, ?)', ["1FMCU59329KC41390", "1018", "2009 FORD ESCAPE", "Black/White", true, 151071.5, false, true, true, false, "noPicture.png"]);
@@ -154,7 +158,7 @@ conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, null, ?)',
 conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, null, ?)', ["1G1ZS52855F285454", "1662", "2003 CHEVROLET MALIBU", "Black/White", true, 90057.8, false, false, false, false, "noPicture.png"]);
 conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, null, ?)', ["JTMRJREV7HD151726", "1679", "2017 TOYOTA RAV 4", "Black/White", true, 8483.8, false, true, true, false, "noPicture.png"]);
 conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, null, ?)', ["JF2GPBCC0FH232864", "2811", "2015 SUBARU XV", "Black/White", true, 9131.5, false, true, true, false, "noPicture.png"]);
-//conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', ["1FTEW1E89HFC38284", "1834", "2017 FORD F150", "Black/White", true, 4385.0, false, true, true, true, "noPicture.png"]);
+conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, null, ?)', ["1FTEW1E89HFC38284", "1834", "2017 FORD F150", "Black/White", true, 4385.0, false, true, true, true, "noPicture.png"]);
 conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, null, ?)', ["2GNF1CEK9C6333734", "1869", "2011 CHEVROLET EQUINOX", "Black/White", true, 27513.0, false, true, true, false, "noPicture.png"]);
 conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, null, ?)', ["1FMCU59H18KA54880", "1994", "2008 FORD ESCAPE", "Black/White", true, 235952.9, false, true, true, false, "noPicture.png"]);
 conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, null, ?)', ["1FMCU59H38KA54881", "2140", "2008 FORD ESCAPE", "Black/White", true, 77522.0, false, true, true, false, "noPicture.png"]);
@@ -178,6 +182,14 @@ conn.query('INSERT INTO reports VALUES(null, ?, ?, ?, ?, ?)', [1, "Car is  very 
 
 conn.query('INSERT INTO users VALUES(null, ?, ?)', ["jenna.tishler@gmail.com", true]);
 conn.query('INSERT INTO users VALUES(null, ?, ?)', ["jenna_tishler@brown.edu", true]);
+
+
+//exportCSV([{a: 0, b:4, c:3},{a: 0, b:4, c:3},{a: 0, b:4, c:3},{a: 0, b:4, c:3}], '/public/temp/h.csv');
+// exportUsers();
+// exportVehicles();
+// exportReservations();
+// exportReports();
+
 /*Sets up the server on port 8080.*/
 server.listen(8080, function(){
     console.log('- Server listening on port 8080');
@@ -233,16 +245,6 @@ function addEvent(title, bodytext, start, end) {
         },
         "Start": start, //"2018-04-28T00:00:00.000Z",
         "End": end, //"2018-04-28T00:30:00.000Z"
-        /*,
-        "Attendees": [
-            {
-                "EmailAddress": {
-                    "Address": email,
-                    "Name": name
-                },
-                "Type": "Required"
-            }
-        ]*/
     };
 
     var addEventParameters = {
@@ -276,6 +278,10 @@ function removeEvent(subject, start, end) {
             console.log('getEvents returned ' + result.value.length + ' events.');
             //return result.value;
             result.value.forEach(function(event) {
+                console.log(event.Start)
+                console.log(start)
+                console.log(event.End)
+                console.log(end)
                 if (event.Subject === subject && event.Start === start && event.End == end) {
                     outlook.calendar.deleteEvent({token: token, eventId: event.Id},
                                                  function(error, result) {
@@ -306,35 +312,8 @@ function nukeEvents() {
             console.log('getEvents returned ' + result.value.length + ' events.');
             //return result.value;
             result.value.forEach(function(event) {
-                outlook.calendar.deleteEvent({token: token, eventId: event.Id},
-                                             function(error, result) {
-                    if (error) {
-                        console.log(error)
-                        //console.log('deleteEvent returned an error');
-                    } else {
-                        console.log("deleteEvent success");
-                    }
-                });
-            });
-        }
-    });
-}
-
-function nukeEvents() {
-    var queryParams = {
-        '$select': 'Subject,Start,End,Id',
-        '$top': 500,
-    };
-
-    outlook.calendar.getEvents({token: token, odataParams: queryParams},
-                               function(error, result){
-        if (error) {
-            console.log('getEvents returned an error: ' + error);
-        }
-        else if (result) {
-            console.log('getEvents returned ' + result.value.length + ' events.');
-            //return result.value;
-            result.value.forEach(function(event) {
+                console.log(event.Start)
+                console.log(event.End)
                 outlook.calendar.deleteEvent({token: token, eventId: event.Id},
                                              function(error, result) {
                     if (error) {
@@ -352,7 +331,7 @@ function nukeEvents() {
 //handles events when a regular user is connnected
 io.of('/user').on('connection', function(socket) {
     socket.on('join', function(user, callback){
-        conn.query('SELECT *, vehicles.isEV FROM reservations INNER JOIN vehicles ON reservations.license = vehicles.license WHERE user = ? ORDER BY end ASC', [user], function(error, data){
+        conn.query('SELECT *, vehicles.isEV, reservations.id FROM reservations INNER JOIN vehicles ON reservations.license = vehicles.license WHERE user = ? ORDER BY end ASC', [user], function(error, data){
             callback(data);
         });
     });
@@ -369,10 +348,12 @@ io.of('/user').on('connection', function(socket) {
                 io.of('/admin').emit("newReservation", resData);
                 var start = new Date(reservationInfo.start);
                 var end = new Date(reservationInfo.end);
-                addEvent(reservationInfo.user + "'s upcoming DEM trip (" +reservationInfo.model + " " + reservationInfo.license + ")", reservationInfo.model + " " + reservationInfo.license + "\n" + reservationInfo.stops, start.toISOString(), end.toISOString());
-                if(reservationInfo.canCarpool){
-                    carpoolNotification(reservationInfo);
-                }
+
+                addEvent(reservationInfo.user + "'s upcoming DEM trip (" + reservationInfo.license + ")", reservationInfo.model + " " + reservationInfo.license + "\n" + reservationInfo.stops, start.toISOString(), end.toISOString());
+                // if(reservationInfo.canCarpool){
+                //     console.log("ya")
+                //     carpoolNotification(reservationInfo);
+                // }
             });
         });
     });
@@ -388,10 +369,11 @@ io.of('/user').on('connection', function(socket) {
                 //Calendar event
                 var start = new Date(reservationInfo.start);
                 var end = new Date(reservationInfo.end);
-                addEvent(reservationInfo.user + "'s upcoming DEM trip (" +reservationInfo.model + " " + reservationInfo.license + ")", reservationInfo.model + " " + reservationInfo.license + "\n" + reservationInfo.stops, start.toISOString(), end.toISOString());
-                if(reservationInfo.canCarpool){
-                    carpoolNotification(reservationInfo);
-                }
+
+                addEvent(reservationInfo.user + "'s upcoming DEM trip (" + reservationInfo.license + ")", reservationInfo.model + " " + reservationInfo.license + "\n" + reservationInfo.stops, start.toISOString(), end.toISOString());
+                // if(reservationInfo.canCarpool){
+                //     carpoolNotification(reservationInfo);
+                // }
             });
         });
     })
@@ -412,8 +394,14 @@ io.of('/user').on('connection', function(socket) {
         // });
     });
 
-    socket.on('cancel', function(reservationID, user, license, start, end, callback){
+    socket.on('cancel', function(reservationID, user, model, license, start, end, callback){
         cancelReservation(reservationID);
+        var startDate = new Date(start);
+        var endDate = new Date(end);
+        var startISO = startDate.toISOString().split('.')[0]+"Z";
+        var endISO = endDate.toISOString().split('.')[0]+"Z";
+        //console.log(user + "'s upcoming DEM trip (" + license + ")", startDate, endDate);
+        removeEvent(user + "'s upcoming DEM trip (" + license + ")", startISO, endISO);
         conn.query('SELECT * FROM reservations WHERE user = ?', [user], function(error, data){
             socket.emit('reservationChange', data);
         });
@@ -432,9 +420,9 @@ io.of('/user').on('connection', function(socket) {
         conn.query('SELECT * FROM reservations WHERE id = ?', [5], function(error, data){
             let mailOptions = {
                 from: 'dem_do-not-reply@outlook.com',
-                to: 'jenna_tishler@brown.edu',
+                to: 'dem_test_a@outlook.com',
                 subject: 'New Report Added',
-                html: '<h1>Reservation: ' + data.rows[0].id + '</h1>' + '<h2>Name: ' + data.rows[0].user + '</h2>' + '<h2>License Plate: ' + data.rows[0].license + '</h2>' + '<p>Report: ' + report + '<p>' + '<p>Needs Service: ' + needsService + '<p>' + '<p>Needs Cleaning: ' + needsCleaning + '<p>' + '<p>Not Charging: ' + notCharging + '<p>'
+                html: '<h1>Reservation: ' + data.rows[0].id + '</h1>' + '<h2>User: ' + data.rows[0].user + '</h2>' + '<h2>Vehicle: ' + data.rows[0].model + " " + data.rows[0].license + '</h2>' + '<p style="font-size: 22px;">Report: ' + report + '<p><br>' + '<p>Needs Service: ' + needsService + '<p>' + '<p>Needs Cleaning: ' + needsCleaning + '<p>' + '<p>Not Charging: ' + notCharging + '<p>'
             };
             transporter.sendMail(mailOptions, function(error, info){
                 if (error) {
@@ -534,6 +522,38 @@ app.get('/auth/outlook',
         function(req, res) {
 });
 
+app.get('/admin/download/users', function(req, res){
+    exportUsers(function(){
+        res.download(__dirname + '/public/temp/users.csv',function(){
+            fs.unlink(__dirname + '/public/temp/users.csv');
+        });
+    });
+});
+
+app.get('/admin/download/vehicles', function(req, res){
+    exportVehicles(function(){
+        res.download(__dirname + '/public/temp/vehicles.csv',function(){
+            fs.unlink(__dirname + '/public/temp/vehicles.csv');
+        });
+    });
+});
+
+app.get('/admin/download/reservations', function(req, res){
+    exportReservations(function(){
+        res.download(__dirname + '/public/temp/reservations.csv',function(){
+            fs.unlink(__dirname + '/public/temp/reservations.csv');
+        });
+    });
+});
+
+app.get('/admin/download/reports', function(req, res){
+    exportReports(function(){
+        res.download(__dirname + '/public/temp/reports.csv',function(){
+            fs.unlink(__dirname + '/public/temp/reports.csv');
+        });
+    });
+});
+
 app.get('/logout', function(req, res) {
     let user_email = "";
     if(req.user !== undefined){
@@ -542,7 +562,7 @@ app.get('/logout', function(req, res) {
     replace({
         regex: "Welcome,(.+)<br>",
         replacement: "Welcome, %user% <br>",
-        paths: ['./public/user/index.html', './public/admin/data.html', './public/admin/fleet.html', './public/admin/index.html'],
+        paths: ['./public/user/index.html', './public/admin/reports.html', './public/admin/fleet.html', './public/admin/index.html'],
         silent: true
     });
     token = undefined;
@@ -689,6 +709,7 @@ function newReservation(socket, reservationInfo, isEdit){
         else {
             //alerts users via email that they have reservations at the same time w/ same stops
             // if(canCarpool){
+            //     console.log("carpool!")
             //     carpoolNotification(carpoolUsers);
             // }
 
@@ -824,7 +845,7 @@ let Storage = multer.diskStorage({
 
 let upload = multer({ storage: Storage });
 
-let fs = require('fs');
+
 
 app.post("/admin/api/Upload", upload.single("imgUploader"), function (req, res) {
     let newName = `${req.body.license}.${req.file.mimetype.replace("image/", "")}`;
@@ -839,3 +860,141 @@ app.post("/admin/api/Upload", upload.single("imgUploader"), function (req, res) 
 
     });
 });
+
+
+
+
+// //Users
+// conn.query('CREATE TABLE IF NOT EXISTS users(id INTEGER PRIMARY KEY AUTOINCREMENT, email TEXT, admin BOOLEAN)');
+// //Resevervations
+// conn.query('CREATE TABLE IF NOT EXISTS vehicles(id TEXT, license TEXT, model TEXT, color TEXT, inService BOOLEAN, miles DOUBLE PRECISION, isEV BOOLEAN, extraTrunk BOOLEAN, offRoad BOOLEAN, equipRack BOOLEAN, featureScore INTEGER, image TEXT)');
+// //Vehicles
+// conn.query('CREATE TABLE IF NOT EXISTS reservations(id INTEGER PRIMARY KEY AUTOINCREMENT, user TEXT, license TEXT, model TEXT, start TEXT, end TEXT, stops TEXT, override BOOLEAN, justification TEXT, needsTrunk BOOLEAN, needsOffRoad BOOLEAN, needsRack BOOLEAN, image TEXT)');
+// //Reports
+// conn.query('CREATE TABLE IF NOT EXISTS reports(id INTEGER PRIMARY KEY AUTOINCREMENT, reservation INTEGER, report TEXT, needsService BOOLEAN, needsCleaning BOOLEAN, notCharging BOOLEAN)');
+
+function exportUsers(callback){
+    conn.query('SELECT * FROM users', function(error, data){
+        let users = data.rows;
+        let options = {fields:[{name:'id', label:'ID'},
+                      {name:'email', label:'Email'},
+                      {name:'admin', label:'Admin'}]};
+        jsoncsv.csvBuffered(users, options, function(err, csv){
+            console.log(csv);
+            fs.writeFile(__dirname + '/public/temp/users.csv', csv, function(err) {
+                if(err) {
+                    return console.log(err);
+                }
+                console.log("The file was saved!");
+                callback();
+            });
+            if(err) {
+                return console.log(err);
+            }
+        });
+    });
+
+}
+
+function exportVehicles(callback){
+    conn.query('SELECT * FROM vehicles', function(error, data){
+        let vehicles = data.rows;
+        let options = {fields:[{name:'id', label:'ID'},
+                        {name:'license', label:'License'},
+                        {name:'model', label:'Model'},
+                        {name:'color', label:'Color'},
+                        {name:'inService', label:'In Service'},
+                        {name:'miles', label:'Miles'},
+                        {name:'isEV', label:'Is EV'},
+                        {name:'extraTrunk', label:'Extra Trunk'},
+                        {name:'offRoad', label:'Off Road'},
+                        {name:'equipRack', label:'Equip Rack'}]};
+        jsoncsv.csvBuffered(vehicles, options, function(err, csv){
+            console.log(csv);
+            fs.writeFile(__dirname + '/public/temp/vehicles.csv', csv, function(err) {
+                if(err) {
+                    return console.log(err);
+                }
+                console.log("The file was saved!");
+                callback();
+            });
+            if(err) {
+                return console.log(err);
+            }
+        });
+    });
+}
+
+function exportReservations(callback){
+    conn.query('SELECT * FROM reservations', function(error, data){
+        let reservations = data.rows;
+        let options = {fields:[{name:'id', label:'ID'},
+                        {name:'user', label:'User'},
+                        {name:'license', label:'License'},
+                        {name:'model', label:'Model'},
+                        {name:'start', label:'Start'},
+                        {name:'end', label:'End'},
+                        {name:'stops', label:'Stops'},
+                        {name:'override', label:'Override'},
+                        {name:'justification', label:'Justification'},
+                        {name:'needsTrunk', label:'Extra Trunk'},
+                        {name:'needsOffRoad', label:'Off Road'},
+                        {name:'needsRack', label:'Equip Rack'}]};
+        jsoncsv.csvBuffered(reservations, options, function(err, csv){
+            console.log(csv);
+            fs.writeFile(__dirname + '/public/temp/reservations.csv', csv, function(err) {
+                if(err) {
+                    return console.log(err);
+                }
+                console.log("The file was saved!");
+                callback();
+            });
+            if(err) {
+                return console.log(err);
+            }
+        });
+    });
+}
+
+function exportReports(callback){
+    conn.query('SELECT * FROM reports', function(error, data){
+        let reports = data.rows;
+        let options = {fields:[{name:'id', label:'ID'},
+                        {name:'reservation', label:'Reservation'},
+                        {name:'report', label:'Report'},
+                        {name:'needsService', label:'Needs Service'},
+                        {name:'needsCleaning', label:'Needs Cleaning'},
+                        {name:'notCharging', label:'Not Charging'}]};
+        jsoncsv.csvBuffered(reports, options, function(err, csv){
+            console.log(csv);
+            fs.writeFile(__dirname + '/public/temp/reports.csv', csv, function(err) {
+                if(err) {
+                    return console.log(err);
+                }
+                console.log("The file was saved!");
+                callback();
+            });
+            if(err) {
+                return console.log(err);
+            }
+        });
+    });
+}
+
+
+
+
+// function exportCSV(data, path){
+//     jsoncsv.csvBuffered(data, {fields:[{name:'a', label:'A'}, {name:'b', label:'B'}, {name:'c', label:'C'}]},function(err, csv){
+//         console.log(csv);
+//         fs.writeFile(__dirname + path, csv, function(err) {
+//             if(err) {
+//                 return console.log(err);
+//             }
+//             console.log("The file was saved!");
+//         });
+//         if(err) {
+//             return console.log(err);
+//         }
+//     });
+// }

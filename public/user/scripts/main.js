@@ -33,17 +33,9 @@ $(document).ready(function() {
          });
     }
     initMap(map);
-    $("#add-stop").click(function() {
-        count++;
-        addStop(count);
-        initMap(count);
-    });
+    $("#add-stop").click(addDestination);
 
-    $("#add-stop-edit").click(function() {
-        count_edit++;
-        addStopEdit(count);
-        initMap(count);
-    });
+    $("#add-stop-edit").click(addDestination);
 
     $("#resModal").on("shown.bs.modal", function () {
         google.maps.event.trigger(map, "resize");
@@ -57,7 +49,9 @@ $(document).ready(function() {
     console.log(userEmail);
 
     userSocket.emit('join',userEmail, function(reservations){
+        console.log("hello")
         console.log(reservations);
+        //console.log(reservations.rows[0].reservations.id);
         for(var i = 0; i < reservations.rows.length; i++){
             let a = reservations.rows[i].end;
             let n = new Date(Date.now());
@@ -76,6 +70,10 @@ $(document).ready(function() {
         cleanFields();
     });
 
+    userSocket.on('reassignReservation', function(data){
+         console.log("reservations reassigned");
+    });
+
     userSocket.on('newReservation', function(vehicles, reservation, isEdit, canCarpool, carpoolUsers){
         console.log('new reservation made');
         currentCar = reservation;
@@ -83,6 +81,21 @@ $(document).ready(function() {
         currentCar.canCarpool = canCarpool;
         currentCar.carpoolUsers = carpoolUsers;
         alternateVehicles = vehicles;
+        console.log(alternateVehicles)
+        if(alternateVehicles.rows.length === 1){
+            if(isEditing){
+                $("#select-alt-vehicle-edit").html("There is only one vehicle that meets your needs.");
+            } else {
+                console.log("one")
+                $("#select-alt-vehicle").html("There is only one vehicle that meets your needs.");
+            }
+        } else {
+            if(isEditing){
+                $("#select-alt-vehicle-edit").html("Please select a vehicle.");
+            } else {
+                $("#select-alt-vehicle").html("Please select a vehicle.");
+            }
+        }
         isEditing = isEdit;
         cleanFields();
         if(isEditing){
@@ -146,9 +159,9 @@ $(document).ready(function() {
     flatpickr(".datePicker", {
         enableTime: true,
         dateFormat: "Y-m-d H:i",
-        minDate: "today",
-        defaultDate: "today",
+        minDate: "today"
     });
+
     jQuery.fn.carousel.Constructor.TRANSITION_DURATION = 5000;
 
 
@@ -177,6 +190,18 @@ $(document).ready(function() {
     }, 60000);
 
 });
+
+function addDestination(){
+    if(isEditing){
+        count_edit++;
+        addStopEdit(count);
+        initMap(count);
+    } else {
+        count++;
+        addStop(count);
+        initMap(count);
+    }
+}
 
 
 function initMap(map) {
@@ -250,7 +275,7 @@ function addStopEdit(count) {
         id = "deleteX">x</span></label>
         <input type=text class="form-control route-stop-edit" id="route-stop-` + count + `">
         </div>`
-    $('#stops').append(newStop);
+    $('#stops-edit').append(newStop);
 }
 
 function deleteStop(obj){
@@ -274,18 +299,18 @@ function sortOnKeys(dict) {
 function cleanFields(){
     if(isEditing){
         console.log('clean edit')
-        $("#carMakeMText-edit").html("Car Model: ");
-        $("#plateNumberMText-edit").html("License Plate: ");
-        $("#startMText-edit").html("Start Time: ");
-        $("#endMText-edit").html("End Time: ");
-        $("#stopsMText-edit").html("Stops: ");
+        $("#carMakeMText-edit").html("<span class='reservation-label'>Car Model</span>: ");
+        $("#plateNumberMText-edit").html("<span class='reservation-label'>License Plate</span>: ");
+        $("#startMText-edit").html("<span class='reservation-label'>Start Time</span>: ");
+        $("#endMText-edit").html("<span class='reservation-label'>End Time</span>: ");
+        $("#stopsMText-edit").html("<span class='reservation-label'>Stops</span>: ");
         $("#new-stops-edit").empty();
     } else {
-        $("#carMakeMText").html("Car Model: ");
-        $("#plateNumberMText").html("License Plate: ");
-        $("#startMText").html("Start Time: ");
-        $("#endMText").html("End Time: ");
-        $("#stopsMText").html("Stops: ");
+        $("#carMakeMText").html("<span class='reservation-label'>Car Model</span>: ");
+        $("#plateNumberMText").html("<span class='reservation-label'>License Plate</span>: ");
+        $("#startMText").html("<span class='reservation-label'>Start Time</span>: ");
+        $("#endMText").html("<span class='reservation-label'>End Time</span>: ");
+        $("#stopsMText").html("<span class='reservation-label'>Stops</span>: ");
         $("#new-stops").empty();
     }
 }
@@ -303,32 +328,48 @@ function override(){
 function renderCar(){
     if(isEditing){
         let id = $("#reservation-id-edit").html();
-        console.log(id)
         userSocket.emit('editReservation', currentCar, id, function(){
-            console.log('added')
             currentCar.id = id;
 
-            $("." + idToDelete).remove();
-            console.log(currentCar.isEV);
-            new Reservation(currentCar);
+            $("#start_" + id).html(currentCar.start)
+            $("#end_" + id).html(currentCar.end)
+            $("#stops_" + id).html(JSON.parse(currentCar.stops))
             sortReservations();
-            currentCar = undefined;
+
             $("#reasoning-field-edit").val("");
 
             cleanFields();
+
+            carpoolAlert(currentCar.user, currentCar.canCarpool, currentCar.carpoolUsers);
+            currentCar = undefined;
         });
     } else {
         userSocket.emit('addReservation', currentCar, function(id){
-            console.log('added')
             currentCar.id = id;
-            console.log(currentCar);
+
             new Reservation(currentCar);
             sortReservations();
-            currentCar = undefined;
+
             $("#reasoning-field").val("");
 
             cleanFields();
+
+            carpoolAlert(currentCar.user, currentCar.canCarpool, currentCar.carpoolUsers);
+            currentCar = undefined;
         });
+    }
+}
+
+function carpoolAlert(user, canCarpool, carpoolUsers){
+    if(canCarpool){
+        $("#carpoolUsersList").empty();
+        for(let i = 0; i < carpoolUsers.length; i++){
+            console.log(carpoolUsers[i])
+            if (carpoolUsers[i] != user){
+                $("#carpoolUsersList").append("<li class = 'list-group-item'>" + carpoolUsers[i] + "</li>");
+            }
+        }
+        $("#carpoolModal").modal();
     }
 }
 
@@ -350,7 +391,7 @@ function altVehicles(){
                 let command = alternateVehicles.rows[i].model + " || " + alternateVehicles.rows[i].license + ` <input type = "radio" name="altVehiclesGroup-edit" onclick = "setVehicle(${i})"><br>`
                 $("#altVehiclesForm-edit").append(command);
             }
-            cleanFields();
+            //cleanFields();
         } else {
             $("#justification-help-edit").removeClass('d-none');
         }
@@ -365,7 +406,7 @@ function altVehicles(){
                 let command = alternateVehicles.rows[i].model + " || " + alternateVehicles.rows[i].license + ` <input type = "radio" name="altVehiclesGroup" onclick = "setVehicle(${i})"><br>`
                 $("#altVehiclesForm").append(command);
             }
-            cleanFields();
+            //cleanFields();
         } else {
             $("#justification-help").removeClass('d-none');
         }
@@ -467,11 +508,12 @@ function newReservation() {
 }
 
 function cancelReservation(){
-    let start = $("." + idToDelete)[0].children[1].children[1].children[0].nextSibling.textContent.substring(2);
-    let end = $("." + idToDelete)[0].children[1].children[1].children[2].nextSibling.textContent.substring(2);
-    let carName = $("." + idToDelete)[0].children[1].children[0].firstChild.textContent.split(" ");
-    let license = carName[carName.length - 1]
-    userSocket.emit('cancel', idToDelete, userEmail, license, start, end, function(){
+    let start = $("#start_" + idToDelete).html();
+    let end = $("#end_" + idToDelete).html();
+    let model = $("#model_" + idToDelete).html();
+    let license = $("#license_" + idToDelete).html();
+
+    userSocket.emit('cancel', idToDelete, userEmail, model, license, start, end, function(){
     });
 
     $("." + idToDelete).remove();
@@ -484,10 +526,52 @@ function cancelReservationProcess(){
     cleanFields();
 }
 
-function addIDToModal(reservationObj){
-    $("#reservation-id-edit").html(reservationObj.id);
-    idToDelete = reservationObj.id;
+function fillInEditModal(data){
+    isEditing = true; 
+
+    $("#reservation-id-edit").html(data.id);
+    $("#start-date-edit").val(data.start);
+    $("#end-date-edit").val(data.end);
+
+    let stopsArr = JSON.parse(data.stops)
+
+    let numExtraStops = stopsArr.length - 3;
+    if(numExtraStops > 0){
+        for(let i = 0; i < numExtraStops; i++){
+            addDestination();
+            console.log("added")
+        }
+    }
+
+    let i = 0;
+    $('.route-stop-edit').each(function() {
+        $(this).val(stopsArr[i]);
+        i++;
+    });
+
+    if(data.needsTrunk == 1){
+        $('#trunk-edit').prop("checked", true);
+    } else {
+        $('#trunk-edit').prop("checked", false);
+    }
+
+    if(data.needsOffRoad == 1){
+        $('#offroading-edit').prop("checked", true);
+    } else {
+        $('#offroading-edit').prop("checked", false);
+    }
+
+    if(data.needsRack == 1){
+        $('#kayak-edit').prop("checked", true);
+    } else {
+        $('#kayak-edit').prop("checked", false);
+    }
 }
+
+// function addIDToModal(reservationObj){
+//     $("#reservation-id-edit").html(reservationObj.id);
+//     idToDelete = reservationObj.id;
+// }
 
 function editReservation(){
     var totalDistance = 0;
@@ -601,26 +685,24 @@ class Reservation {
 
     }
     addToDom(r) {
+        let data = JSON.stringify(r);
+        //console.log(r.id)
+        let imageFilePath = "./media/vehicle_images/"
+        let DOMobject = `<div class="card ${r.border} mb-3 ${r.id} upcomingReservation" style="width: 18rem;">`
+                            + `<img class = "card-img-top" src="${imageFilePath + r.image}">`
+                            + `<div class="card-body">`
+                                + `<h5 class="card-title"><span id="model_${r.id}" class="card-model">${r.model}</span> <span id="license_${r.id}" class="card-license">${r.license}</span></h5>`
+                                + `<p class="card-text"><strong>Start</strong>: <span id="start_${r.id}" class="card-start">${r.start}</span> <br>`
+                                    + `<strong>End</strong>:<span id="end_${r.id}" class="card-end">${r.end}</span> <br>`
+                                        + `<strong>Route</strong>: <span id = "stops_${r.id}">${JSON.parse(r.stops)}</span> </p>`
+                                        + `<span style = "display: none;" id = "res-id">${r.id}</span>`
+                                + `<a href="#" id = "${r.id}" class="btn btn-primary edit" data-toggle="modal" data-target="#editModal" onclick = 'fillInEditModal(${data});'>Edit reservation</a>`
+                                + `<a href="#" id = "${r.id}" class="btn btn-secondary" data-toggle="modal" data-target="#cancelModal" onclick = "setDeleteCard(this);">Cancel</a>`
+                            + `</div>`
+                        + `</div>`;
 
-        let imageFilePath = "./media/vehicle_images/";
-        let stops = "";
-        let stopsArray = JSON.parse(r.stops);
-        for (let i = 0; i < stopsArray.length; i++){
-            stops += `${stopsArray[i]}<br>`;
-        }
-        let DOMobject = `<div class="card border-success mb-3 ${r.id} upcomingReservation" style="width: 18rem;">
-                            <img class = "card-img-top" src="${imageFilePath + r.image}">
-                            <div class="card-body">
-                                <h5 class="card-title"><span class="card-model">${r.model}</span> <span class="card-license">${r.license}</span></h5>
-                                <p class="card-text"><strong>Start</strong>: <span class="card-start">${r.start}</span> <br>
-                                    <strong>End</strong>:<span class="card-end"> ${r.end}</span> <br>
-                                        <span style = "display:none;"><strong>Route</strong>: ${JSON.parse(r.stops)} </span> </p>
-                                        <span style = "display: none;" id = "res-id">${r.id}</span>
-                                <a href="#" id = "${r.id}" class="btn btn-primary edit" data-toggle="modal" data-target="#editModal" onclick = "addIDToModal(this);">Edit reservation</a>
-                                <a href="#" id = "${r.id}" class="btn btn-secondary" data-toggle="modal" data-target="#cancelModal" onclick = "setDeleteCard(this);">Cancel</a>
-                            </div>
-                        </div>`;
         $('.cards').append(DOMobject);
+        //console.log(DOMobject)
     }
 }
 
