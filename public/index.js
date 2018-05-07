@@ -55,7 +55,6 @@ let base =
         '#outlook-btn {' +
           'text-decoration: none; ' +
           'color: white;' + 
-          'font-size: 16px;' +
           'background-color: #17426D; ' +
           'padding: 10px 30px; ' +
           'border-radius: 10px;' +
