@@ -201,9 +201,9 @@ io.of('/admin').on('connection', function(socket){
         removeVehicle(license);
         callback();
     });
-    socket.on('vehicleEdited', function(id, vehicle, callback){
-        editVehicle(id, vehicle);
-        callback();
+    socket.on('vehicleEdited', function(vehicle){
+        editVehicle(vehicle);
+        //callback();
     });
     socket.on('vehicleStatusUpdated', function(license, status, callback){
         updateVehicleStatus(license, status);
@@ -573,17 +573,21 @@ function updateAdminReservations(){
 function updateVehicles(){
     conn.query('SELECT * FROM vehicles',function(error, data){
         io.of('/admin').emit('vehicleChange', data);
+        //console.log(data)
     });
 }
 function addVehicle(vehicle){
-    conn.query('INSERT INTO vehicles VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',[vehicle.license, vehicle.model, vehicle.color, vehicle.status, vehicle.miles, vehicle.isEv, vehicle.trunk, vehicle.offRoad, vehicle.equipmentRack, vehicle.image],function(error, data){
+    conn.query('INSERT INTO vehicles VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?, ?, null, ?)',[vehicle.license, vehicle.model, vehicle.color, vehicle.status, vehicle.miles, vehicle.isEv, vehicle.trunk, vehicle.offRoad, vehicle.equipmentRack, vehicle.image],function(error, data){
+        conn.query('UPDATE vehicles SET featureScore = extraTrunk + offRoad + equipRack WHERE id = ?', [vehicle.id]);
         updateVehicles();
     });
     console.log(vehicle);
 }
-function editVehicle(id, vehicle){
-    conn.query('REPLACE INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, null, ?)',[vehicle.license, vehicle.model, vehicle.color, vehicle.miles, vehicle.status, vehicle.isEv, vehicle.trunk, vehicle.offRoad, vehicle.equipmentRack, vehicle.image],function(error, data){
-        conn.query('UPDATE vehicles SET featureScore = extraTrunk + offRoad + equipRack WHERE id = ?', [id]);
+
+function editVehicle(vehicle){
+    console.log(vehicle)
+    conn.query('UPDATE vehicles SET license = ?, model = ?, color = ?, miles = ?, inService = ?, isEV = ?, extraTrunk = ?, offRoad = ?, equipRack = ?, image = ? WHERE id = ?',[vehicle.license, vehicle.model, vehicle.color, vehicle.miles, vehicle.inService, vehicle.isEV, vehicle.extraTrunk, vehicle.offRoad, vehicle.equipRack, vehicle.image, vehicle.id],function(error, data){
+        conn.query('UPDATE vehicles SET featureScore = extraTrunk + offRoad + equipRack WHERE id = ?', [vehicle.id]);
         updateVehicles();
     });
 }
