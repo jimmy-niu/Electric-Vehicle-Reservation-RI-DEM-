@@ -297,7 +297,7 @@ function renderCar(){
             console.log('added')
             currentCar.id = id;
 
-            $("." + idToDelete).remove();
+            $("." + id).remove();
             console.log(currentCar.isEV);
             new Reservation(currentCar);
             sortReservations();
@@ -473,10 +473,41 @@ function cancelReservationProcess(){
     cleanFields();
 }
 
-function addIDToModal(reservationObj){
-    $("#reservation-id-edit").html(reservationObj.id);
-    idToDelete = reservationObj.id;
+function fillInEditModal(data){
+    $("#reservation-id-edit").html(data.id);
+    $("#start-date-edit").val(data.start);
+    $("#end-date-edit").val(data.end);
+
+    let stopsArr = JSON.parse(data.stops)
+    let i = 0;
+    $('.route-stop-edit').each(function() {
+            $(this).val(stopsArr[i]);
+            i++;
+    });
+
+    if(data.needsTrunk == 1){
+        $('#trunk-edit').prop("checked", true);
+    } else {
+        $('#trunk-edit').prop("checked", false);
+    }
+
+    if(data.needsOffRoad == 1){
+        $('#offroading-edit').prop("checked", true);
+    } else {
+        $('#offroading-edit').prop("checked", false);
+    }
+
+    if(data.needsRack == 1){
+        $('#kayak-edit').prop("checked", true);
+    } else {
+        $('#kayak-edit').prop("checked", false);
+    }
 }
+
+// function addIDToModal(reservationObj){
+//     $("#reservation-id-edit").html(reservationObj.id);
+//     idToDelete = reservationObj.id;
+// }
 
 function editReservation(){
     var totalDistance = 0;
@@ -589,7 +620,7 @@ class Reservation {
 
     }
     addToDom(r) {
-
+        let data = JSON.stringify(r);
         let imageFilePath = "./media/vehicle_images/"
         let DOMobject = `<div class="card border-success mb-3 ${r.id} upcomingReservation" style="width: 18rem;">
                             <img class = "card-img-top" src="${imageFilePath + r.image}">
@@ -599,7 +630,7 @@ class Reservation {
                                     <strong>End</strong>:<span class="card-end"> ${r.end}</span> <br>
                                         <strong>Route</strong>: ${JSON.parse(r.stops)} </p>
                                         <span style = "display: none;" id = "res-id">${r.id}</span>
-                                <a href="#" id = "${r.id}" class="btn btn-primary edit" data-toggle="modal" data-target="#editModal" onclick = "addIDToModal(this);">Edit reservation</a>
+                                <a href="#" id = "${r.id}" class="btn btn-primary edit" data-toggle="modal" data-target="#editModal" onclick = 'fillInEditModal(${data});'>Edit reservation</a>
                                 <a href="#" id = "${r.id}" class="btn btn-secondary" data-toggle="modal" data-target="#cancelModal" onclick = "setDeleteCard(this);">Cancel</a>
                             </div>
                         </div>`;
