@@ -115,6 +115,7 @@ h3 {
     font-weight: bold;
 }
 
-#reportModal .modal-body {
+#reportModal .modal-body,
+#errorModal .modal-body {
     overflow-y: auto;
 }
