@@ -33,17 +33,9 @@ $(document).ready(function() {
          });
     }
     initMap(map);
-    $("#add-stop").click(function() {
-        count++;
-        addStop(count);
-        initMap(count);
-    });
+    $("#add-stop").click(addDestination);
 
-    $("#add-stop-edit").click(function() {
-        count_edit++;
-        addStopEdit(count);
-        initMap(count);
-    });
+    $("#add-stop-edit").click(addDestination);
 
     $("#resModal").on("shown.bs.modal", function () {
         google.maps.event.trigger(map, "resize");
@@ -167,6 +159,18 @@ $(document).ready(function() {
 
 });
 
+function addDestination(){
+    if(isEditing){
+        count_edit++;
+        addStopEdit(count);
+        initMap(count);
+    } else {
+        count++;
+        addStop(count);
+        initMap(count);
+    }
+}
+
 
 function initMap(map) {
     var i;
@@ -239,7 +243,7 @@ function addStopEdit(count) {
         id = "deleteX">x</span></label>
         <input type=text class="form-control route-stop-edit" id="route-stop-` + count + `">
         </div>`
-    $('#stops').append(newStop);
+    $('#stops-edit').append(newStop);
 }
 
 function deleteStop(obj){
@@ -474,15 +478,26 @@ function cancelReservationProcess(){
 }
 
 function fillInEditModal(data){
+    isEditing = true; 
+
     $("#reservation-id-edit").html(data.id);
     $("#start-date-edit").val(data.start);
     $("#end-date-edit").val(data.end);
 
     let stopsArr = JSON.parse(data.stops)
+    
+    let numExtraStops = stopsArr.length - 3;
+    if(numExtraStops > 0){
+        for(let i = 0; i < numExtraStops; i++){
+            addDestination();
+            console.log("added")
+        }
+    }
+
     let i = 0;
     $('.route-stop-edit').each(function() {
-            $(this).val(stopsArr[i]);
-            i++;
+        $(this).val(stopsArr[i]);
+        i++;
     });
 
     if(data.needsTrunk == 1){
