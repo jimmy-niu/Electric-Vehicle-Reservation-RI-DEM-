@@ -443,7 +443,7 @@ function newReservation() {
         //2018-05-09 03:00
         //alert(end);
         var endDateString = endDate.getFullYear() + "-" + ("0"+(endDate.getMonth() + 1)).slice(-2) + "-" + ("0" + endDate.getDate()).slice(-2) + " " + ("0" + (endDate.getHours() + 6)).slice(-2) + ":" + ("0" + endDate.getMinutes()).slice(-2);
-        alert(endDateString)
+        // alert(endDateString)
         /*if (23 > 20) {
             let resData = {user: userEmail, start: endDate.toString(), end: (new Date(endDate.setHours(endDate.getHours() + 2))).toString(), stops: "", override: false, justification: "", needsTrunk: false, needsOffRoad: false, needsRack: false};
             userSocket.emit('reservation', resData, function(){
