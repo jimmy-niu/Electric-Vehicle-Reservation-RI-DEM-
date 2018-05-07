@@ -543,12 +543,16 @@ app.get('/auth/outlook',
         function(req, res) {
 });
 
-app.get('/admin/download/users', function(req, res){
-    exportUsers(function(){
-        res.download(__dirname + '/public/temp/users.csv',function(){
-            fs.unlink(__dirname + '/public/temp/users.csv');
+app.get('/admin/download/users', passport.authenticate('windowslive', { failureRedirect: '/' }),
+    function(req, res){
+    var user_email = req.user._json.EmailAddress;
+    if (adminEmails.includes(user_email)) {
+        exportUsers(function(){
+            res.download(__dirname + '/public/temp/users.csv',function(){
+                fs.unlink(__dirname + '/public/temp/users.csv');
+            });
         });
-    });
+    }
 });
 
 app.get('/admin/download/vehicles', function(req, res){
