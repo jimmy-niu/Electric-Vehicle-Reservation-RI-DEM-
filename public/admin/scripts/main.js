@@ -112,16 +112,20 @@ function addVehicle(){
     let trunk = $('#extraTrunkChoice').is(':checked');
     let offRoad = $('#offRoadChoice').is(':checked');
     let equipmentRack = $('#equipChoice').is(':checked');
+    let image = $('#imageFileName').val();
 
     if(license !== '' && model !== '' && color !== ''){
         let vehicle = {license: license, model: model, color: color, miles: miles, status: status,
-                       isEv: carType, trunk: trunk, offRoad: offRoad, equipmentRack: equipmentRack};
+                       isEv: carType, trunk: trunk, offRoad: offRoad, equipmentRack: equipmentRack, image: image};
         console.time("Add Vehicle");
         adminSocket.emit("vehicleAdded", vehicle, function(){
             console.timeEnd("Add Vehicle");
-        });
+        }); 
     }
-    cleanFields();
+    clearForms($("#carSpecs"));
+    clearForms($("#carCaps"));
+    clearForms($("#frmUploader"));
+    console.log($("#imageFileName").val());
 }
 
 function editVehicle(id, vehicle){
@@ -210,20 +214,23 @@ function setUploader(){
     // bind to the form's submit event
     $('#frmUploader').unbind("submit").bind("submit", function(e){
         e.preventDefault();
-
-        let options = {
-            resetForm: true,
-            data: {license: ""},
-            success: function(data){
-                console.log("inside the thingy!");
-                console.log(data);
-                console.log("we done!");
-                clearForms($("#frmUploader"));
-            }
-        };
-        options.data.license = $("#licenseField").val();
-        $(this).ajaxSubmit(options);
+        if($('#licenseField').val() === "" || $('#licenseField').val() === undefined){
+            window.alert("Please enter a license plate number before uploading the vehicle!")
+        } else {
+            let options = {
+                data: {license: ""},
+                success: finishedUpload
+            };
+            options.data.license = $("#licenseField").val();
+            $(this).ajaxSubmit(options);
+        }
     });
+}
+
+function finishedUpload(data){
+    console.log(data);
+    $('#imageFileName').val(data);
+    window.alert("Image uploaded successfully!");
 }
 
 /*
