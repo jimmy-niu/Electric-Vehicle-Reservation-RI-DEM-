@@ -17,7 +17,7 @@ var autocompletes_edit = {};
 
 // Sets up the sockets.
 $(document).ready(function() {
-    /*var mapOptions = {
+    var mapOptions = {
         center: new google.maps.LatLng(41.8267, -71.3977),
         zoom: 15,
         mapTypeId: google.maps.MapTypeId.ROADMAP
@@ -47,7 +47,7 @@ $(document).ready(function() {
 
     $("#resModal").on("shown.bs.modal", function () {
         google.maps.event.trigger(map, "resize");
-    });*/
+    });
 
     $("#cancel-res").click(cancelReservation);
     //$("#add-stop").click(function() {addStop(); return false; });
@@ -379,7 +379,7 @@ function deleteStop(obj){
 
 function newReservation() {
     // let user = // ???
-    /*var bounds = new google.maps.LatLngBounds();
+    var bounds = new google.maps.LatLngBounds();
     var ac_sorted = Object.values(sortOnKeys(autocompletes))
 
     map.setZoom(15);
@@ -413,7 +413,7 @@ function newReservation() {
             $("#distanceMText").html($("#distanceMText").html() + (totalDistance * 0.000621371).toFixed(2) + " miles");
             $("#durationMText").html($("#durationMText").html() + (totalDuration / 60.0).toFixed(0) + " minutes");
         }
-    });*/
+    });
 
     let start = $("#start-date").val();
     let end = $("#end-date").val();
@@ -445,7 +445,7 @@ function newReservation() {
         //2018-05-09 03:00
         //alert(end);
         var endDateString = endDate.getFullYear() + "-" + ("0"+(endDate.getMonth() + 1)).slice(-2) + "-" + ("0" + endDate.getDate()).slice(-2) + " " + ("0" + (endDate.getHours() + 6)).slice(-2) + ":" + ("0" + endDate.getMinutes()).slice(-2);
-        //alert(endDateString)
+        alert(endDateString)
         /*if (23 > 20) {
             let resData = {user: userEmail, start: endDate.toString(), end: (new Date(endDate.setHours(endDate.getHours() + 2))).toString(), stops: "", override: false, justification: "", needsTrunk: false, needsOffRoad: false, needsRack: false};
             userSocket.emit('reservation', resData, function(){
