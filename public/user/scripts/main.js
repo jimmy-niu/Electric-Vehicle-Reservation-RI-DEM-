@@ -14,6 +14,7 @@ var map = null;
 var map_edit = null;
 var autocompletes = {};
 var autocompletes_edit = {};
+var directionsDisplay = null;
 
 // Sets up the sockets.
 $(document).ready(function() {
@@ -23,14 +24,16 @@ $(document).ready(function() {
         mapTypeId: google.maps.MapTypeId.ROADMAP
     };
     map = new google.maps.Map(document.getElementById("mapCanvas"), mapOptions);
-    map_edit = new google.maps.Map(document.getElementById("mapCanvasEdit"), mapOptions);
+    //map_edit = new google.maps.Map(document.getElementById("mapCanvasEdit"), mapOptions);
+
+    directionsDisplay = new google.maps.DirectionsRenderer;
 
     if (navigator.geolocation) {
-         navigator.geolocation.getCurrentPosition(function (position) {
-             initialLocation = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
-             map.setCenter(initialLocation);
-             map_edit.setCenter(initialLocation);
-         });
+        navigator.geolocation.getCurrentPosition(function (position) {
+            initialLocation = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+            map.setCenter(initialLocation);
+            //map_edit.setCenter(initialLocation);
+        });
     }
     initMap(map);
     $("#add-stop").click(addDestination);
@@ -67,11 +70,10 @@ $(document).ready(function() {
     userSocket.on('reservationChange', function(reservations){
         console.log("reservation change");
         $("." + idToDelete).remove();
-        cleanFields();
     });
 
     userSocket.on('reassignReservation', function(data){
-         console.log("reservations reassigned");
+        console.log("reservations reassigned");
     });
 
     userSocket.on('newReservation', function(vehicles, reservation, isEdit, canCarpool, carpoolUsers){
@@ -97,7 +99,6 @@ $(document).ready(function() {
             }
         }
         isEditing = isEdit;
-        cleanFields();
         if(isEditing){
             $("#carMakeMText-edit").html($("#carMakeMText-edit").html() + reservation.model);
             $("#plateNumberMText-edit").html($("#plateNumberMText-edit").html() + reservation.license);
@@ -110,14 +111,14 @@ $(document).ready(function() {
             $("#plateNumberMText").html($("#plateNumberMText").html() + reservation.license);
             $("#startMText").html($("#startMText").html() + reservation.start);
             $("#endMText").html($("#endMText").html() + reservation.end);
-            
+
             let stopsArray = JSON.parse(reservation.stops);
             let stop = "<ol>";
             for(let i=0; i<stopsArray.length; i++){
                 stop += `<li>${stopsArray[i]}</li>`;
             }
             stop += "</ol>";
-            
+
             $("#stopsMText").html($("#stopsMText").html() + "<br>" + stop);
             $("#resModal").modal();
         }
@@ -151,7 +152,7 @@ $(document).ready(function() {
             $("#messageMText-edit").html("You have an existing reservation that overlaps with the times you selected.");
             $('#errorModal-edit').modal();
         } else {
-           $("#messageMText").html("You have an existing reservation that overlaps with the times you selected.");
+            $("#messageMText").html("You have an existing reservation that overlaps with the times you selected.");
             $('#errorModal').modal();
         }
     });
@@ -262,25 +263,29 @@ function getBoundsZoomLevel(bounds, mapDim) {
 
 function addStop(count) {
     let newStop = ` <div class="form-group">
-        <label>Destination <span onclick = "deleteStop(this);"
-        id = "deleteX">x</span></label>
-        <input type=text class="form-control route-stop" id="route-stop-` + count + `">
-        </div>`
-    $('#stops').append(newStop);
+<label>Destination <span onclick = "deleteStop(this);"
+id = "deleteX">x</span></label>
+<input type=text class="form-control route-stop" id="route-stop-` + count + `">
+</div>`
+    $('#new-stops').append(newStop);
 }
 
 function addStopEdit(count) {
     let newStop = ` <div class="form-group">
-        <label>Destination <span onclick = "deleteStop(this);"
-        id = "deleteX">x</span></label>
-        <input type=text class="form-control route-stop-edit" id="route-stop-` + count + `">
-        </div>`
+<label>Destination <span onclick = "deleteStop(this);"
+id = "deleteX">x</span></label>
+<input type=text class="form-control route-stop-edit" id="route-stop-` + count + `">
+</div>`
     $('#stops-edit').append(newStop);
 }
 
 function deleteStop(obj){
+    count--;
+    count_edit--;
     let toDelete = obj.parentNode.parentNode;
-    toDelete.parentNode.removeChild(toDelete);
+    console.log(toDelete.children[1].id); //.replace(`${obj}`));
+    delete autocompletes[toDelete.children[1].id];
+    $(toDelete).remove();
 }
 
 function sortOnKeys(dict) {
@@ -304,6 +309,10 @@ function cleanFields(){
         $("#startMText-edit").html("<span class='reservation-label'>Start Time</span>: ");
         $("#endMText-edit").html("<span class='reservation-label'>End Time</span>: ");
         $("#stopsMText-edit").html("<span class='reservation-label'>Stops</span>: ");
+
+        $("#distanceMText").html(`<span class="reservation-label">Total distance</span>: `);
+        $("#durationMText").html(`<span class="reservation-label">Total duration</span>: `);
+
         $("#new-stops-edit").empty();
     } else {
         $("#carMakeMText").html("<span class='reservation-label'>Car Model</span>: ");
@@ -311,9 +320,25 @@ function cleanFields(){
         $("#startMText").html("<span class='reservation-label'>Start Time</span>: ");
         $("#endMText").html("<span class='reservation-label'>End Time</span>: ");
         $("#stopsMText").html("<span class='reservation-label'>Stops</span>: ");
+
+        $("#distanceMText").html(`<span class="reservation-label">Total distance</span>: `);
+        $("#durationMText").html(`<span class="reservation-label">Total duration</span>: `);
+
+        $("#newReservationBody")
+            .find("input,textarea,select")
+            .val('')
+            .end()
+            .find("input[type=checkbox], input[type=radio]")
+            .prop("checked", "")
+            .end();
         $("#new-stops").empty();
     }
+    autocompletes = {};
 }
+
+$('#modal1').on('hidden.bs.modal', function (e) {
+
+})
 
 function override(){
     if(isEditing){
@@ -391,7 +416,7 @@ function altVehicles(){
                 let command = alternateVehicles.rows[i].model + " || " + alternateVehicles.rows[i].license + ` <input type = "radio" name="altVehiclesGroup-edit" onclick = "setVehicle(${i})"><br>`
                 $("#altVehiclesForm-edit").append(command);
             }
-            cleanFields();
+            //cleanFields();
         } else {
             $("#justification-help-edit").removeClass('d-none');
         }
@@ -406,38 +431,19 @@ function altVehicles(){
                 let command = alternateVehicles.rows[i].model + " || " + alternateVehicles.rows[i].license + ` <input type = "radio" name="altVehiclesGroup" onclick = "setVehicle(${i})"><br>`
                 $("#altVehiclesForm").append(command);
             }
-            cleanFields();
+            //cleanFields();
         } else {
             $("#justification-help").removeClass('d-none');
         }
     }
 }
 
-
-/*function addStop() {
-    console.log("we in addStop");
-    let newStop = ` <div class="form-group">
-<label>Destination <span onclick = "deleteStop(this);"
-id = "deleteX">x</span></label>
-<input type=text class="form-control route-stop">
-</div>`
-    $('#stops').append(newStop);
-}
-
-function deleteStop(obj){
-    let toDelete = obj.parentNode.parentNode;
-    toDelete.parentNode.removeChild(toDelete);
-}*/
-
 function newReservation() {
-    // let user = // ???
     var bounds = new google.maps.LatLngBounds();
     var ac_sorted = Object.values(sortOnKeys(autocompletes))
 
-    map.setZoom(15);
     var directionsService = new google.maps.DirectionsService;
-    var directionsDisplay = new google.maps.DirectionsRenderer;
-    directionsDisplay.setMap(map)
+    directionsDisplay.setMap(map);
 
     var waypoints = [];
     for (var i = 1; i < ac_sorted.length - 1; i++) {
@@ -577,53 +583,39 @@ function editReservation(){
     var totalDistance = 0;
     var totalDuration = 0;
     var bounds = new google.maps.LatLngBounds();
-    var ac_sorted = Object.values(sortOnKeys(autocompletes_edit))
+    var ac_sorted = Object.values(sortOnKeys(autocompletes_edit));
+    
+    /*var directionsService = new google.maps.DirectionsService;
+    var directionsDisplay = new google.maps.DirectionsRenderer;
+    directionsDisplay.setMap(map_edit);
 
-    /*for (var i = 0; i < ac_sorted.length; i++) {
-        /*var marker = new google.maps.Marker({
-            position: ac_sorted[i].geometry.location,
-            map: map,
-            status: "active"
+    var waypoints = [];
+    for (var i = 1; i < ac_sorted.length - 1; i++) {
+        waypoints.push({
+            location: new google.maps.LatLng(ac_sorted[i].geometry.location.lat(), ac_sorted[i].geometry.location.lng()),
+            stopover: true
         })
-        //alert(JSON.stringify(ac_sorted[key].geometry.location))
-        var coords = new google.maps.LatLng(ac_sorted[i].geometry.location.lat(), ac_sorted[i].geometry.location.lng())
-        bounds.extend(coords)
     }
-    map.fitBounds(bounds);*/
-
-    // map_edit.setZoom(15);
-    // var directionsService = new google.maps.DirectionsService;
-    // var directionsDisplay = new google.maps.DirectionsRenderer;
-    // directionsDisplay.setMap(map_edit)
-
-    // var waypoints = [];
-    // for (var i = 1; i < ac_sorted.length - 1; i++) {
-    //     waypoints.push({
-    //         location: new google.maps.LatLng(ac_sorted[i].geometry.location.lat(), ac_sorted[i].geometry.location.lng()),
-    //         stopover: true
-    //     })
-    // }
-    // directionsService.route({
-    //     origin: new google.maps.LatLng(ac_sorted[0].geometry.location.lat(), ac_sorted[0].geometry.location.lng()),
-    //     destination: new google.maps.LatLng(ac_sorted[ac_sorted.length - 1].geometry.location.lat(), ac_sorted[ac_sorted.length - 1].geometry.location.lng()),
-    //     waypoints: waypoints,
-    //     travelMode: 'DRIVING'
-    // }, function(response, status) {
-    //     if (status === 'OK') {
-    //         var totalDistance = 0;
-    //         var totalDuration = 0;
-    //         directionsDisplay.setDirections(response);
-    //         // calculate time and distance
-    //         var legs = response.routes[0].legs;
-    //         for(var i = 0; i < legs.length; i++) {
-    //             totalDistance += legs[i].distance.value;
-    //             totalDuration += legs[i].duration.value;
-    //         }
-    //         $("#distanceMText-edit").html($("#distanceMText-edit").html() + (totalDistance * 0.000621371).toFixed(2) + " miles");
-    //         $("#durationMText-edit").html($("#durationMText-edit").html() + (totalDuration / 60.0).toFixed(0) + " minutes");
-    //     }
-    // });
-
+    directionsService.route({
+        origin: new google.maps.LatLng(ac_sorted[0].geometry.location.lat(), ac_sorted[0].geometry.location.lng()),
+        destination: new google.maps.LatLng(ac_sorted[ac_sorted.length - 1].geometry.location.lat(), ac_sorted[ac_sorted.length - 1].geometry.location.lng()),
+        waypoints: waypoints,
+        travelMode: 'DRIVING'
+    }, function(response, status) {
+        if (status === 'OK') {
+            var totalDistance = 0;
+            var totalDuration = 0;
+            directionsDisplay.setDirections(response);
+            // calculate time and distance
+            var legs = response.routes[0].legs;
+            for(var i = 0; i < legs.length; i++) {
+                totalDistance += legs[i].distance.value;
+                totalDuration += legs[i].duration.value;
+            }
+            $("#distanceMText-edit").html($("#distanceMText-edit").html() + (totalDistance * 0.000621371).toFixed(2) + " miles");
+            $("#durationMText-edit").html($("#durationMText-edit").html() + (totalDuration / 60.0).toFixed(0) + " minutes");
+        }
+    });*/
     let id =  $("#reservation-id-edit").html();
     let start = $("#start-date-edit").val();
     let end = $("#end-date-edit").val();
@@ -689,17 +681,17 @@ class Reservation {
         //console.log(r.id)
         let imageFilePath = "./media/vehicle_images/"
         let DOMobject = `<div class="card ${r.border} mb-3 ${r.id} upcomingReservation" style="width: 18rem;">`
-                            + `<img class = "card-img-top" src="${imageFilePath + r.image}">`
-                            + `<div class="card-body">`
-                                + `<h5 class="card-title"><span id="model_${r.id}" class="card-model">${r.model}</span> <span id="license_${r.id}" class="card-license">${r.license}</span></h5>`
-                                + `<p class="card-text"><strong>Start</strong>: <span id="start_${r.id}" class="card-start">${r.start}</span> <br>`
-                                    + `<strong>End</strong>:<span id="end_${r.id}" class="card-end">${r.end}</span> <br>`
-                                        + `<strong>Route</strong>: <span id = "stops_${r.id}">${JSON.parse(r.stops)}</span> </p>`
-                                        + `<span style = "display: none;" id = "res-id">${r.id}</span>`
-                                + `<a href="#" id = "${r.id}" class="btn btn-primary edit" data-toggle="modal" data-target="#editModal" onclick = 'fillInEditModal(${data});'>Edit reservation</a>`
-                                + `<a href="#" id = "${r.id}" class="btn btn-secondary" data-toggle="modal" data-target="#cancelModal" onclick = "setDeleteCard(this);">Cancel</a>`
-                            + `</div>`
-                        + `</div>`;
+        + `<img class = "card-img-top" src="${imageFilePath + r.image}">`
+        + `<div class="card-body">`
+        + `<h5 class="card-title"><span id="model_${r.id}" class="card-model">${r.model}</span> <span id="license_${r.id}" class="card-license">${r.license}</span></h5>`
+        + `<p class="card-text"><strong>Start</strong>: <span id="start_${r.id}" class="card-start">${r.start}</span> <br>`
+        + `<strong>End</strong>:<span id="end_${r.id}" class="card-end">${r.end}</span> <br>`
+        + `<strong>Route</strong>: <span id = "stops_${r.id}">${JSON.parse(r.stops)}</span> </p>`
+        + `<span style = "display: none;" id = "res-id">${r.id}</span>`
+        + `<a href="#" id = "${r.id}" class="btn btn-primary edit" data-toggle="modal" data-target="#editModal" onclick = 'fillInEditModal(${data});'>Edit reservation</a>`
+        + `<a href="#" id = "${r.id}" class="btn btn-secondary" data-toggle="modal" data-target="#cancelModal" onclick = "setDeleteCard(this);">Cancel</a>`
+        + `</div>`
+        + `</div>`;
 
         $('.cards').append(DOMobject);
         //console.log(DOMobject)
@@ -718,14 +710,14 @@ class OldReservation {
     addToDom(r) {
         let imageFilePath = "./media/vehicle_images/";
         let DOMobject = `<div class="card mb-3 ${r.border}" style="width: 18rem;">
-                            <img class = "card-img-top" src="${imageFilePath + r.image}">
-                            <div class="card-body">
-                                <h5 class="card-title">${r.model} ${r.license}</h5>
-                                <p class="card-text"><strong>Start</strong>: ${r.start}<br>
-                                    <strong>End</strong>: ${r.end}</p>
-                                    <a href="#" class="btn btn-primary edit" data-toggle="modal" data-target="#reportModal">Make report </a>
-                            </div>
-                        </div>`;
+<img class = "card-img-top" src="${imageFilePath + r.image}">
+<div class="card-body">
+<h5 class="card-title">${r.model} ${r.license}</h5>
+<p class="card-text"><strong>Start</strong>: ${r.start}<br>
+<strong>End</strong>: ${r.end}</p>
+<a href="#" class="btn btn-primary edit" data-toggle="modal" data-target="#reportModal">Make report </a>
+</div>
+</div>`;
         $('#old-reservations').prepend(DOMobject);
     }
 }
@@ -737,19 +729,19 @@ function overrideVehicle(reservationID, license, model, justification){
 
 function sortReservations(){
     var cards = $('.cards');
-	var reservations = $('.upcomingReservation');
+    var reservations = $('.upcomingReservation');
     console.log(reservations);
     reservations.sort(function(a,b){
-	       var an = $(a).find('.card-end').html().toString().trim();
-		   var bn = $(b).find('.card-end').html().toString().trim();
+        var an = $(a).find('.card-end').html().toString().trim();
+        var bn = $(b).find('.card-end').html().toString().trim();
 
-	       if(an > bn) {
-		       return 1;
-	       }
-	       if(an < bn) {
-		       return -1;
-	       }
-	       return 0;
+        if(an > bn) {
+            return 1;
+        }
+        if(an < bn) {
+            return -1;
+        }
+        return 0;
     });
 
     reservations.detach().appendTo(cards);

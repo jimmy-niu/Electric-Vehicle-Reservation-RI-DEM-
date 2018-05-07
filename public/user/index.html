@@ -10,7 +10,7 @@
         <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js" integrity="sha384-cs/chFZiN24E4KMATLdqdvsezGxaGsi4hLGOzlXwp5UZB1LY//20VyM2taTB4QvJ" crossorigin="anonymous"></script>
         <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js" integrity="sha384-uefMccjFJAIv6A+rW+L4AHf99KvxDjWSu1z9VI8SKNVmz4sk7buKt/6v9KI65qnm" crossorigin="anonymous"></script>
-        <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC8Z1eImtyFGgIBO_HyUZqeN5M5DW6z0e4&libraries=places"
+        <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCkO-QHCX9_TOtsTOpkh1ssAJRG0ZZYLec&libraries=places"
                 async defer></script>
         <script src="/socket.io/socket.io.js"></script>
 
@@ -66,7 +66,7 @@
                                 <span aria-hidden="true">&times;</span>
                             </button>
                         </div>
-                        <div class="modal-body">
+                        <div id = "newReservationBody" class="modal-body">
                             <form>
                                 <div class="form-group">
                                     <label for="start-date">Reservation Start</label>
@@ -87,6 +87,8 @@
                                         <input class="form-control route-stop" id="route-stop-2" type="text" placeholder="Enter a location"/>
                                         <!-- <input type=text class="form-control route-stop" value="Home"> -->
                                     </div>
+                                </div>
+                                <div id = "new-stops">
                                 </div>
                                 <div class="form-group">
                                     <label>Dropoff Location</label>
@@ -225,9 +227,9 @@
                             <p id = "startMText-edit"><span class="reservation-label">Start Time</span>: </p>
                             <p id = "endMText-edit"><span class="reservation-label">End Date</span>: </p>
                             <p id = "stopsMText-edit"><span class="reservation-label">Stops</span>: </p>
-                            <p id = "distanceMText-edit"><span class="reservation-label">Total distance</span>: </p>
+                            <!-- <p id = "distanceMText-edit"><span class="reservation-label">Total distance</span>: </p>
                             <p id = "durationMText-edit"><span class="reservation-label">Total duration</span>: </p>
-                            <div id="mapCanvasEdit" style="width: 450px; height: 300px; margin-left:auto; margin-right:auto; margin-bottom: 10px"></div>
+                            <div id="mapCanvasEdit" style="width: 450px; height: 300px; margin-left:auto; margin-right:auto; margin-bottom: 10px"></div> -->
                         </div>
                         <div class="modal-footer" id="acceptDeclineButtons-edit">
                             <button type="button" id="decline-edit" class="btn btn-danger" data-toggle="modal" data-target="#declineModal-edit" data-dismiss="modal">Decline</button>
