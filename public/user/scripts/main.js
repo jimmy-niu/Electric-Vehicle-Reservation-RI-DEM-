@@ -91,7 +91,15 @@ $(document).ready(function() {
             $("#plateNumberMText").html($("#plateNumberMText").html() + reservation.license);
             $("#startMText").html($("#startMText").html() + reservation.start);
             $("#endMText").html($("#endMText").html() + reservation.end);
-            $("#stopsMText").html($("#stopsMText").html() + JSON.parse(reservation.stops));
+            
+            let stopsArray = JSON.parse(reservation.stops);
+            let stop = "<ol>";
+            for(let i=0; i<stopsArray.length; i++){
+                stop += `<li>${stopsArray[i]}</li>`;
+            }
+            stop += "</ol>";
+            
+            $("#stopsMText").html($("#stopsMText").html() + "<br>" + stop);
             $("#resModal").modal();
         }
     });
@@ -129,7 +137,13 @@ $(document).ready(function() {
         }
     });
 
-    flatpickr(".datePicker", {enableTime: true, dateFormat: "Y-m-d H:i"});
+    flatpickr(".datePicker", {
+        enableTime: true,
+        dateFormat: "Y-m-d H:i",
+        minDate: "today",
+        // defaultDate: "today",
+    });
+
     jQuery.fn.carousel.Constructor.TRANSITION_DURATION = 5000;
 
 
@@ -139,8 +153,6 @@ $(document).ready(function() {
             let a = $('.upcomingReservation').eq(i).find('.card-end').html().toString().trim();
             let n = new Date(Date.now());
             let b = n.getFullYear() + "-" + ("0"+(n.getMonth() + 1)).slice(-2) + "-" + ("0" + n.getDate()).slice(-2) + " " + ("0" + (n.getHours())).slice(-2) + ":" + ("0" + n.getMinutes()).slice(-2);
-            console.log(a);
-            console.log(b);
             let border;
             if($('.upcomingReservation').eq(i).hasClass('.border-success')){
                 border = 1;
@@ -269,18 +281,18 @@ function sortOnKeys(dict) {
 function cleanFields(){
     if(isEditing){
         console.log('clean edit')
-        $("#carMakeMText-edit").html("Car Model: ");
-        $("#plateNumberMText-edit").html("License Plate: ");
-        $("#startMText-edit").html("Start Time: ");
-        $("#endMText-edit").html("End Time: ");
-        $("#stopsMText-edit").html("Stops: ");
+        $("#carMakeMText-edit").html("<span class='reservation-label'>Car Model</span>: ");
+        $("#plateNumberMText-edit").html("<span class='reservation-label'>License Plate</span>: ");
+        $("#startMText-edit").html("<span class='reservation-label'>Start Time</span>: ");
+        $("#endMText-edit").html("<span class='reservation-label'>End Time</span>: ");
+        $("#stopsMText-edit").html("<span class='reservation-label'>Stops</span>: ");
         $("#new-stops-edit").empty();
     } else {
-        $("#carMakeMText").html("Car Model: ");
-        $("#plateNumberMText").html("License Plate: ");
-        $("#startMText").html("Start Time: ");
-        $("#endMText").html("End Time: ");
-        $("#stopsMText").html("Stops: ");
+        $("#carMakeMText").html("<span class='reservation-label'>Car Model</span>: ");
+        $("#plateNumberMText").html("<span class='reservation-label'>License Plate</span>: ");
+        $("#startMText").html("<span class='reservation-label'>Start Time</span>: ");
+        $("#endMText").html("<span class='reservation-label'>End Time</span>: ");
+        $("#stopsMText").html("<span class='reservation-label'>Stops</span>: ");
         $("#new-stops").empty();
     }
 }
@@ -448,7 +460,7 @@ function newReservation() {
         //2018-05-09 03:00
         //alert(end);
         var endDateString = endDate.getFullYear() + "-" + ("0"+(endDate.getMonth() + 1)).slice(-2) + "-" + ("0" + endDate.getDate()).slice(-2) + " " + ("0" + (endDate.getHours() + 6)).slice(-2) + ":" + ("0" + endDate.getMinutes()).slice(-2);
-        alert(endDateString)
+        // alert(endDateString)
         /*if (23 > 20) {
             let resData = {user: userEmail, start: endDate.toString(), end: (new Date(endDate.setHours(endDate.getHours() + 2))).toString(), stops: "", override: false, justification: "", needsTrunk: false, needsOffRoad: false, needsRack: false};
             userSocket.emit('reservation', resData, function(){
@@ -630,10 +642,12 @@ class Reservation {
         } else {
             reservationData.border = "border-danger";
         }
+        console.log(reservationData);
         this.addToDom(reservationData);
 
     }
     addToDom(r) {
+<<<<<<< HEAD
         let data = JSON.stringify(r);
         //console.log(r.id)
         let imageFilePath = "./media/vehicle_images/"
@@ -649,6 +663,7 @@ class Reservation {
                                 + `<a href="#" id = "${r.id}" class="btn btn-secondary" data-toggle="modal" data-target="#cancelModal" onclick = "setDeleteCard(this);">Cancel</a>`
                             + `</div>`
                         + `</div>`;
+
         $('.cards').append(DOMobject);
         //console.log(DOMobject)
     }
@@ -664,8 +679,9 @@ class OldReservation {
         this.addToDom(reservationData);
     }
     addToDom(r) {
+        let imageFilePath = "./media/vehicle_images/";
         let DOMobject = `<div class="card mb-3 ${r.border}" style="width: 18rem;">
-                            <img class = "card-img-top" src="https://media.ed.edmunds-media.com/ford/explorer/2017/oem/2017_ford_explorer_4dr-suv_platinum_rq_oem_1_815.jpg" alt="explorer placeholder image">
+                            <img class = "card-img-top" src="${imageFilePath + r.image}">
                             <div class="card-body">
                                 <h5 class="card-title">${r.model} ${r.license}</h5>
                                 <p class="card-text"><strong>Start</strong>: ${r.start}<br>

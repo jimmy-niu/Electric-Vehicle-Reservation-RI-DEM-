@@ -692,11 +692,12 @@ function newReservation(socket, reservationInfo, isEdit){
             //     carpoolNotification(carpoolUsers);
             // }
 
-            conn.query('SELECT license, model, vehicles.isEV FROM vehicles WHERE extraTrunk >= ? AND offRoad >= ? AND equipRack >= ? AND license NOT IN (SELECT license FROM reservations WHERE start <= ? AND end >= ?) ORDER BY isEV DESC, featureScore ASC, miles ASC', [needsTrunk, needsOffRoad, needsRack, reservationInfo.end, reservationInfo.start], function(error, data){
+            conn.query('SELECT license, model, vehicles.isEV, image FROM vehicles WHERE extraTrunk >= ? AND offRoad >= ? AND equipRack >= ? AND license NOT IN (SELECT license FROM reservations WHERE start <= ? AND end >= ?) ORDER BY isEV DESC, featureScore ASC, miles ASC', [needsTrunk, needsOffRoad, needsRack, reservationInfo.end, reservationInfo.start], function(error, data){
                 if(data.rows.length !== 0){
                     reservationInfo.model = data.rows[0].model;
                     reservationInfo.license = data.rows[0].license;
                     reservationInfo.isEV = data.rows[0].isEV;
+                    reservationInfo.image = data.rows[0].image;
                     socket.emit('newReservation', data, reservationInfo, isEdit, canCarpool, carpoolUsers);
                 } else {
                     socket.emit('noVehicle');
@@ -827,6 +828,7 @@ let fs = require('fs');
 
 app.post("/admin/api/Upload", upload.single("imgUploader"), function (req, res) {
     let newName = `${req.body.license}.${req.file.mimetype.replace("image/", "")}`;
+
     fs.rename(`public/user/media/vehicle_images/${tempName}`, `public/user/media/vehicle_images/${newName}`, function(err){
         if ( err ) {
             console.log('ERROR: ' + err);

@@ -31,14 +31,30 @@ body {
     padding-top: 12px;
 }
 
+
+.card-img-top{
+    max-height: 15vw !important;
+}
+
+.card-body{
+    max-height: 60vh;
+    overflow: auto;
+}
+
+
 #deleteX {
     color: grey;
     cursor: pointer;
 }
 
-.modal-body {
+.bold{
+    font-weight: 600;
+    color: orange;
+}
+
+.modal-body{
     overflow: auto;
-    max-height: 550px;
+    max-height: 72vh;
 }
 
 .btn-danger{
@@ -112,5 +128,9 @@ h3 {
 
 #decline {
     margin-right: auto;
+    font-weight: bold;
+}
+
+.reservation-label {
     font-weight: bold;
 }
