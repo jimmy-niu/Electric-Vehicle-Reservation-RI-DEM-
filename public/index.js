@@ -30,12 +30,13 @@ let base =
         'html { ' +
           'background-image: url("https://goo.gl/WLebPB");' +
           'background-position: center 10%; ' +
+          'background-repeat: no-repeat;' +
         '}' +
 
         '#login-container { ' + 
           'background-color: rgba(255, 255, 255, .8);' +
           'width: 400px; ' +
-          'height: 230px; ' +
+          'height: 30vh; ' +
           'margin: auto; ' +
           'border-radius: 30px; ' +
           'padding-left: 15px; ' +
@@ -51,13 +52,14 @@ let base =
           'font-size: 14px;' +
         '}' +
 
-        '#outlook-btn { ' +
+        '#outlook-btn {' +
           'text-decoration: none; ' +
-          'background-color: #17426D; ' +
           'color: white;' + 
+          'font-size: 16px;' +
+          'background-color: #17426D; ' +
           'padding: 10px 30px; ' +
           'border-radius: 10px;' +
-          'margin-left: 17%;' +
+          'border: 0;' +
         '}' +
 
         '#logo{ height: 8vh; padding-right: 1vw; }' +
@@ -92,7 +94,7 @@ module.exports = {
     '<li>Edit or cancel a reservation</li>'+
     '<li>Get email notifications</li>'+
     '<li>Integrate seamlessly with Outlook Calendar</li></ul>'+
-    '<a id="outlook-btn" href="/auth/outlook">Sign in with Outlook</a>' +
+    '<div style="text-align: center;"><a id="outlook-btn" href="/auth/outlook">Sign in with Outlook</a></div>' +
     '</div>';
     return base.replace('%body%', html);
   },
