@@ -4,7 +4,6 @@ let currentVehicle = 0;
 // Sets up the sockets.
 $(document).ready(function() {
     adminSocket.emit('updatePage', function(){
-        console.timeEnd('Page Update Event');
     });
 
     adminSocket.on('reservationChange', function(reservations){
@@ -21,15 +20,19 @@ $(document).ready(function() {
     });
 
     adminSocket.on('vehicleChange', function(vehicles){
-        for(let i = currentVehicle; i < vehicles.rowCount; i ++){
+        // for(let i = currentVehicle; i < vehicles.rowCount; i ++){
+        //     new Vehicle(vehicles.rows[i]);
+        //     currentVehicle ++;
+        // }
+        $('#current_fleet').empty();
+        for(let i = 0; i < vehicles.rowCount; i++){
             new Vehicle(vehicles.rows[i]);
-            currentVehicle ++;
         }
     });
 
     adminSocket.on('reportChange', function(reports){
         // TODO: actually make this do something???
-        console.log(reports);
+        //console.log(reports);
     });
 
     setUploader();
@@ -103,6 +106,7 @@ function modifyUser() {
 }
 
 function addVehicle(){
+    let id = $('#vinField').val();
     let license = $('#licenseField').val();
     let model = $('#modelField').val();
     let color = $('#colorField').val();
@@ -114,13 +118,11 @@ function addVehicle(){
     let equipmentRack = $('#equipChoice').is(':checked');
     let image = $('#imageFileName').val();
 
-    if(license !== '' && model !== '' && color !== ''){
-        let vehicle = {license: license, model: model, color: color, miles: miles, status: status,
+    if(id !== '' && license !== '' && model !== '' && color !== ''){
+        let vehicle = {id: id, license: license, model: model, color: color, miles: miles, status: status,
                        isEv: carType, trunk: trunk, offRoad: offRoad, equipmentRack: equipmentRack, image: image};
-        console.time("Add Vehicle");
         adminSocket.emit("vehicleAdded", vehicle, function(){
-            console.timeEnd("Add Vehicle");
-        }); 
+        });
     }
     clearForms($("#carSpecs"));
     clearForms($("#carCaps"));
@@ -128,26 +130,73 @@ function addVehicle(){
     console.log($("#imageFileName").val());
 }
 
-function editVehicle(id, vehicle){
-    console.time("Edit Vehicle");
-    adminSocket.emit('vehicleEdited', id, vehicle, function(){
-        console.timeEnd("Edit Vehicle")
-    });
+function fillInEditModal(vehicleData){
+    $('#vinField-edit').val(vehicleData.id);
+    $('#licenseField-edit').val(vehicleData.license);
+    $('#modelField-edit').val(vehicleData.model);
+    $('#colorField-edit').val(vehicleData.color);
+    $('#milesField-edit').val(vehicleData.miles);
+
+    if(vehicleData.inService == 1){
+        $('#carStatusField-edit').val("ready");
+    } else {
+        $('#carStatusField-edit').val("service");
+    }
+
+    if(vehicleData.isEV == 1){
+        $('#evStatusField-edit').val("ev");
+    } else {
+        $('#evStatusField-edit').val("gas");
+    }
+
+    if(vehicleData.extraTrunk == 1){
+        $('#extraTrunkChoice-edit').prop("checked", true);
+    } else {
+        $('#extraTrunkChoice-edit').prop("checked", false);
+    }
+
+    if(vehicleData.offRoad == 1){
+        $('#offRoadChoice-edit').prop("checked", true);
+    } else {
+        $('#offRoadChoice-edit').prop("checked", false);
+    }
+
+    if(vehicleData.equipmentRack == 1){
+        $('#equipChoice-edit').prop("checked", true);
+    } else {
+        $('#equipChoice-edit').prop("checked", false);
+    }
+}
+
+function editVehicle(){
+    let id = $('#vinField-edit').val();
+    let license = $('#licenseField-edit').val();
+    let model = $('#modelField-edit').val();
+    let color = $('#colorField-edit').val();
+    let miles = $('#milesField-edit').val();
+    let status  = ($('#carStatusField-edit').val() === "service");
+    let carType = ($('#evStatusField-edit').val() === 'ev');
+    let trunk = $('#extraTrunkChoice-edit').is(':checked');
+    let offRoad = $('#offRoadChoice-edit').is(':checked');
+    let equipmentRack = $('#equipChoice-edit').is(':checked');
+
+    if(id !== '' && license !== '' && model !== '' && color !== ''){
+        let vehicle = {id: id, license: license, model: model, color: color, miles: miles, inService: status,
+                       isEV: carType, extraTrunk: trunk, offRoad: offRoad, equipRack: equipmentRack};
+        adminSocket.emit('vehicleEdited', vehicle);
+    }
+    //cleanFields();
 }
 
 function deleteVehicle(license){
-    console.time("Delete Vehicle");
     adminSocket.emit("vehicleRemoved", license, function(){
-        console.timeEnd("Delete Vehicle")
     });
     // This works on just deleting the vehicle dom obj btw.
     $('.'+license).remove();
 }
 
 function updateVehicleStatus(license, status){
-    console.time("Update Vehicle Status");
     adminSocket.emit('vehicleStatusUpdated', license, status, function(){
-        console.timeEnd("Update Vehicle Status");
     });
 }
 
@@ -170,7 +219,7 @@ class Reservation {
         if(justification !== ''){
             justification = `<a href = "#justificationModal" class = "btn btn-large btn-primary drop-shadow" data-toggle="modal" onclick = "setJustificationModal('${r.justification}')">Click To See</a>`
         }
-        console.log(r);
+        //console.log(r);
         let DOMobject = `<div class = "col-entry reservation-user ${r.license}">${r.user}</div>`
         + `<div class = "col-entry reservation-start ${r.license}">${r.start}</div>`
         + `<div class = "col-entry reservation-end ${r.license}">${r.end}</div>`
@@ -191,14 +240,15 @@ class Vehicle {
         if(v.isEV){
             carType = "Electric Vehicle";
         }
+        let data = JSON.stringify(v);
         let DOMobject = `<div class = "col-entry ${v.license}">${v.license}</div>` + `<div class = "col-entry ${v.license}">${v.color} ${v.model}</div>`
         + `<div class = "col-entry ${v.license}">${v.miles} miles</div>`
         + `<div class = "col-entry ${v.license}">${carType}</div>`
         + `<div class = "col-entry ${v.license}"><span class="dropdown">`
         + `<button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Change Status</button>`
         + `<ul class="dropdown-menu">`
-            + `<a href="#editVehicle"><li><i class="fa fa-wrench"></i> Edit Car</li></a>`
-            + `<div onclick = 'deleteVehicle("${v.license}")'><li><i class="fa fa-archive"></i> Retire</li></div>`
+        + `<a href="#editVehicle" data-toggle="modal" data-target="#editVehicleModal" onclick = 'fillInEditModal(${data});'<li><i class="fa fa-wrench"></i> Edit Car</li></a>`
+        + `<div onclick = 'deleteVehicle("${v.license}")'><li><i class="fa fa-archive"></i> Retire</li></div>`
         + `</ul></span></div>`;
 
         $('#current_fleet').append(DOMobject);

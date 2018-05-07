@@ -324,6 +324,7 @@ function renderCar(){
 function setVehicle(index){
     currentCar.license = alternateVehicles.rows[index].license;
     currentCar.model = alternateVehicles.rows[index].model;
+    currentCar.image = alternateVehicles.rows[index].image;
 }
 
 function altVehicles(){
@@ -588,8 +589,10 @@ class Reservation {
 
     }
     addToDom(r) {
-        let DOMobject = `<div class="card ${r.border} mb-3 ${r.id} upcomingReservation" style="width: 18rem;">
-                            <img class = "card-img-top" src="https://upload.wikimedia.org/wikipedia/commons/5/5f/DCA_Prius_1Gen_12_2011_3592.JPG" alt="prius placeholder image">
+
+        let imageFilePath = "./media/vehicle_images/"
+        let DOMobject = `<div class="card border-success mb-3 ${r.id} upcomingReservation" style="width: 18rem;">
+                            <img class = "card-img-top" src="${imageFilePath + r.image}">
                             <div class="card-body">
                                 <h5 class="card-title"><span class="card-model">${r.model}</span> <span class="card-license">${r.license}</span></h5>
                                 <p class="card-text"><strong>Start</strong>: <span class="card-start">${r.start}</span> <br>
