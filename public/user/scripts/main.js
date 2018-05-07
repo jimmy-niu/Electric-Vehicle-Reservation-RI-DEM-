@@ -585,6 +585,7 @@ class Reservation {
         } else {
             reservationData.border = "border-danger";
         }
+        console.log(reservationData);
         this.addToDom(reservationData);
 
     }
