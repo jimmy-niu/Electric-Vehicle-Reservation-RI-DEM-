@@ -32,7 +32,7 @@
 
             <div>
                 <div id = "user">
-                    <span id = "user_email">Welcome, dem_test_u_2@outlook.com <br>
+                    <span id = "user_email">Welcome, dem_test_u@outlook.com <br>
                     </span>
                     <a href = "/logout" style = "font-size: 2vh; color: #D7A342">Logout</a>
                 </div>
@@ -136,11 +136,11 @@
                             <form>
                                 <div class="form-group">
                                     <label for="start-date-edit">Reservation Start</label>
-                                    <input class = "datePicker" id ="start-date-edit" placeholder="Select Date.." type="text" value = "2018-05-09 1:00">
+                                    <input class = "datePicker" id ="start-date-edit" placeholder="Select Date.." type="text">
                                 </div>
                                 <div class="form-group">
                                     <label for="end-date-edit">Reservation End</label>
-                                    <input class = "datePicker" id ="end-date-edit" placeholder="Select Date.." type="text" value = "2018-05-09 3:00">
+                                    <input class = "datePicker" id ="end-date-edit" placeholder="Select Date.." type="text">
                                 </div>
                                 <div class="form-group">
                                     <label>Pickup Location</label>
@@ -196,13 +196,13 @@
                             </button>
                         </div>
                         <div id="carModal" class="modal-body">
-                            <p id = "carMakeMText">Car Model: </p>
-                            <p id = "plateNumberMText">Plate Number: </p>
-                            <p id = "startMText">Start Time: </p>
-                            <p id = "endMText">End Date: </p>
-                            <p id = "stopsMText">Stops: </p>
-                            <p id = "distanceMText">Total distance: </p>
-                            <p id = "durationMText">Total duration: </p>
+                            <p id = "carMakeMText"><span class="reservation-label">Car Model</span>: </p>
+                            <p id = "plateNumberMText"><span class="reservation-label">Plate Number</span>: </p>
+                            <p id = "startMText"><span class="reservation-label">Start Time</span>: </p>
+                            <p id = "endMText"><span class="reservation-label">End Date</span>: </p>
+                            <p id = "stopsMText"><span class="reservation-label">Stops</span>: </p>
+                            <p id = "distanceMText"><span class="reservation-label">Total distance</span>: </p>
+                            <p id = "durationMText"><span class="reservation-label">Total duration</span>: </p>
                             <div id="mapCanvas" style="width: 450px; height: 300px; margin-left:auto; margin-right:auto; margin-bottom: 10px"></div>
                         </div>
                         <div class="modal-footer" id="acceptDeclineButtons">
@@ -223,13 +223,13 @@
                             </button>
                         </div>
                         <div id="carModal-edit" class="modal-body">
-                            <p id = "carMakeMText-edit">Car Model: </p>
-                            <p id = "plateNumberMText-edit">Plate Number: </p>
-                            <p id = "startMText-edit">Start Time: </p>
-                            <p id = "endMText-edit">End Date: </p>
-                            <p id = "stopsMText-edit">Stops: </p>
-                            <p id = "distanceMText-edit">Total distance: </p>
-                            <p id = "durationMText-edit">Total duration: </p>
+                            <p id = "carMakeMText-edit"><span class="reservation-label">Car Model</span>: </p>
+                            <p id = "plateNumberMText-edit"><span class="reservation-label">Plate Number</span>: </p>
+                            <p id = "startMText-edit"><span class="reservation-label">Start Time</span>: </p>
+                            <p id = "endMText-edit"><span class="reservation-label">End Date</span>: </p>
+                            <p id = "stopsMText-edit"><span class="reservation-label">Stops</span>: </p>
+                            <p id = "distanceMText-edit"><span class="reservation-label">Total distance</span>: </p>
+                            <p id = "durationMText-edit"><span class="reservation-label">Total duration</span>: </p>
                             <div id="mapCanvasEdit" style="width: 450px; height: 300px; margin-left:auto; margin-right:auto; margin-bottom: 10px"></div>
                         </div>
                         <div class="modal-footer" id="acceptDeclineButtons-edit">

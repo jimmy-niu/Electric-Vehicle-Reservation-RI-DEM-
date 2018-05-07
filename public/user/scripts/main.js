@@ -139,11 +139,7 @@ $(document).ready(function() {
         enableTime: true,
         dateFormat: "Y-m-d H:i",
         minDate: "today",
-        defaultDate: "today",
-    });
-
-    $('#new-res-form').on('hidden.bs.modal', function() {
-        $(this).find('form').trigger('reset');
+        // defaultDate: "today",
     });
 
     jQuery.fn.carousel.Constructor.TRANSITION_DURATION = 5000;
@@ -271,18 +267,18 @@ function sortOnKeys(dict) {
 function cleanFields(){
     if(isEditing){
         console.log('clean edit')
-        $("#carMakeMText-edit").html("Car Model: ");
-        $("#plateNumberMText-edit").html("License Plate: ");
-        $("#startMText-edit").html("Start Time: ");
-        $("#endMText-edit").html("End Time: ");
-        $("#stopsMText-edit").html("Stops: ");
+        $("#carMakeMText-edit").html("<span class='reservation-label'>Car Model</span>: ");
+        $("#plateNumberMText-edit").html("<span class='reservation-label'>License Plate</span>: ");
+        $("#startMText-edit").html("<span class='reservation-label'>Start Time</span>: ");
+        $("#endMText-edit").html("<span class='reservation-label'>End Time</span>: ");
+        $("#stopsMText-edit").html("<span class='reservation-label'>Stops</span>: ");
         $("#new-stops-edit").empty();
     } else {
-        $("#carMakeMText").html("Car Model: ");
-        $("#plateNumberMText").html("License Plate: ");
-        $("#startMText").html("Start Time: ");
-        $("#endMText").html("End Time: ");
-        $("#stopsMText").html("Stops: ");
+        $("#carMakeMText").html("<span class='reservation-label'>Car Model</span>: ");
+        $("#plateNumberMText").html("<span class='reservation-label'>License Plate</span>: ");
+        $("#startMText").html("<span class='reservation-label'>Start Time</span>: ");
+        $("#endMText").html("<span class='reservation-label'>End Time</span>: ");
+        $("#stopsMText").html("<span class='reservation-label'>Stops</span>: ");
         $("#new-stops").empty();
     }
 }
