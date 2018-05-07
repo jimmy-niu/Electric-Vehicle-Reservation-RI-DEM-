@@ -58,7 +58,7 @@
             </div>
         </div>
         
-        <div id = "imageUploadLocation"></div>
+<!--        <img src = "../admin_u/media/polar_bear.png">-->
 
         <!-- Modals here -->
 
@@ -71,7 +71,7 @@
                     </div>
                     <div class="modal-body">
 
-                        <form>
+                        <form id = "carSpecs">
                             <h5>Car Specifications:</h5>
                             License: <input type = "text" id = "licenseField" title="License"> <br> <br>
                             Model: <input type = "text" id = "modelField" title="Model"> <br> <br>
@@ -85,10 +85,13 @@
                         <form id="frmUploader" enctype="multipart/form-data" method="POST" action="api/Upload/">
                             <input id = "imageInput" type="file" accept = ".png, .jpg, .jpeg" name="imgUploader">
                             <input type="submit" name="submit" id="btnSubmit" value="Upload"/>
+                            <input id="imageFileName" type="text" style="display: none;" value="noPicture.png"/>
                         </form>
+                        
+                        
                         <hr>
 
-                        <form>
+                        <form id = "carCaps">
                             <h5>Car Capabilities:</h5>
                             Car Status:  <select id="carStatusField">
                             <option value="ready">Ready</option>
