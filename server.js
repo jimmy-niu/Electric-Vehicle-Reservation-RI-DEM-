@@ -206,6 +206,7 @@ io.of('/admin').on('connection', function(socket){
     socket.on('updatePage', function(callback){
         updateAdminReservations();
         updateVehicles();
+        updateReports();
         callback();
     });
 
@@ -593,6 +594,12 @@ function updateAdminReservations(){
 function updateVehicles(){
     conn.query('SELECT * FROM vehicles',function(error, data){
         io.of('/admin').emit('vehicleChange', data);
+        //console.log(data)
+    });
+}
+function updateReports(){
+    conn.query('SELECT * FROM reports',function(error, data){
+        io.of('/admin').emit('reportChange', data);
         //console.log(data)
     });
 }

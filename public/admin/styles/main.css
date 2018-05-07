@@ -73,7 +73,8 @@ h2{
 
 :root{
     --reservation_columns: 20% 15% 15% 20% 15% 15%;
-    --fleet_columns: 20% 20% 20% 20% 20%;;
+    --fleet_columns: 20% 20% 20% 20% 20%;
+    --report_columns: 10% 30% 15% 15% 15%;
 }
 
 .table{
@@ -106,6 +107,23 @@ h2{
     display: grid;
     padding: 2vh 2vw 0vh 2vw;
     grid-template-columns: var(--fleet_columns);
+    max-height: 80%;
+    overflow: auto;
+}
+
+.report_table{
+    display: grid;
+    padding: 2vh 2vw 1vh 2vw;
+    grid-template-columns: var(--report_columns);
+    max-height: 80%;
+    overflow: auto;
+}
+
+.report_header {
+    margin-bottom: none;
+    display: grid;
+    padding: 2vh 2vw 0vh 2vw;
+    grid-template-columns: var(--report_columns);
     max-height: 80%;
     overflow: auto;
 }

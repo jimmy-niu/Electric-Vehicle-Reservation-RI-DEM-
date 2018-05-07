@@ -20,10 +20,6 @@ $(document).ready(function() {
     });
 
     adminSocket.on('vehicleChange', function(vehicles){
-        // for(let i = currentVehicle; i < vehicles.rowCount; i ++){
-        //     new Vehicle(vehicles.rows[i]);
-        //     currentVehicle ++;
-        // }
         $('#current_fleet').empty();
         for(let i = 0; i < vehicles.rowCount; i++){
             new Vehicle(vehicles.rows[i]);
@@ -31,8 +27,13 @@ $(document).ready(function() {
     });
 
     adminSocket.on('reportChange', function(reports){
-        // TODO: actually make this do something???
-        //console.log(reports);
+        console.log("we are in reportchange!");
+        console.log(reports);
+
+        $('#reports').empty();
+        for(let i = 0; i < reports.rowCount; i++){
+            new Report(reports.rows[i]);
+        }
     });
 
     $('#export-users').click(function(e){
@@ -275,6 +276,33 @@ class Vehicle {
     }
 }
 
+function getBooleanStr(aNumber){
+    if(aNumber === 1){
+        return "Yes";
+    } else {
+        return "No";
+    }
+}
+
+class Report {
+    constructor(reportData){
+        this.addToDOM(reportData);
+    }
+
+    addToDOM(r){
+        let justification = r.justification;
+        if(justification !== ''){
+            justification = `<a href = "#justificationModal" class = "btn btn-large btn-primary drop-shadow" data-toggle="modal" onclick = "setJustificationModal('${r.justification}')">Click To See</a>`
+        }
+        let DOMobject = `<div class = "col-entry report-res-id ${r.id}">${r.id}</div>`
+        + `<div class = "col-entry report-content ${r.id}">${r.report}</div>`
+        + `<div class = "col-entry needs-cleaning ${r.id}">${getBooleanStr(r.needsCleaning)}</div>`
+        + `<div class = "col-entry needs-service ${r.id}">${getBooleanStr(r.needsService)}</div>`
+        + `<div class = "col-entry charging ${r.id}">${getBooleanStr(r.notCharging)}</div>`;
+
+        $('#reports').append(DOMobject);
+    }
+}
 
 /*
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
