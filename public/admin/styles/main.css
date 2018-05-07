@@ -57,6 +57,10 @@ body{
     cursor: pointer;
 }
 
+.rightMargin{
+    margin-right: 1vw
+}
+
 .button:hover{
     box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
 }
@@ -75,6 +79,7 @@ h2{
     --reservation_columns: 20% 15% 15% 20% 15% 15%;
     --fleet_columns: 20% 20% 20% 20% 20%;
     --report_columns: 10% 30% 15% 15% 15%;
+    --user_columns: 20% 10%;
 }
 
 .table{
@@ -127,6 +132,24 @@ h2{
     max-height: 80%;
     overflow: auto;
 }
+
+.user_table{
+    display: grid;
+    padding: 2vh 2vw 1vh 2vw;
+    grid-template-columns: var(--user_columns);
+    max-height: 80%;
+    overflow: auto;
+}
+
+.user_header {
+    margin-bottom: none;
+    display: grid;
+    padding: 2vh 2vw 0vh 2vw;
+    grid-template-columns: var(--user_columns);
+    max-height: 80%;
+    overflow: auto;
+}
+
 
 .table-header{
     display: flex;

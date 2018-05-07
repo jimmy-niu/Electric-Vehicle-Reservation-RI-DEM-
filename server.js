@@ -180,9 +180,27 @@ conn.query('UPDATE vehicles SET featureScore = extraTrunk + offRoad + equipRack'
 conn.query('INSERT INTO reports VALUES(null, ?, ?, ?, ?, ?)', [5, "Car sucks.", true, true, false]);
 conn.query('INSERT INTO reports VALUES(null, ?, ?, ?, ?, ?)', [1, "Car is  very dirty.", false, true, false]);
 
-conn.query('INSERT INTO users VALUES(null, ?, ?)', ["jenna.tishler@gmail.com", true]);
-conn.query('INSERT INTO users VALUES(null, ?, ?)', ["jenna_tishler@brown.edu", true]);
+conn.query('INSERT INTO users VALUES(null, ?, ?)', ["dem_test_a@outlook.com", true]);
+conn.query('INSERT INTO users VALUES(null, ?, ?)', ["dem_test_u@outlook.com", false]);
+conn.query('INSERT INTO users VALUES(null, ?, ?)', ["dem_test_u_2@outlook.com", false]);
 
+let adminEmails = [];
+let normalEmails = [];
+
+function populateEmailLists(){
+    conn.query('SELECT * FROM users', function(error, data){
+        console.log(data);
+        for(let i = 0; i < data.rowCount; i++) {
+            if(data.rows[i].admin === 1){
+                adminEmails.push(data.rows[i].email);
+            } else {
+                normalEmails.push(data.rows[i].email);
+            }
+        }
+    });
+}
+
+populateEmailLists();
 
 //exportCSV([{a: 0, b:4, c:3},{a: 0, b:4, c:3},{a: 0, b:4, c:3},{a: 0, b:4, c:3}], '/public/temp/h.csv');
 // exportUsers();
@@ -193,7 +211,6 @@ conn.query('INSERT INTO users VALUES(null, ?, ?)', ["jenna_tishler@brown.edu", t
 /*Sets up the server on port 8080.*/
 server.listen(8080, function(){
     console.log('- Server listening on port 8080');
-
 });
 
 //handles events when an admin user is connected
@@ -207,6 +224,7 @@ io.of('/admin').on('connection', function(socket){
         updateAdminReservations();
         updateVehicles();
         updateReports();
+        updateUsers();
         callback();
     });
 
@@ -489,7 +507,7 @@ app.get('/authorize',
         function(req, res) {
     var user_email = req.user._json.EmailAddress;
     var name = req.user._json.DisplayName;
-    if (user_email === 'dem_test_a@outlook.com') {
+    if (adminEmails.includes(user_email)) {
         app.use("/admin", express.static(__dirname + '/public/admin'));
         app.use("/admin_u", express.static(__dirname + '/public/user'));
         replace({
@@ -504,7 +522,7 @@ app.get('/authorize',
         //res.render('admin/index.html', {user : user_email});
         //res.redirect('admin/index/?email=' + encodeURIComponent(user_email));
         io.of('/admin').emit('admin-connected', user_email);
-    } else if (user_email === 'dem_test_u@outlook.com' || user_email === 'dem_test_u_2@outlook.com') {
+    } else if (normalEmails.includes(user_email)) {
         app.use("/user", express.static(__dirname + '/public/user'));
         io.sockets.emit('user-connected', user_email);
         replace({
@@ -515,6 +533,8 @@ app.get('/authorize',
         })
         nukeEvents();
         res.redirect('user/index.html');
+    } else {
+        res.send(index.loginPagePassport());
     }
 });
 
@@ -597,12 +617,6 @@ function updateVehicles(){
         //console.log(data)
     });
 }
-function updateReports(){
-    conn.query('SELECT * FROM reports',function(error, data){
-        io.of('/admin').emit('reportChange', data);
-        //console.log(data)
-    });
-}
 function addVehicle(vehicle){
     conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, null, ?)',[vehicle.id, vehicle.license, vehicle.model, vehicle.color, vehicle.status, vehicle.miles, vehicle.isEv, vehicle.trunk, vehicle.offRoad, vehicle.equipmentRack, vehicle.image],function(error, data){
         conn.query('UPDATE vehicles SET featureScore = extraTrunk + offRoad + equipRack WHERE id = ?', [vehicle.id]);
@@ -632,7 +646,12 @@ function updateVehicleStatus(license, status){
 function updateReports(){
     conn.query('SELECT * FROM reports', function(error, data){
         io.of('/admin').emit('reportChange', data);
-        console.log(data);
+    });
+}
+function updateUsers(){
+    conn.query('SELECT * FROM users ORDER BY admin DESC', function(error, data){
+        io.of('/admin').emit('userChange', data);
+        populateEmailLists();
     });
 }
 function removeReport(id){
@@ -648,19 +667,18 @@ function getSpecificReports(reservation){
 
 function addUser(email, admin){
     conn.query('INSERT INTO users VALUES(null, ?, ?)',[email, admin],function(error, data){
-        console.log(error);
-        console.log("done");
+        updateUsers();
     });
 }
 
 function changeUserStatus(email, admin){
     conn.query('UPDATE users SET admin = ? WHERE email = ?',[admin, email],function(error, data){
-
+        updateUsers();
     });
 }
 function removeUser(email){
     conn.query('DELETE FROM users WHERE email = ?', [email], function(error, data){
-        console.log("User Removal Query");
+        updateUsers();
     });
 }
 

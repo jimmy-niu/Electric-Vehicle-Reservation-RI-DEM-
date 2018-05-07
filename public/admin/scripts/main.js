@@ -35,6 +35,16 @@ $(document).ready(function() {
             new Report(reports.rows[i]);
         }
     });
+    
+    adminSocket.on('userChange', function(users){
+        console.log("we are in users change!");
+        console.log(users);
+
+        $('#users').empty();
+        for(let i = 0; i < users.rowCount; i++){
+            new User(users.rows[i]);
+        }
+    });
 
     $('#export-users').click(function(e){
         e.preventDefault();
@@ -70,6 +80,18 @@ function bindClickHandlers(){
     $("#fleet_title").bind("click", function(){
         toggle_hidden('fleet_header');
         toggle_hidden('current_fleet');
+        toggleTitle(this);
+    });
+    
+    $("#report_title").bind("click", function(){
+        toggle_hidden('report_header');
+        toggle_hidden('reports');
+        toggleTitle(this);
+    });
+    
+    $("#user_title").bind("click", function(){
+        toggle_hidden('user_header');
+        toggle_hidden('users');
         toggleTitle(this);
     });
 }
@@ -118,12 +140,7 @@ function modifyUser() {
             adminSocket.emit('userRemoved', email);
         }
     }
-
-    $('#adminChoice').prop('checked', false);
-    $('#userChoice').prop('checked', false);
-    $('#addChoice').prop('checked', false);
-    $('#removeChoice').prop('checked', false);
-    $('#emailField').val('');
+    clearForms($('#userForm'));
 }
 
 function addVehicle(){
@@ -148,7 +165,6 @@ function addVehicle(){
     clearForms($("#carSpecs"));
     clearForms($("#carCaps"));
     clearForms($("#frmUploader"));
-    console.log($("#imageFileName").val());
 }
 
 function fillInEditModal(vehicleData){
@@ -290,10 +306,6 @@ class Report {
     }
 
     addToDOM(r){
-        let justification = r.justification;
-        if(justification !== ''){
-            justification = `<a href = "#justificationModal" class = "btn btn-large btn-primary drop-shadow" data-toggle="modal" onclick = "setJustificationModal('${r.justification}')">Click To See</a>`
-        }
         let DOMobject = `<div class = "col-entry report-res-id ${r.id}">${r.id}</div>`
         + `<div class = "col-entry report-content ${r.id}">${r.report}</div>`
         + `<div class = "col-entry needs-cleaning ${r.id}">${getBooleanStr(r.needsCleaning)}</div>`
@@ -303,6 +315,20 @@ class Report {
         $('#reports').append(DOMobject);
     }
 }
+
+class User {
+    constructor(userData){
+        this.addToDOM(userData);
+    }
+
+    addToDOM(r){
+        let DOMobject = `<div class = "col-entry ${r.id}">${r.email}</div>`
+        + `<div class = "col-entry ${r.id}">${getBooleanStr(r.admin)}</div>`
+        
+        $('#users').append(DOMobject);
+    }
+}
+
 
 /*
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
