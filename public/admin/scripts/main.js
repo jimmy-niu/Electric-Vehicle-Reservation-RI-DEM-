@@ -82,6 +82,18 @@ function bindClickHandlers(){
         toggle_hidden('current_fleet');
         toggleTitle(this);
     });
+    
+    $("#report_title").bind("click", function(){
+        toggle_hidden('report_header');
+        toggle_hidden('reports');
+        toggleTitle(this);
+    });
+    
+    $("#user_title").bind("click", function(){
+        toggle_hidden('user_header');
+        toggle_hidden('users');
+        toggleTitle(this);
+    });
 }
 
 function toggle_hidden(id){
@@ -128,12 +140,7 @@ function modifyUser() {
             adminSocket.emit('userRemoved', email);
         }
     }
-
-    $('#adminChoice').prop('checked', false);
-    $('#userChoice').prop('checked', false);
-    $('#addChoice').prop('checked', false);
-    $('#removeChoice').prop('checked', false);
-    $('#emailField').val('');
+    clearForms($('#userForm'));
 }
 
 function addVehicle(){
@@ -158,7 +165,6 @@ function addVehicle(){
     clearForms($("#carSpecs"));
     clearForms($("#carCaps"));
     clearForms($("#frmUploader"));
-    console.log($("#imageFileName").val());
 }
 
 function fillInEditModal(vehicleData){

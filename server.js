@@ -646,13 +646,11 @@ function updateVehicleStatus(license, status){
 function updateReports(){
     conn.query('SELECT * FROM reports', function(error, data){
         io.of('/admin').emit('reportChange', data);
-        console.log(data);
     });
 }
 function updateUsers(){
-    conn.query('SELECT * FROM users ORDER BY admin', function(error, data){
+    conn.query('SELECT * FROM users ORDER BY admin DESC', function(error, data){
         io.of('/admin').emit('userChange', data);
-        console.log(data);
         populateEmailLists();
     });
 }
