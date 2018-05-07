@@ -26,7 +26,7 @@
             </div>
             <div>
                 <div id = "user">
-                    Welcome, %user% <br>
+                    Welcome, dem_test_a@outlook.com <br>
                     <a href = "/logout" style = "font-size: 2vh; color: #D7A342">Logout</a>
                     <a href = "../admin_u/index_admin.html" style = "font-size: 1vh; color: #D7A342">Change to user view</a>
                 </div>
@@ -37,69 +37,9 @@
             <div class = "Nav-Buttons">
                 <a href = "./fleet.html"><div class = "button drop-shadow">Manage Fleet</div></a>
 
-                <a href = "#modifyUserModal" class = "btn btn-large btn-primary drop-shadow" data-toggle="modal">Add/Remove User</a>
-                <a href = "#" id = "export-users" class = "btn btn-large btn-primary drop-shadow">Export Users</a>
-                <a href = "#" id = "export-vehicles" class = "btn btn-large btn-primary drop-shadow">Export Vehicles</a>
+                <a href = "./reports.html"><div class = "button drop-shadow">Reports and Accounts</div></a>
+                
                 <a href = "#" id = "export-reservations" class = "btn btn-large btn-primary drop-shadow">Export Reservations</a>
-                <a href = "#" id = "export-reports" class = "btn btn-large btn-primary drop-shadow">Export Reports</a>
-                <div id="modifyUserModal" class="modal fade">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h3>Manage Users</h3>
-                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                            </div>
-
-                            <div class="modal-body">
-
-                                <form>
-                                    <h5>Type of Account:</h5>
-                                    Admin: <input type = "radio" name="adminUser" id="adminChoice" value="admin" title="Admin">
-                                    <br>
-
-                                    User: <input type = "radio" name="adminUser" id="userChoice" value="user" title="User">
-
-                                    <hr>
-
-                                    <h5>Modification:</h5>
-                                    Add: <input type = "radio" name="addRemove" id="addChoice" value="add" title="Add choice">
-                                    <br>
-                                    Remove: <input type = "radio" name="addRemove" id="removeChoice" value="remove" title="Remove choice">
-
-                                    <hr>
-                                    Email of User: <input type = "text" id = "emailField" title="User Email">
-
-                                </form>
-
-                            </div>
-
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-
-                                <button type="button" class="btn btn-primary" data-dismiss="modal" aria-hidden="true" onclick = 'modifyUser();'>Submit</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div id="justificationModal" class="modal fade">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h3>Override Justification</h3>
-                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                            </div>
-                            <div class="modal-body">
-                                <p id = "justificationModalText"></p>
-                            </div>
-
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
             </div>
 
         </div>
