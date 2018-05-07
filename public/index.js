@@ -95,11 +95,7 @@ module.exports = {
     '<li>Edit or cancel a reservation</li>'+
     '<li>Get email notifications</li>'+
     '<li>Integrate seamlessly with Outlook Calendar</li></ul>'+
-<<<<<<< HEAD
-    '<div style="text-align: center;"><a id="outlook-btn" href="/auth/outlook">Sign in with Outlook</a></div>' +
-=======
     `<div id="outlook-btn" onclick="window.location = '/auth/outlook'">Sign in with Outlook</div>` +
->>>>>>> ea0df3fcee62b39fbb607dcb7ac7234df26d7230
     '</div>';
     return base.replace('%body%', html);
   },
