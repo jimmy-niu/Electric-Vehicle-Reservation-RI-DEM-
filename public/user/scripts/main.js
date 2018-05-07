@@ -136,8 +136,8 @@ $(document).ready(function() {
     });
 
     flatpickr(".datePicker", {
-        enableTime: true, 
-        dateFormat: "Y-m-d H:i", 
+        enableTime: true,
+        dateFormat: "Y-m-d H:i",
         minDate: "today",
         defaultDate: "today",
     });
