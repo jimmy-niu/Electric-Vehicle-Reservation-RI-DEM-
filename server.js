@@ -38,11 +38,6 @@ let jsoncsv = require('json-csv');
 
 let fs = require('fs');
 
-
-
-
-
-
 let engines = require('consolidate');
 app.engine('html', require('hogan-express'));
 app.set('views', __dirname + '/public'); // tell Express where to find templates, in this case the '/public' directory
@@ -56,20 +51,20 @@ app.use(session(
     })
        );
 
-// var transporter = nodemailer.createTransport({
-//     pool: true,
-//     maxConnections: 10,
-//     host: "smtp-mail.outlook.com", // hostname
-//     secureConnection: false, // TLS requires secureConnection to be false
-//     port: 587, // port for secure SMTP
-//     auth: {
-//         user: 'dem_do-not-reply@outlook.com',
-//         pass: 'DEMnoreply123'
-//     },
-//     tls: {
-//         ciphers:'SSLv3'
-//     }
-// });
+var transporter = nodemailer.createTransport({
+    pool: true,
+    maxConnections: 10,
+    host: "smtp-mail.outlook.com", // hostname
+    secureConnection: false, // TLS requires secureConnection to be false
+    port: 587, // port for secure SMTP
+    auth: {
+        user: 'dem_do-not-reply@outlook.com',
+        pass: 'DEMnoreply123'
+    },
+    tls: {
+        ciphers:'SSLv3'
+    }
+});
 
 // let mailOptions = {
 //     from: 'dem_do-not-reply@outlook.com',
@@ -142,15 +137,15 @@ conn.query('CREATE TABLE IF NOT EXISTS reservations(id INTEGER PRIMARY KEY AUTOI
 conn.query('CREATE TABLE IF NOT EXISTS reports(id INTEGER PRIMARY KEY AUTOINCREMENT, reservation INTEGER, report TEXT, needsService BOOLEAN, needsCleaning BOOLEAN, notCharging BOOLEAN)');
 
 //test data
-conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',["jenna.tishler@gmail.com", "1322", "2015 FORD CMAX", "2018-05-09 01:00", "2018-05-09 03:00", JSON.stringify(["563 North Main Street, Providence, RI, USA", "565 Atwells Avenue, Providence, RI, USA", "563 North Main Street, Providence, RI, USA"]), false, "", false, false, false, "noPicture.png"]);
+conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',["jenna.tishler@gmail.com", "1322", "2015 FORD CMAX", "2018-05-21 11:00", "2018-05-21 15:00", JSON.stringify(["563 North Main Street, Providence, RI, USA", "565 Atwells Avenue, Providence, RI, USA", "563 North Main Street, Providence, RI, USA"]), false, "", false, false, false, "noPicture.png"]);
 conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',["jenna_tishler@brown.edu", "704", "2015 FORD CMAX", "2018-05-10 01:00", "2018-05-10 03:00", JSON.stringify(["home", "work", "home"]), false, "", false, false, false, "noPicture.png"]);
-conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',["Max Luebbers", "2254", "2016 FORD CMAX", "2018-05-21 11:00", "2018-05-21 15:00", JSON.stringify(["home", "work"]), false, "", false, false, false, "noPicture.png"]);
-conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',["dem_test_u_2@outlook.com", "1869", "2011 CHEVROLET EQUINOX", "2018-05-19 14:00", "2018-05-19 17:00", JSON.stringify(["home", "work"]), true, "I have a reason.", false, false, false, "noPicture.png"]);
+conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',["emily_kasbohm@brown.edu", "2254", "2016 FORD CMAX", "2018-05-21 11:00", "2018-05-21 15:00", JSON.stringify(["563 North Main Street, Providence, RI, USA", "565 Atwells Avenue, Providence, RI, USA", "563 North Main Street, Providence, RI, USA"]), false, "", false, false, false, "noPicture.png"]);
+conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',["dem_test_u_2@outlook.com", "1869", "2011 CHEVROLET EQUINOX", "2018-05-06 14:00", "2018-05-06 17:00", JSON.stringify(["home", "work"]), true, "I have a reason.", false, false, false, "noPicture.png"]);
 conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',["dem_test_u_2@outlook.com", "2254", "2016 FORD CMAX", "2018-05-21 10:00", "2018-05-21 10:30", JSON.stringify(["work", "beach"]), false, "", false, false, false, "noPicture.png"]);
 conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',["dem_test_u@outlook.com", "704", "2015 FORD CMAX", "2017-05-19 11:00", "2017-05-20 11:00", JSON.stringify(["home", "work"]), false, "", false, false, false, "noPicture.png"]);
 conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',["dem_test_u@outlook.com", "1322", "2015 FORD CMAX", "2011-05-18 11:00", "2011-05-18 15:00", JSON.stringify(["Work", "Home"]), false, "", false, false, false, "noPicture.png"]);
 conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',["dem_test_u@outlook.com", "704", "2015 FORD CMAX", "2010-05-19 11:00", "2010-05-20 11:00", JSON.stringify(["home", "work"]), false, "", false, false, false, "noPicture.png"]);
-conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',["dem_test_u@outlook.com", "2254", "2016 FORD CMAX", "2013-05-21 11:00", "2013-05-21 15:00", JSON.stringify(["home", "work"]), false, "", false, false, false, "noPicture.png"]);
+conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',["dem_test_u@outlook.com", "2254", "2016 FORD CMAX", "2013-05-21 11:00", "2013-05-21 15:00", JSON.stringify(["563 North Main Street, Providence, RI, USA", "565 Atwells Avenue, Providence, RI, USA", "563 North Main Street, Providence, RI, USA"]), false, "", false, false, false, "noPicture.png"]);
 
 conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, null, ?)', ["JF2GPBCC3FH253482", "1011", "2016 SUBARU CV", "Black/White", true, 11451.5, false, true, true, false, "noPicture.png"]);
 conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, null, ?)', ["1FMCU59329KC41390", "1018", "2009 FORD ESCAPE", "Black/White", true, 151071.5, false, true, true, false, "noPicture.png"]);
@@ -347,10 +342,12 @@ io.of('/user').on('connection', function(socket) {
                 io.of('/admin').emit("newReservation", resData);
                 var start = new Date(reservationInfo.start);
                 var end = new Date(reservationInfo.end);
-                addEvent(reservationInfo.user + "'s upcoming DEM trip (" + reservationInfo.license + ")", reservationInfo.model + " " + reservationInfo.license + "\n" + reservationInfo.stops, start.toISOString(), end.toISOString());
-                if(reservationInfo.canCarpool){
-                    carpoolNotification(reservationInfo);
-                }
+
+                addEvent(reservationInfo.user + "'s upcoming DEM trip (" +reservationInfo.model + " " + reservationInfo.license + ")", reservationInfo.model + " " + reservationInfo.license + "\n" + reservationInfo.stops, start.toISOString(), end.toISOString());
+                // if(reservationInfo.canCarpool){
+                //     console.log("ya")
+                //     carpoolNotification(reservationInfo);
+                // }
             });
         });
     });
@@ -366,10 +363,11 @@ io.of('/user').on('connection', function(socket) {
                 //Calendar event
                 var start = new Date(reservationInfo.start);
                 var end = new Date(reservationInfo.end);
-                addEvent(reservationInfo.user + "'s upcoming DEM trip (" + reservationInfo.license + ")", reservationInfo.model + " " + reservationInfo.license + "\n" + reservationInfo.stops, start.toISOString(), end.toISOString());
-                if(reservationInfo.canCarpool){
-                    carpoolNotification(reservationInfo);
-                }
+
+                addEvent(reservationInfo.user + "'s upcoming DEM trip (" +reservationInfo.model + " " + reservationInfo.license + ")", reservationInfo.model + " " + reservationInfo.license + "\n" + reservationInfo.stops, start.toISOString(), end.toISOString());
+                // if(reservationInfo.canCarpool){
+                //     carpoolNotification(reservationInfo);
+                // }
             });
         });
     })
@@ -390,7 +388,7 @@ io.of('/user').on('connection', function(socket) {
         // });
     });
 
-    socket.on('cancel', function(reservationID, user, license, start, end, callback){
+    socket.on('cancel', function(reservationID, user, model, license, start, end, callback){
         cancelReservation(reservationID);
         console.log(start, end);
         removeEvent(user + "'s upcoming DEM trip (" + license + ")", start, end);
@@ -412,9 +410,9 @@ io.of('/user').on('connection', function(socket) {
         conn.query('SELECT * FROM reservations WHERE id = ?', [5], function(error, data){
             let mailOptions = {
                 from: 'dem_do-not-reply@outlook.com',
-                to: 'jenna_tishler@brown.edu',
+                to: 'dem_test_a@outlook.com',
                 subject: 'New Report Added',
-                html: '<h1>Reservation: ' + data.rows[0].id + '</h1>' + '<h2>Name: ' + data.rows[0].user + '</h2>' + '<h2>License Plate: ' + data.rows[0].license + '</h2>' + '<p>Report: ' + report + '<p>' + '<p>Needs Service: ' + needsService + '<p>' + '<p>Needs Cleaning: ' + needsCleaning + '<p>' + '<p>Not Charging: ' + notCharging + '<p>'
+                html: '<h1>Reservation: ' + data.rows[0].id + '</h1>' + '<h2>User: ' + data.rows[0].user + '</h2>' + '<h2>Vehicle: ' + data.rows[0].model + " " + data.rows[0].license + '</h2>' + '<p style="font-size: 22px;">Report: ' + report + '<p><br>' + '<p>Needs Service: ' + needsService + '<p>' + '<p>Needs Cleaning: ' + needsCleaning + '<p>' + '<p>Not Charging: ' + notCharging + '<p>'
             };
             transporter.sendMail(mailOptions, function(error, info){
                 if (error) {
@@ -701,6 +699,7 @@ function newReservation(socket, reservationInfo, isEdit){
         else {
             //alerts users via email that they have reservations at the same time w/ same stops
             // if(canCarpool){
+            //     console.log("carpool!")
             //     carpoolNotification(carpoolUsers);
             // }
 

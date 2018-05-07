@@ -335,10 +335,13 @@ function renderCar(){
             $("#end_" + id).html(currentCar.end)
             $("#stops_" + id).html(JSON.parse(currentCar.stops))
             sortReservations();
-            currentCar = undefined;
+
             $("#reasoning-field-edit").val("");
 
             cleanFields();
+
+            carpoolAlert(currentCar.user, currentCar.canCarpool, currentCar.carpoolUsers);
+            currentCar = undefined;
         });
     } else {
         userSocket.emit('addReservation', currentCar, function(id){
@@ -346,11 +349,27 @@ function renderCar(){
 
             new Reservation(currentCar);
             sortReservations();
-            currentCar = undefined;
+
             $("#reasoning-field").val("");
 
             cleanFields();
+
+            carpoolAlert(currentCar.user, currentCar.canCarpool, currentCar.carpoolUsers);
+            currentCar = undefined;
         });
+    }
+}
+
+function carpoolAlert(user, canCarpool, carpoolUsers){
+    if(canCarpool){
+        $("#carpoolUsersList").empty();
+        for(let i = 0; i < carpoolUsers.length; i++){
+            console.log(carpoolUsers[i])
+            if (carpoolUsers[i] != user){
+                $("#carpoolUsersList").append("<li class = 'list-group-item'>" + carpoolUsers[i] + "</li>");
+            }
+        }
+        $("#carpoolModal").modal();
     }
 }
 
@@ -489,11 +508,12 @@ function newReservation() {
 }
 
 function cancelReservation(){
-    let start = $("." + idToDelete)[0].children[1].children[1].children[0].nextSibling.textContent.substring(2);
-    let end = $("." + idToDelete)[0].children[1].children[1].children[2].nextSibling.textContent.substring(2);
-    let carName = $("." + idToDelete)[0].children[1].children[0].firstChild.textContent.split(" ");
-    let license = carName[carName.length - 1]
-    userSocket.emit('cancel', idToDelete, userEmail, license, start, end, function(){
+    let start = $("#start_" + idToDelete).html();
+    let end = $("#end_" + idToDelete).html();
+    let model = $("#model_" + idToDelete).html();
+    let license = $("#license_" + idToDelete).html();
+
+    userSocket.emit('cancel', idToDelete, userEmail, model, license, start, end, function(){
     });
 
     $("." + idToDelete).remove();
@@ -671,9 +691,9 @@ class Reservation {
         let DOMobject = `<div class="card ${r.border} mb-3 ${r.id} upcomingReservation" style="width: 18rem;">`
                             + `<img class = "card-img-top" src="${imageFilePath + r.image}">`
                             + `<div class="card-body">`
-                                + `<h5 class="card-title"><span class="card-model">${r.model}</span> <span class="card-license">${r.license}</span></h5>`
+                                + `<h5 class="card-title"><span id="model_${r.id}" class="card-model">${r.model}</span> <span id="license_${r.id}" class="card-license">${r.license}</span></h5>`
                                 + `<p class="card-text"><strong>Start</strong>: <span id="start_${r.id}" class="card-start">${r.start}</span> <br>`
-                                    + `<strong>End</strong>:<span id="end_${r.id}" class="card-end"> ${r.end}</span> <br>`
+                                    + `<strong>End</strong>:<span id="end_${r.id}" class="card-end">${r.end}</span> <br>`
                                         + `<strong>Route</strong>: <span id = "stops_${r.id}">${JSON.parse(r.stops)}</span> </p>`
                                         + `<span style = "display: none;" id = "res-id">${r.id}</span>`
                                 + `<a href="#" id = "${r.id}" class="btn btn-primary edit" data-toggle="modal" data-target="#editModal" onclick = 'fillInEditModal(${data});'>Edit reservation</a>`
