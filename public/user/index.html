@@ -32,7 +32,7 @@
 
             <div>
                 <div id = "user">
-                    <span id = "user_email">Welcome, dem_test_u@outlook.com <br>
+                    <span id = "user_email">Welcome, dem_test_u_2@outlook.com <br>
                     </span>
                     <a href = "/logout" style = "font-size: 2vh; color: #D7A342">Logout</a>
                 </div>
@@ -409,6 +409,26 @@
                     </div>
                 </div>
             </div> 
+
+            <div class="modal fade" id="carpoolModal" tabindex="-2" role="dialog" aria-labelledby="carpoolModalLabel" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="carpoolModalLabel">Carpool Alert!</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <p>Your reservation matches in time and date with the following users. We strongly encourage you to talk to them and arrange a carpool. By carpooling just twice a week, 1,600 pounds of greenhouse gases can be kept out of the air each year.</p>
+                            <ul class="list-group" id="carpoolUsersList"></ul>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" id="carpoolButton" class="btn btn-success" data-dismiss="modal">Thanks!</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
             <h3>Upcoming Reservations</h3>
             <div class="cards row">
