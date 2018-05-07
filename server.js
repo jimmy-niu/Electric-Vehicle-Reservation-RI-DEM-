@@ -278,6 +278,10 @@ function removeEvent(subject, start, end) {
             console.log('getEvents returned ' + result.value.length + ' events.');
             //return result.value;
             result.value.forEach(function(event) {
+                console.log(event.Start)
+                console.log(start)
+                console.log(event.End)
+                console.log(end)
                 if (event.Subject === subject && event.Start === start && event.End == end) {
                     outlook.calendar.deleteEvent({token: token, eventId: event.Id},
                                                  function(error, result) {
@@ -308,6 +312,8 @@ function nukeEvents() {
             console.log('getEvents returned ' + result.value.length + ' events.');
             //return result.value;
             result.value.forEach(function(event) {
+                console.log(event.Start)
+                console.log(event.End)
                 outlook.calendar.deleteEvent({token: token, eventId: event.Id},
                                              function(error, result) {
                     if (error) {
@@ -343,7 +349,7 @@ io.of('/user').on('connection', function(socket) {
                 var start = new Date(reservationInfo.start);
                 var end = new Date(reservationInfo.end);
 
-                addEvent(reservationInfo.user + "'s upcoming DEM trip (" +reservationInfo.model + " " + reservationInfo.license + ")", reservationInfo.model + " " + reservationInfo.license + "\n" + reservationInfo.stops, start.toISOString(), end.toISOString());
+                addEvent(reservationInfo.user + "'s upcoming DEM trip (" + reservationInfo.license + ")", reservationInfo.model + " " + reservationInfo.license + "\n" + reservationInfo.stops, start.toISOString(), end.toISOString());
                 // if(reservationInfo.canCarpool){
                 //     console.log("ya")
                 //     carpoolNotification(reservationInfo);
@@ -364,7 +370,7 @@ io.of('/user').on('connection', function(socket) {
                 var start = new Date(reservationInfo.start);
                 var end = new Date(reservationInfo.end);
 
-                addEvent(reservationInfo.user + "'s upcoming DEM trip (" +reservationInfo.model + " " + reservationInfo.license + ")", reservationInfo.model + " " + reservationInfo.license + "\n" + reservationInfo.stops, start.toISOString(), end.toISOString());
+                addEvent(reservationInfo.user + "'s upcoming DEM trip (" + reservationInfo.license + ")", reservationInfo.model + " " + reservationInfo.license + "\n" + reservationInfo.stops, start.toISOString(), end.toISOString());
                 // if(reservationInfo.canCarpool){
                 //     carpoolNotification(reservationInfo);
                 // }
@@ -390,8 +396,12 @@ io.of('/user').on('connection', function(socket) {
 
     socket.on('cancel', function(reservationID, user, model, license, start, end, callback){
         cancelReservation(reservationID);
-        console.log(start, end);
-        removeEvent(user + "'s upcoming DEM trip (" + license + ")", start, end);
+        var startDate = new Date(start);
+        var endDate = new Date(end);
+        var startISO = startDate.toISOString().split('.')[0]+"Z";
+        var endISO = endDate.toISOString().split('.')[0]+"Z";
+        //console.log(user + "'s upcoming DEM trip (" + license + ")", startDate, endDate);
+        removeEvent(user + "'s upcoming DEM trip (" + license + ")", startISO, endISO);
         conn.query('SELECT * FROM reservations WHERE user = ?', [user], function(error, data){
             socket.emit('reservationChange', data);
         });
