@@ -37,7 +37,7 @@ body {
 }
 
 .modal-body {
-    overflow-y: scroll;
+    overflow: auto;
     max-height: 550px;
 }
 
@@ -113,8 +113,4 @@ h3 {
 #decline {
     margin-right: auto;
     font-weight: bold;
-}
-
-#reportModal .modal-body {
-    overflow-y: auto;
 }
