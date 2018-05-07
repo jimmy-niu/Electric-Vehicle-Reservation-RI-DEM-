@@ -47,6 +47,11 @@ body {
     cursor: pointer;
 }
 
+.bold{
+    font-weight: 600;
+    color: orange;
+}
+
 .modal-body{
     overflow: auto;
     max-height: 70vh;

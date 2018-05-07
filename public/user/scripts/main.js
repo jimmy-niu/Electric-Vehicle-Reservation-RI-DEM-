@@ -97,7 +97,15 @@ $(document).ready(function() {
             $("#plateNumberMText").html($("#plateNumberMText").html() + reservation.license);
             $("#startMText").html($("#startMText").html() + reservation.start);
             $("#endMText").html($("#endMText").html() + reservation.end);
-            $("#stopsMText").html($("#stopsMText").html() + JSON.parse(reservation.stops));
+            
+            let stopsArray = JSON.parse(reservation.stops);
+            let stop = "<ol>";
+            for(let i=0; i<stopsArray.length; i++){
+                stop += `<li>${stopsArray[i]}</li>`;
+            }
+            stop += "</ol>";
+            
+            $("#stopsMText").html($("#stopsMText").html() + "<br>" + stop);
             $("#resModal").modal();
         }
     });
