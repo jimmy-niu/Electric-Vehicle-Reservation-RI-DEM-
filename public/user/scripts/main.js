@@ -24,7 +24,7 @@ $(document).ready(function() {
         mapTypeId: google.maps.MapTypeId.ROADMAP
     };
     map = new google.maps.Map(document.getElementById("mapCanvas"), mapOptions);
-    //map_edit = new google.maps.Map(document.getElementById("mapCanvasEdit"), mapOptions);
+    map_edit = new google.maps.Map(document.getElementById("mapCanvasEdit"), mapOptions);
 
     directionsDisplay = new google.maps.DirectionsRenderer;
 
@@ -32,7 +32,7 @@ $(document).ready(function() {
         navigator.geolocation.getCurrentPosition(function (position) {
             initialLocation = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
             map.setCenter(initialLocation);
-            //map_edit.setCenter(initialLocation);
+            map_edit.setCenter(initialLocation);
         });
     }
     initMap(map);
@@ -218,6 +218,7 @@ function initMap(map) {
             //alert(place.formatted_address)
             //alert(this.inputId)
             autocompletes[this.inputId] = place;
+            autocompletes_edit[this.inputId] = place;
         })
     }
     for (i = 0; i < inputs_edit.length; i++) {
@@ -579,14 +580,13 @@ function fillInEditModal(data){
 //     idToDelete = reservationObj.id;
 // }
 
-function editReservation(){
+function editReservation() {
     var totalDistance = 0;
     var totalDuration = 0;
     var bounds = new google.maps.LatLngBounds();
     var ac_sorted = Object.values(sortOnKeys(autocompletes_edit));
     
-    /*var directionsService = new google.maps.DirectionsService;
-    var directionsDisplay = new google.maps.DirectionsRenderer;
+    var directionsService = new google.maps.DirectionsService;
     directionsDisplay.setMap(map_edit);
 
     var waypoints = [];
@@ -615,7 +615,8 @@ function editReservation(){
             $("#distanceMText-edit").html($("#distanceMText-edit").html() + (totalDistance * 0.000621371).toFixed(2) + " miles");
             $("#durationMText-edit").html($("#durationMText-edit").html() + (totalDuration / 60.0).toFixed(0) + " minutes");
         }
-    });*/
+    });
+
     let id =  $("#reservation-id-edit").html();
     let start = $("#start-date-edit").val();
     let end = $("#end-date-edit").val();
