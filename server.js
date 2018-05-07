@@ -506,7 +506,7 @@ app.get('/authorize',
         replace({
             regex: "Welcome,(.+)<br>",
             replacement: "Welcome, " + user_email + " <br>",
-            paths: ['./public/admin/data.html', './public/admin/fleet.html', './public/admin/index.html',
+            paths: ['./public/admin/reports.html', './public/admin/fleet.html', './public/admin/index.html',
                     './public/user/index_admin.html'],
             silent: true
         })

@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+
+<html lang="en">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+        <title>ADMIN: DEM Vehicle Reservation</title>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+        <link rel="stylesheet" type = "text/css" href = "./styles/main.css">
+        <script src="/socket.io/socket.io.js"></script>
+
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+        <script src="./scripts/jquery-3.1.1.min.js"></script>
+        <script src="./scripts/jquery.form.min.js"></script>
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js" integrity="sha384-cs/chFZiN24E4KMATLdqdvsezGxaGsi4hLGOzlXwp5UZB1LY//20VyM2taTB4QvJ" crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js" integrity="sha384-uefMccjFJAIv6A+rW+L4AHf99KvxDjWSu1z9VI8SKNVmz4sk7buKt/6v9KI65qnm" crossorigin="anonymous"></script>
+        <script src="./scripts/main.js"></script>
+
+
+
+    </head>
+    <body>
+        <div class = "header drop-shadow">
+            <div id = "first-part">
+                <img id="logo" src="./media/ri-dem-logo.png" alt="DEM logo">
+                <div id = "title" >
+                    <span style = "font-size: 6vh;">F</span>leet Management
+                </div>
+            </div>
+
+            <div>
+                <div id = "user">
+                    Welcome, dem_test_a@outlook.com <br>
+                    <a href = "/logout" style = "font-size: 2vh; color: #D7A342">Logout</a>
+                </div>
+            </div>            
+        </div>
+
+        <div style = "padding: 1vh 2vw 1vh 2vw;">
+            <div class = "Nav-Buttons">
+                <a href = "./index.html"><div class = "button drop-shadow">Reservations</div></a>
+            </div>
+
+            <div class = "content drop-shadow">
+                <h2 id = "reports_title" class = "table-title">Reports: ▼</h2>
+
+                <div id = "fleet_header" class = "fleet_header">
+                    <div class = "table-header-entry">Reservation Id</div>
+                    <div class = "table-header-entry">Report</div>
+                    <div class = "table-header-entry">Needs Service</div>
+                    <div class = "table-header-entry">Needs Cleaning</div>
+                    <div class = "table-header-entry">Charging Station Available?</div>
+                </div>
+
+                <div id = "reports" class = "report_table"></div>
+            </div>
+        </div>
+    </body>
+</html>
