@@ -352,7 +352,7 @@ function nukeEvents() {
 //handles events when a regular user is connnected
 io.of('/user').on('connection', function(socket) {
     socket.on('join', function(user, callback){
-        conn.query('SELECT * FROM reservations WHERE user = ? ORDER BY start DESC', [user], function(error, data){
+        conn.query('SELECT *, vehicles.isEV FROM reservations INNER JOIN vehicles ON reservations.license = vehicles.license WHERE user = ? ORDER BY end ASC', [user], function(error, data){
             callback(data);
         });
     });
@@ -692,11 +692,11 @@ function newReservation(socket, reservationInfo, isEdit){
             //     carpoolNotification(carpoolUsers);
             // }
 
-            conn.query('SELECT license, model, image FROM vehicles WHERE extraTrunk >= ? AND offRoad >= ? AND equipRack >= ? AND license NOT IN (SELECT license FROM reservations WHERE start <= ? AND end >= ?) ORDER BY isEV DESC, featureScore ASC, miles ASC', [needsTrunk, needsOffRoad, needsRack, reservationInfo.end, reservationInfo.start], function(error, data){
+            conn.query('SELECT license, model, vehicles.isEV FROM vehicles WHERE extraTrunk >= ? AND offRoad >= ? AND equipRack >= ? AND license NOT IN (SELECT license FROM reservations WHERE start <= ? AND end >= ?) ORDER BY isEV DESC, featureScore ASC, miles ASC', [needsTrunk, needsOffRoad, needsRack, reservationInfo.end, reservationInfo.start], function(error, data){
                 if(data.rows.length !== 0){
                     reservationInfo.model = data.rows[0].model;
                     reservationInfo.license = data.rows[0].license;
-                    reservationInfo.image = data.rows[0].image;
+                    reservationInfo.isEV = data.rows[0].isEV;
                     socket.emit('newReservation', data, reservationInfo, isEdit, canCarpool, carpoolUsers);
                 } else {
                     socket.emit('noVehicle');
@@ -754,10 +754,10 @@ function carpoolNotification(reservationInfo){
             from: 'dem_do-not-reply@outlook.com',
             to: reservationInfo.carpoolUsers[i],
             subject: 'Carpool Notifcation',
-            html: "<h2>Carpool Alert!</h2>" + 
+            html: "<h2>Carpool Alert!</h2>" +
                 "<p>You are receiving this email because you and at least one other " +
                 "user have made reservations at the same exact time with the same route. " +
-                "We strongly encourage you to talk to them and arrange a carpool. By " + 
+                "We strongly encourage you to talk to them and arrange a carpool. By " +
                 "carpooling just twice a week, 1,600 pounds of greenhouse gases can be " +
                 "kept out of the air each year. Here is a list of the people you can " +
                 "carpool with: " + JSON.stringify(reservationInfo.carpoolUsers) + "</p>" +
@@ -827,8 +827,13 @@ let fs = require('fs');
 
 app.post("/admin/api/Upload", upload.single("imgUploader"), function (req, res) {
     let newName = `${req.body.license}.${req.file.mimetype.replace("image/", "")}`;
-    
+<<<<<<< HEAD
+
+    fs.rename(`public/vehicle_images/${tempName}`, `public/vehicle_images/${newName}`, function(err){
+=======
+
     fs.rename(`public/user/media/vehicle_images/${tempName}`, `public/user/media/vehicle_images/${newName}`, function(err){
+>>>>>>> origin/master
         if ( err ) {
             console.log('ERROR: ' + err);
         } else {
@@ -838,4 +843,3 @@ app.post("/admin/api/Upload", upload.single("imgUploader"), function (req, res) 
 
     });
 });
-

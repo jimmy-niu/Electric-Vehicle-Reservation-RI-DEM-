@@ -45,7 +45,7 @@
 
             <div class = "content drop-shadow">
                 <h2 id = "fleet_title" class = "table-title">Current Fleet: ▼</h2>
-                
+
                 <div id = "fleet_header" class = "fleet_header">
                     <div class = "table-header-entry">License</div>
                     <div class = "table-header-entry">Model</div>
@@ -53,12 +53,12 @@
                     <div class = "table-header-entry">Car Type</div>
                     <div class = "table-header-entry">Change Status</div>
                 </div>
-                
+
                 <div id = "current_fleet" class = "fleet_table"></div>
             </div>
         </div>
-        
-<!--        <img src = "../admin_u/media/polar_bear.png">-->
+
+        <!--        <img src = "../admin_u/media/polar_bear.png">-->
 
         <!-- Modals here -->
 
@@ -81,15 +81,15 @@
                             Miles on Car: <input type = "number" id = "milesField" value = 0>
                             <br><br>
                         </form>
-                        
+
                         Upload Image:
                         <form id="frmUploader" enctype="multipart/form-data" method="POST" action="api/Upload/">
                             <input id = "imageInput" type="file" accept = ".png, .jpg, .jpeg" name="imgUploader">
                             <input type="submit" name="submit" id="btnSubmit" value="Upload"/>
                             <input id="imageFileName" type="text" style="display: none;" value="noPicture.png"/>
                         </form>
-                        
-                        
+
+
                         <hr>
 
                         <form id = "carCaps">
@@ -111,7 +111,7 @@
                             Equipment Rack: <input type = "checkbox" id="equipChoice">
                         </form>
                     </div>
-                    
+
                     <div class="modal-footer">
                         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
 

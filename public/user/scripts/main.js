@@ -57,8 +57,12 @@ $(document).ready(function() {
     console.log(userEmail);
 
     userSocket.emit('join',userEmail, function(reservations){
+        console.log(reservations);
         for(var i = 0; i < reservations.rows.length; i++){
-            if(Date.parse(reservations.rows[i].end) > Date.now()){
+            let a = reservations.rows[i].end;
+            let n = new Date(Date.now());
+            let b = n.getFullYear() + "-" + ("0"+(n.getMonth() + 1)).slice(-2) + "-" + ("0" + n.getDate()).slice(-2) + " " + ("0" + (n.getHours())).slice(-2) + ":" + ("0" + n.getMinutes()).slice(-2);
+            if(a >= b){
                 new Reservation(reservations.rows[i]);
             } else {
                 new OldReservation(reservations.rows[i]);
@@ -75,6 +79,7 @@ $(document).ready(function() {
     userSocket.on('newReservation', function(vehicles, reservation, isEdit, canCarpool, carpoolUsers){
         console.log('new reservation made');
         currentCar = reservation;
+        console.log(currentCar);
         currentCar.canCarpool = canCarpool;
         currentCar.carpoolUsers = carpoolUsers;
         alternateVehicles = vehicles;
@@ -142,19 +147,23 @@ $(document).ready(function() {
             let b = n.getFullYear() + "-" + ("0"+(n.getMonth() + 1)).slice(-2) + "-" + ("0" + n.getDate()).slice(-2) + " " + ("0" + (n.getHours())).slice(-2) + ":" + ("0" + n.getMinutes()).slice(-2);
             console.log(a);
             console.log(b);
+            let border;
+            if($('.upcomingReservation').eq(i).hasClass('.border-success')){
+                border = 1;
+            } else if($('.upcomingReservation').eq(i).hasClass('.border-danger')){
+                border = 0;
+            }
             if(a < b){
-                console.log("hello");
                 let r = {model: $('.upcomingReservation').eq(i).find('.card-model').html(), license: $('.upcomingReservation').eq(i).find('.card-license').html(),
-                         start: $('.upcomingReservation').eq(i).find('.card-start').html(), end: $('.upcomingReservation').eq(i).find('.card-end').html()}
+                         start: $('.upcomingReservation').eq(i).find('.card-start').html(), end: $('.upcomingReservation').eq(i).find('.card-end').html(),
+                         isEV: border};
                 $('.upcomingReservation').eq(i).remove();
                 new OldReservation(r);
 
             }
             i ++;
-
         }
-
-    }, 3000);
+    }, 60000);
 
 });
 
@@ -289,9 +298,9 @@ function renderCar(){
             currentCar.id = id;
 
             $("." + idToDelete).remove();
-
+            console.log(currentCar.isEV);
             new Reservation(currentCar);
-
+            sortReservations();
             currentCar = undefined;
             $("#reasoning-field-edit").val("");
 
@@ -301,8 +310,9 @@ function renderCar(){
         userSocket.emit('addReservation', currentCar, function(id){
             console.log('added')
             currentCar.id = id;
+            console.log(currentCar);
             new Reservation(currentCar);
-
+            sortReservations();
             currentCar = undefined;
             $("#reasoning-field").val("");
 
@@ -314,6 +324,7 @@ function renderCar(){
 function setVehicle(index){
     currentCar.license = alternateVehicles.rows[index].license;
     currentCar.model = alternateVehicles.rows[index].model;
+    currentCar.image = alternateVehicles.rows[index].image;
 }
 
 function altVehicles(){
@@ -566,14 +577,24 @@ function setDeleteCard(obj){
 }
 
 class Reservation {
+
     constructor(reservationData) {
+
+        if(reservationData.isEV == true){
+            reservationData.border = "border-success";
+        } else {
+            reservationData.border = "border-danger";
+        }
         this.addToDom(reservationData);
+
     }
     addToDom(r) {
+
+        let imageFilePath = "./media/vehicle_images/"
         let DOMobject = `<div class="card border-success mb-3 ${r.id} upcomingReservation" style="width: 18rem;">
-                            <img class = "card-img-top" src="https://upload.wikimedia.org/wikipedia/commons/5/5f/DCA_Prius_1Gen_12_2011_3592.JPG" alt="prius placeholder image">
+                            <img class = "card-img-top" src="${imageFilePath + r.image}">
                             <div class="card-body">
-                                <h5 class="card-title"><span class="card-model">${r.model}</span><span class="card-license">${r.license}</span></h5>
+                                <h5 class="card-title"><span class="card-model">${r.model}</span> <span class="card-license">${r.license}</span></h5>
                                 <p class="card-text"><strong>Start</strong>: <span class="card-start">${r.start}</span> <br>
                                     <strong>End</strong>:<span class="card-end"> ${r.end}</span> <br>
                                         <strong>Route</strong>: ${JSON.parse(r.stops)} </p>
@@ -588,10 +609,15 @@ class Reservation {
 
 class OldReservation {
     constructor(reservationData) {
+        if(reservationData.isEV == true){
+            reservationData.border = "border-success";
+        } else {
+            reservationData.border = "border-danger";
+        }
         this.addToDom(reservationData);
     }
     addToDom(r) {
-        let DOMobject = `<div class="card border-danger mb-3" style="width: 18rem;">
+        let DOMobject = `<div class="card mb-3 ${r.border}" style="width: 18rem;">
                             <img class = "card-img-top" src="https://media.ed.edmunds-media.com/ford/explorer/2017/oem/2017_ford_explorer_4dr-suv_platinum_rq_oem_1_815.jpg" alt="explorer placeholder image">
                             <div class="card-body">
                                 <h5 class="card-title">${r.model} ${r.license}</h5>
@@ -604,6 +630,27 @@ class OldReservation {
     }
 }
 
+
 function overrideVehicle(reservationID, license, model, justification){
     userSocket.emit('vehicleOverride', reservationID, license, model, justification);
+}
+
+function sortReservations(){
+    var cards = $('.cards');
+	var reservations = $('.upcomingReservation');
+    console.log(reservations);
+    reservations.sort(function(a,b){
+	       var an = $(a).find('.card-end').html().toString().trim();
+		   var bn = $(b).find('.card-end').html().toString().trim();
+
+	       if(an > bn) {
+		       return 1;
+	       }
+	       if(an < bn) {
+		       return -1;
+	       }
+	       return 0;
+    });
+
+    reservations.detach().appendTo(cards);
 }
