@@ -145,8 +145,6 @@ $(document).ready(function() {
             let a = $('.upcomingReservation').eq(i).find('.card-end').html().toString().trim();
             let n = new Date(Date.now());
             let b = n.getFullYear() + "-" + ("0"+(n.getMonth() + 1)).slice(-2) + "-" + ("0" + n.getDate()).slice(-2) + " " + ("0" + (n.getHours())).slice(-2) + ":" + ("0" + n.getMinutes()).slice(-2);
-            console.log(a);
-            console.log(b);
             let border;
             if($('.upcomingReservation').eq(i).hasClass('.border-success')){
                 border = 1;
