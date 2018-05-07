@@ -30,6 +30,7 @@ let base =
         'html { ' +
           'background-image: url("https://goo.gl/WLebPB");' +
           'background-position: center 10%; ' +
+          'background-repeat: no-repeat;' +
         '}' +
 
         '#login-container { ' + 
