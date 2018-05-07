@@ -15,8 +15,6 @@
         <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js" integrity="sha384-cs/chFZiN24E4KMATLdqdvsezGxaGsi4hLGOzlXwp5UZB1LY//20VyM2taTB4QvJ" crossorigin="anonymous"></script>
         <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js" integrity="sha384-uefMccjFJAIv6A+rW+L4AHf99KvxDjWSu1z9VI8SKNVmz4sk7buKt/6v9KI65qnm" crossorigin="anonymous"></script>
-
-        <script src="CSVExport.js"></script>
     </head>
     <body>
         <div class = "header drop-shadow">
@@ -28,7 +26,7 @@
             </div>
             <div>
                 <div id = "user">
-                    Welcome, %user% <br>
+                    Welcome, dem_test_a@outlook.com <br>
                     <a href = "/logout" style = "font-size: 2vh; color: #D7A342">Logout</a>
                     <a href = "../admin_u/index_admin.html" style = "font-size: 1vh; color: #D7A342">Change to user view</a>
                 </div>
@@ -40,7 +38,10 @@
                 <a href = "./fleet.html"><div class = "button drop-shadow">Manage Fleet</div></a>
 
                 <a href = "#modifyUserModal" class = "btn btn-large btn-primary drop-shadow" data-toggle="modal">Add/Remove User</a>
-
+                <a href = "#" id = "export-users" class = "btn btn-large btn-primary drop-shadow">Export Users</a>
+                <a href = "#" id = "export-vehicles" class = "btn btn-large btn-primary drop-shadow">Export Vehicles</a>
+                <a href = "#" id = "export-reservations" class = "btn btn-large btn-primary drop-shadow">Export Reservations</a>
+                <a href = "#" id = "export-reports" class = "btn btn-large btn-primary drop-shadow">Export Reports</a>
                 <div id="modifyUserModal" class="modal fade">
                     <div class="modal-dialog">
                         <div class="modal-content">

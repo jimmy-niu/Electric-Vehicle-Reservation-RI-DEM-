@@ -185,10 +185,10 @@ conn.query('INSERT INTO users VALUES(null, ?, ?)', ["jenna_tishler@brown.edu", t
 
 
 //exportCSV([{a: 0, b:4, c:3},{a: 0, b:4, c:3},{a: 0, b:4, c:3},{a: 0, b:4, c:3}], '/public/temp/h.csv');
-exportUsers();
-exportVehicles();
-exportReservations();
-exportReports();
+// exportUsers();
+// exportVehicles();
+// exportReservations();
+// exportReports();
 
 /*Sets up the server on port 8080.*/
 server.listen(8080, function(){
@@ -332,35 +332,6 @@ function nukeEvents() {
     });
 }
 
-function nukeEvents() {
-    var queryParams = {
-        '$select': 'Subject,Start,End,Id',
-        '$top': 500,
-    };
-
-    outlook.calendar.getEvents({token: token, odataParams: queryParams},
-                               function(error, result){
-        if (error) {
-            console.log('getEvents returned an error: ' + error);
-        }
-        else if (result) {
-            console.log('getEvents returned ' + result.value.length + ' events.');
-            //return result.value;
-            result.value.forEach(function(event) {
-                outlook.calendar.deleteEvent({token: token, eventId: event.Id},
-                                             function(error, result) {
-                    if (error) {
-                        console.log(error)
-                        //console.log('deleteEvent returned an error');
-                    } else {
-                        console.log("deleteEvent success");
-                    }
-                });
-            });
-        }
-    });
-}
-
 //handles events when a regular user is connnected
 io.of('/user').on('connection', function(socket) {
     socket.on('join', function(user, callback){
@@ -381,6 +352,7 @@ io.of('/user').on('connection', function(socket) {
                 io.of('/admin').emit("newReservation", resData);
                 var start = new Date(reservationInfo.start);
                 var end = new Date(reservationInfo.end);
+
                 addEvent(reservationInfo.user + "'s upcoming DEM trip (" +reservationInfo.model + " " + reservationInfo.license + ")", reservationInfo.model + " " + reservationInfo.license + "\n" + reservationInfo.stops, start.toISOString(), end.toISOString());
                 // if(reservationInfo.canCarpool){
                 //     console.log("ya")
@@ -401,6 +373,7 @@ io.of('/user').on('connection', function(socket) {
                 //Calendar event
                 var start = new Date(reservationInfo.start);
                 var end = new Date(reservationInfo.end);
+
                 addEvent(reservationInfo.user + "'s upcoming DEM trip (" +reservationInfo.model + " " + reservationInfo.license + ")", reservationInfo.model + " " + reservationInfo.license + "\n" + reservationInfo.stops, start.toISOString(), end.toISOString());
                 // if(reservationInfo.canCarpool){
                 //     carpoolNotification(reservationInfo);
@@ -427,6 +400,8 @@ io.of('/user').on('connection', function(socket) {
 
     socket.on('cancel', function(reservationID, user, model, license, start, end, callback){
         cancelReservation(reservationID);
+        console.log(start, end);
+        removeEvent(user + "'s upcoming DEM trip (" + license + ")", start, end);
         conn.query('SELECT * FROM reservations WHERE user = ?', [user], function(error, data){
             socket.emit('reservationChange', data);
         });
@@ -545,6 +520,38 @@ app.get('/authorize',
 app.get('/auth/outlook',
         passport.authenticate('windowslive', { scope: process.env.CLIENT_SCOPES }),
         function(req, res) {
+});
+
+app.get('/admin/download/users', function(req, res){
+    exportUsers(function(){
+        res.download(__dirname + '/public/temp/users.csv',function(){
+            fs.unlink(__dirname + '/public/temp/users.csv');
+        });
+    });
+});
+
+app.get('/admin/download/vehicles', function(req, res){
+    exportVehicles(function(){
+        res.download(__dirname + '/public/temp/vehicles.csv',function(){
+            fs.unlink(__dirname + '/public/temp/vehicles.csv');
+        });
+    });
+});
+
+app.get('/admin/download/reservations', function(req, res){
+    exportReservations(function(){
+        res.download(__dirname + '/public/temp/reservations.csv',function(){
+            fs.unlink(__dirname + '/public/temp/reservations.csv');
+        });
+    });
+});
+
+app.get('/admin/download/reports', function(req, res){
+    exportReports(function(){
+        res.download(__dirname + '/public/temp/reports.csv',function(){
+            fs.unlink(__dirname + '/public/temp/reports.csv');
+        });
+    });
 });
 
 app.get('/logout', function(req, res) {
@@ -866,7 +873,7 @@ app.post("/admin/api/Upload", upload.single("imgUploader"), function (req, res) 
 // //Reports
 // conn.query('CREATE TABLE IF NOT EXISTS reports(id INTEGER PRIMARY KEY AUTOINCREMENT, reservation INTEGER, report TEXT, needsService BOOLEAN, needsCleaning BOOLEAN, notCharging BOOLEAN)');
 
-function exportUsers(){
+function exportUsers(callback){
     conn.query('SELECT * FROM users', function(error, data){
         let users = data.rows;
         let options = {fields:[{name:'id', label:'ID'},
@@ -879,15 +886,17 @@ function exportUsers(){
                     return console.log(err);
                 }
                 console.log("The file was saved!");
+                callback();
             });
             if(err) {
                 return console.log(err);
             }
         });
     });
+
 }
 
-function exportVehicles(){
+function exportVehicles(callback){
     conn.query('SELECT * FROM vehicles', function(error, data){
         let vehicles = data.rows;
         let options = {fields:[{name:'id', label:'ID'},
@@ -907,6 +916,7 @@ function exportVehicles(){
                     return console.log(err);
                 }
                 console.log("The file was saved!");
+                callback();
             });
             if(err) {
                 return console.log(err);
@@ -915,7 +925,7 @@ function exportVehicles(){
     });
 }
 
-function exportReservations(){
+function exportReservations(callback){
     conn.query('SELECT * FROM reservations', function(error, data){
         let reservations = data.rows;
         let options = {fields:[{name:'id', label:'ID'},
@@ -937,6 +947,7 @@ function exportReservations(){
                     return console.log(err);
                 }
                 console.log("The file was saved!");
+                callback();
             });
             if(err) {
                 return console.log(err);
@@ -945,7 +956,7 @@ function exportReservations(){
     });
 }
 
-function exportReports(){
+function exportReports(callback){
     conn.query('SELECT * FROM reports', function(error, data){
         let reports = data.rows;
         let options = {fields:[{name:'id', label:'ID'},
@@ -961,6 +972,7 @@ function exportReports(){
                     return console.log(err);
                 }
                 console.log("The file was saved!");
+                callback();
             });
             if(err) {
                 return console.log(err);
