@@ -350,6 +350,7 @@ function nukeEvents() {
 //handles events when a regular user is connnected
 io.of('/user').on('connection', function(socket) {
     socket.on('join', function(user, callback){
+        socket.user = user;
         conn.query('SELECT *, vehicles.isEV, reservations.id FROM reservations INNER JOIN vehicles ON reservations.license = vehicles.license WHERE user = ? ORDER BY end ASC', [user], function(error, data){
             callback(data);
         });
@@ -543,36 +544,64 @@ app.get('/auth/outlook',
         function(req, res) {
 });
 
-app.get('/admin/download/users', function(req, res){
-    exportUsers(function(){
-        res.download(__dirname + '/public/temp/users.csv',function(){
-            fs.unlink(__dirname + '/public/temp/users.csv');
+app.get('/admin/download/users', 
+    function(req, res) {
+    var user_email = req.user._json.EmailAddress;
+    if (adminEmails.includes(user_email)) {
+        exportUsers(function(){
+            res.download(__dirname + '/public/admin/temp/users.csv',function(){
+                fs.unlink(__dirname + '/public/admin/temp/users.csv');
+            });
         });
-    });
+    } else {
+        console.log("not authorized");
+        res.redirect("/");
+    }
 });
 
-app.get('/admin/download/vehicles', function(req, res){
-    exportVehicles(function(){
-        res.download(__dirname + '/public/temp/vehicles.csv',function(){
-            fs.unlink(__dirname + '/public/temp/vehicles.csv');
+app.get('/admin/download/vehicles',
+    function(req, res) {
+    var user_email = req.user._json.EmailAddress;
+    if (adminEmails.includes(user_email)) {
+        exportVehicles(function(){
+            res.download(__dirname + '/public/admin/temp/vehicles.csv',function(){
+                fs.unlink(__dirname + '/public/admin/temp/vehicles.csv');
+            });
         });
-    });
+    } else {
+        console.log("not authorized");
+        res.redirect("/");
+    }
 });
 
-app.get('/admin/download/reservations', function(req, res){
-    exportReservations(function(){
-        res.download(__dirname + '/public/temp/reservations.csv',function(){
-            fs.unlink(__dirname + '/public/temp/reservations.csv');
+app.get('/admin/download/reservations',
+    function(req, res) {
+    var user_email = req.user._json.EmailAddress;
+    if (adminEmails.includes(user_email)) {
+        exportReservations(function(){
+            res.download(__dirname + '/public/admin/temp/reservations.csv',function(){
+                fs.unlink(__dirname + '/public/admin/temp/reservations.csv');
+            });
         });
-    });
+    } else {
+        console.log("not authorized");
+        res.redirect("/");
+    }
 });
 
-app.get('/admin/download/reports', function(req, res){
-    exportReports(function(){
-        res.download(__dirname + '/public/temp/reports.csv',function(){
-            fs.unlink(__dirname + '/public/temp/reports.csv');
+app.get('/admin/download/reports', 
+    function(req, res) {
+    var user_email = req.user._json.EmailAddress;
+    if (adminEmails.includes(user_email)) {
+        exportReports(function(){
+            res.download(__dirname + '/public/admin/temp/reports.csv',function(){
+                fs.unlink(__dirname + '/public/admin/temp/reports.csv');
+            });
         });
-    });
+    } else {
+        console.log("not authorized");
+        res.redirect("/");
+    }
 });
 
 app.get('/logout', function(req, res) {
@@ -841,7 +870,14 @@ function reassignReservations(license){
                 if(data.rows.length !== 0){
                     conn.query('UPDATE reservations SET license = ?, model = ?, image = ? WHERE id = ?',[data.rows[0].license, data.rows[0].model, data.rows[0].image, reservationInfo.id],function(error, data){
                         conn.query('SELECT * FROM reservations WHERE id = ?', [reservationInfo.id], function(error, data){
-                            //socket.emit('reassignReservation', data);
+
+                            // for(let i = 0; i < data.rows.length; i++){
+                            //     if(data.rows[i].user === io.sockets.sockets[i].nickname){
+                            //
+                            //         socket.emit('reassignReservation', data);
+                            //     }
+                            // }
+                            // io.of('/admin').emit("newReservation", data);
                             io.of('/admin').emit("newReservation", data);
                         });
                     });
@@ -906,7 +942,7 @@ function exportUsers(callback){
                       {name:'admin', label:'Admin'}]};
         jsoncsv.csvBuffered(users, options, function(err, csv){
             console.log(csv);
-            fs.writeFile(__dirname + '/public/temp/users.csv', csv, function(err) {
+            fs.writeFile(__dirname + '/public/admin/temp/users.csv', csv, function(err) {
                 if(err) {
                     return console.log(err);
                 }
@@ -936,7 +972,7 @@ function exportVehicles(callback){
                         {name:'equipRack', label:'Equip Rack'}]};
         jsoncsv.csvBuffered(vehicles, options, function(err, csv){
             console.log(csv);
-            fs.writeFile(__dirname + '/public/temp/vehicles.csv', csv, function(err) {
+            fs.writeFile(__dirname + '/public/admin/temp/vehicles.csv', csv, function(err) {
                 if(err) {
                     return console.log(err);
                 }
@@ -967,7 +1003,7 @@ function exportReservations(callback){
                         {name:'needsRack', label:'Equip Rack'}]};
         jsoncsv.csvBuffered(reservations, options, function(err, csv){
             console.log(csv);
-            fs.writeFile(__dirname + '/public/temp/reservations.csv', csv, function(err) {
+            fs.writeFile(__dirname + '/public/admin/temp/reservations.csv', csv, function(err) {
                 if(err) {
                     return console.log(err);
                 }
@@ -992,7 +1028,7 @@ function exportReports(callback){
                         {name:'notCharging', label:'Not Charging'}]};
         jsoncsv.csvBuffered(reports, options, function(err, csv){
             console.log(csv);
-            fs.writeFile(__dirname + '/public/temp/reports.csv', csv, function(err) {
+            fs.writeFile(__dirname + '/public/admin/temp/reports.csv', csv, function(err) {
                 if(err) {
                     return console.log(err);
                 }
