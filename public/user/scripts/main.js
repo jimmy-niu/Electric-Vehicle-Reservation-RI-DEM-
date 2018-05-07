@@ -141,6 +141,11 @@ $(document).ready(function() {
         minDate: "today",
         defaultDate: "today",
     });
+
+    $('#new-res-form').on('hidden.bs.modal', function() {
+        $(this).find('form').trigger('reset');
+    });
+
     jQuery.fn.carousel.Constructor.TRANSITION_DURATION = 5000;
 
 
