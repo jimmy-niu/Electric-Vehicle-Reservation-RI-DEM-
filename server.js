@@ -827,13 +827,7 @@ let fs = require('fs');
 
 app.post("/admin/api/Upload", upload.single("imgUploader"), function (req, res) {
     let newName = `${req.body.license}.${req.file.mimetype.replace("image/", "")}`;
-<<<<<<< HEAD
-
-    fs.rename(`public/vehicle_images/${tempName}`, `public/vehicle_images/${newName}`, function(err){
-=======
-
     fs.rename(`public/user/media/vehicle_images/${tempName}`, `public/user/media/vehicle_images/${newName}`, function(err){
->>>>>>> origin/master
         if ( err ) {
             console.log('ERROR: ' + err);
         } else {
