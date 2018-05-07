@@ -280,8 +280,8 @@ function deleteStop(obj){
     count--;
     count_edit--;
     let toDelete = obj.parentNode.parentNode;
-    console.log($(obj).parent(":label").html().replace(`${obj}`));
-    $(toDelete).empty();
+    console.log(toDelete.children[1].id); //.replace(`${obj}`));
+    delete autocompletes[toDelete.children[1].id];
     $(toDelete).remove();
 }
 
@@ -330,7 +330,6 @@ function cleanFields(){
             .end();
         $("#new-stops").empty();
     }
-    currentCar = undefined;
     autocompletes = {};
 }
 
