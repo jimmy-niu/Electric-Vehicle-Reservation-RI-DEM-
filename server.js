@@ -876,7 +876,7 @@ app.post("/admin/api/Upload", upload.single("imgUploader"), function (req, res) 
 function exportUsers(callback){
     conn.query('SELECT * FROM users', function(error, data){
         let users = data.rows;
-        let options = {fields:[{name:'id', label:'ID'},
+        let options = {fields:[{name:'id', label:'Id'},
                       {name:'email', label:'Email'},
                       {name:'admin', label:'Admin'}]};
         jsoncsv.csvBuffered(users, options, function(err, csv){
@@ -899,7 +899,7 @@ function exportUsers(callback){
 function exportVehicles(callback){
     conn.query('SELECT * FROM vehicles', function(error, data){
         let vehicles = data.rows;
-        let options = {fields:[{name:'id', label:'ID'},
+        let options = {fields:[{name:'id', label:'Id'},
                         {name:'license', label:'License'},
                         {name:'model', label:'Model'},
                         {name:'color', label:'Color'},
@@ -928,7 +928,7 @@ function exportVehicles(callback){
 function exportReservations(callback){
     conn.query('SELECT * FROM reservations', function(error, data){
         let reservations = data.rows;
-        let options = {fields:[{name:'id', label:'ID'},
+        let options = {fields:[{name:'id', label:'Id'},
                         {name:'user', label:'User'},
                         {name:'license', label:'License'},
                         {name:'model', label:'Model'},
@@ -959,7 +959,7 @@ function exportReservations(callback){
 function exportReports(callback){
     conn.query('SELECT * FROM reports', function(error, data){
         let reports = data.rows;
-        let options = {fields:[{name:'id', label:'ID'},
+        let options = {fields:[{name:'id', label:'Id'},
                         {name:'reservation', label:'Reservation'},
                         {name:'report', label:'Report'},
                         {name:'needsService', label:'Needs Service'},
