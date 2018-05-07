@@ -350,7 +350,6 @@ function nukeEvents() {
 //handles events when a regular user is connnected
 io.of('/user').on('connection', function(socket) {
     socket.on('join', function(user, callback){
-        socket.user = user;
         conn.query('SELECT *, vehicles.isEV, reservations.id FROM reservations INNER JOIN vehicles ON reservations.license = vehicles.license WHERE user = ? ORDER BY end ASC', [user], function(error, data){
             callback(data);
         });

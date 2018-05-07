@@ -47,7 +47,7 @@ $(document).ready(function() {
 
     userEmail = $("#user_email").html().replace("Welcome, ", "").replace(" <br>", "").replace("\n", "").trim();
     console.log(userEmail);
-
+    
     userSocket.emit('join',userEmail, function(reservations){
         console.log("hello")
         console.log(reservations);
