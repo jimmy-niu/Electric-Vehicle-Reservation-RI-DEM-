@@ -45,7 +45,7 @@ function bindClickHandlers(){
         toggle_hidden('upcoming_header');
         toggleTitle(this);
     });
-    
+
     $("#fleet_title").bind("click", function(){
         toggle_hidden('fleet_header'); 
         toggle_hidden('current_fleet');
@@ -64,6 +64,11 @@ function toggleTitle(object){
     } else {
         object.innerHTML = content.replace("▲", "▼");
     }
+}
+
+function insertVehicleImage(id, imgSrc){
+    let img = `<img src = "${imgSrc}"`
+    $(`#${id}`).append()
 }
 
 function clearForms(obj){
@@ -111,14 +116,18 @@ function addVehicle(){
     let trunk = $('#extraTrunkChoice').is(':checked');
     let offRoad = $('#offRoadChoice').is(':checked');
     let equipmentRack = $('#equipChoice').is(':checked');
+    let image = $('#imageFileName').val();
 
     if(id !== '' && license !== '' && model !== '' && color !== ''){
         let vehicle = {id: id, license: license, model: model, color: color, miles: miles, status: status,
-                       isEv: carType, trunk: trunk, offRoad: offRoad, equipmentRack: equipmentRack};
+                       isEv: carType, trunk: trunk, offRoad: offRoad, equipmentRack: equipmentRack, image: image};
         adminSocket.emit("vehicleAdded", vehicle, function(){
         });
     }
-    //cleanFields();
+    clearForms($("#carSpecs"));
+    clearForms($("#carCaps"));
+    clearForms($("#frmUploader"));
+    console.log($("#imageFileName").val());
 }
 
 function fillInEditModal(vehicleData){
@@ -252,25 +261,26 @@ class Vehicle {
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  */
 function setUploader(){
-    let options = {
-        uploadProgress: showProgress,
-        resetForm: true,
-        data: {license: ""}
-    };
-
     // bind to the form's submit event
     $('#frmUploader').unbind("submit").bind("submit", function(e){
         e.preventDefault();
-        options.data.license = $("#licenseField").val();
-        $(this).ajaxSubmit(options);
-        return true;
+        if($('#licenseField').val() === "" || $('#licenseField').val() === undefined){
+            window.alert("Please enter a license plate number before uploading the vehicle!")
+        } else {
+            let options = {
+                data: {license: ""},
+                success: finishedUpload
+            };
+            options.data.license = $("#licenseField").val();
+            $(this).ajaxSubmit(options);
+        }
     });
 }
 
-function showProgress(event, position, total, percentageComplete){
-    if(percentageComplete === 100){
-        clearForms($("#frmUploader"));
-    }
+function finishedUpload(data){
+    console.log(data);
+    $('#imageFileName').val(data);
+    window.alert("Image uploaded successfully!");
 }
 
 /*

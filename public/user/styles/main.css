@@ -15,30 +15,20 @@ body {
     padding: 2vh 2vw 2vh 2vw;
 }
 
-.carousel {
+#fact-container {
     background-image: url("../media/polar_bear.png");
     background-repeat: no-repeat;
     background-size: auto 80%;
     background-position: 1% center;
     background-color: #5cb9e4;
-    overflow-x: hidden;
-    overflow-y: hidden;
-}
-
-.fun-fact {
     height: 50px;
-    padding: 13px 80px;
-}
-
-.carousel-inner .carousel-item {
-    transition: -webkit-transform 4s ease;
-    transition: transform 4s ease;
-    transition: transform 4s ease, -webkit-transform 4s ease;
-  }
-
-.fun-fact p {
     font-weight: bold;
     color: white;
+}
+
+.carousel {
+    margin-left: 80px;
+    padding-top: 12px;
 }
 
 #deleteX {
