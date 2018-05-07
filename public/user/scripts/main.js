@@ -143,7 +143,12 @@ $(document).ready(function() {
         }
     });
 
-    flatpickr(".datePicker", {enableTime: true, dateFormat: "Y-m-d H:i"});
+    flatpickr(".datePicker", {
+        enableTime: true,
+        dateFormat: "Y-m-d H:i",
+        minDate: "today",
+        defaultDate: "today",
+    });
     jQuery.fn.carousel.Constructor.TRANSITION_DURATION = 5000;
 
 
