@@ -14,6 +14,7 @@ var map = null;
 var map_edit = null;
 var autocompletes = {};
 var autocompletes_edit = {};
+var directionsDisplay = null;
 
 // Sets up the sockets.
 $(document).ready(function() {
@@ -23,13 +24,15 @@ $(document).ready(function() {
         mapTypeId: google.maps.MapTypeId.ROADMAP
     };
     map = new google.maps.Map(document.getElementById("mapCanvas"), mapOptions);
-    map_edit = new google.maps.Map(document.getElementById("mapCanvasEdit"), mapOptions);
+    //map_edit = new google.maps.Map(document.getElementById("mapCanvasEdit"), mapOptions);
+
+    directionsDisplay = new google.maps.DirectionsRenderer;
 
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(function (position) {
             initialLocation = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
             map.setCenter(initialLocation);
-            map_edit.setCenter(initialLocation);
+            //map_edit.setCenter(initialLocation);
         });
     }
     initMap(map);
@@ -439,10 +442,8 @@ function newReservation() {
     var bounds = new google.maps.LatLngBounds();
     var ac_sorted = Object.values(sortOnKeys(autocompletes))
 
-    map.setZoom(15);
     var directionsService = new google.maps.DirectionsService;
-    var directionsDisplay = new google.maps.DirectionsRenderer;
-    directionsDisplay.setMap(map)
+    directionsDisplay.setMap(map);
 
     var waypoints = [];
     for (var i = 1; i < ac_sorted.length - 1; i++) {
@@ -583,7 +584,38 @@ function editReservation(){
     var totalDuration = 0;
     var bounds = new google.maps.LatLngBounds();
     var ac_sorted = Object.values(sortOnKeys(autocompletes_edit));
+    
+    /*var directionsService = new google.maps.DirectionsService;
+    var directionsDisplay = new google.maps.DirectionsRenderer;
+    directionsDisplay.setMap(map_edit);
 
+    var waypoints = [];
+    for (var i = 1; i < ac_sorted.length - 1; i++) {
+        waypoints.push({
+            location: new google.maps.LatLng(ac_sorted[i].geometry.location.lat(), ac_sorted[i].geometry.location.lng()),
+            stopover: true
+        })
+    }
+    directionsService.route({
+        origin: new google.maps.LatLng(ac_sorted[0].geometry.location.lat(), ac_sorted[0].geometry.location.lng()),
+        destination: new google.maps.LatLng(ac_sorted[ac_sorted.length - 1].geometry.location.lat(), ac_sorted[ac_sorted.length - 1].geometry.location.lng()),
+        waypoints: waypoints,
+        travelMode: 'DRIVING'
+    }, function(response, status) {
+        if (status === 'OK') {
+            var totalDistance = 0;
+            var totalDuration = 0;
+            directionsDisplay.setDirections(response);
+            // calculate time and distance
+            var legs = response.routes[0].legs;
+            for(var i = 0; i < legs.length; i++) {
+                totalDistance += legs[i].distance.value;
+                totalDuration += legs[i].duration.value;
+            }
+            $("#distanceMText-edit").html($("#distanceMText-edit").html() + (totalDistance * 0.000621371).toFixed(2) + " miles");
+            $("#durationMText-edit").html($("#durationMText-edit").html() + (totalDuration / 60.0).toFixed(0) + " minutes");
+        }
+    });*/
     let id =  $("#reservation-id-edit").html();
     let start = $("#start-date-edit").val();
     let end = $("#end-date-edit").val();
