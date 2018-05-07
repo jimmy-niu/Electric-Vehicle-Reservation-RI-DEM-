@@ -31,7 +31,7 @@
 
             <div>
                 <div id = "user">
-                    Welcome, dem_test_a@outlook.com <br>
+                    Welcome, %user% <br>
                     <a href = "/logout" style = "font-size: 2vh; color: #D7A342">Logout</a>
                 </div>
             </div>            
@@ -45,7 +45,7 @@
 
             <div class = "content drop-shadow">
                 <h2 id = "fleet_title" class = "table-title">Current Fleet: ▼</h2>
-                
+
                 <div id = "fleet_header" class = "fleet_header">
                     <div class = "table-header-entry">License</div>
                     <div class = "table-header-entry">Model</div>
@@ -53,12 +53,12 @@
                     <div class = "table-header-entry">Car Type</div>
                     <div class = "table-header-entry">Change Status</div>
                 </div>
-                
+
                 <div id = "current_fleet" class = "fleet_table"></div>
             </div>
         </div>
-        
-<!--        <img src = "../admin_u/media/polar_bear.png">-->
+
+        <!--        <img src = "../admin_u/media/polar_bear.png">-->
 
         <!-- Modals here -->
 
@@ -73,6 +73,7 @@
 
                         <form id = "carSpecs">
                             <h5>Car Specifications:</h5>
+                            VIN: <input type = "text" id = "vinField" title="VIN"> <br> <br>
                             License: <input type = "text" id = "licenseField" title="License"> <br> <br>
                             Model: <input type = "text" id = "modelField" title="Model"> <br> <br>
                             Color: <input type = "text" id = "colorField" title="Color">
@@ -80,15 +81,15 @@
                             Miles on Car: <input type = "number" id = "milesField" value = 0>
                             <br><br>
                         </form>
-                        
+
                         Upload Image:
                         <form id="frmUploader" enctype="multipart/form-data" method="POST" action="api/Upload/">
                             <input id = "imageInput" type="file" accept = ".png, .jpg, .jpeg" name="imgUploader">
                             <input type="submit" name="submit" id="btnSubmit" value="Upload"/>
                             <input id="imageFileName" type="text" style="display: none;" value="noPicture.png"/>
                         </form>
-                        
-                        
+
+
                         <hr>
 
                         <form id = "carCaps">
@@ -110,7 +111,7 @@
                             Equipment Rack: <input type = "checkbox" id="equipChoice">
                         </form>
                     </div>
-                    
+
                     <div class="modal-footer">
                         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
 
@@ -119,5 +120,63 @@
                 </div>
             </div>
         </div>
+
+        <div id="editVehicleModal" class="modal fade">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3>Edit Vehicle</h3>
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    </div>
+                    <div class="modal-body">
+
+                        <form>
+                            <h5>Car Specifications:</h5>
+                            VIN: <input type = "text" id = "vinField-edit" title="VIN"> <br> <br>
+                            License: <input type = "text" id = "licenseField-edit" title="License"> <br> <br>
+                            Model: <input type = "text" id = "modelField-edit" title="Model"> <br> <br>
+                            Color: <input type = "text" id = "colorField-edit" title="Color">
+                            <br> <br>
+                            Miles on Car: <input type = "number" id = "milesField-edit" value = 0>
+                            <br><br>
+                        </form>
+                        
+                        Upload Image:
+                        <form id="frmUploader" enctype="multipart/form-data" method="POST" action="api/Upload/">
+                            <input id = "imageInput-edit" type="file" accept = ".png, .jpg, .jpeg" name="imgUploader">
+                            <input type="submit" name="submit" id="btnSubmit-edit" value="Upload"/>
+                        </form>  
+                        <hr>
+
+                        <form>
+                            <h5>Car Capabilities:</h5>
+                            Car Status:  <select id="carStatusField-edit">
+                            <option value="ready">Ready</option>
+                            <option value="service">Service</option>
+                            </select>
+                            <br> <br>
+                            Car Type: <select id="evStatusField-edit">
+                            <option value="ev">Electric / Hybrid</option>
+                            <option value="gas">Gas</option>
+                            </select>
+                            <br> <br>
+                            Extra Trunk Space: <input type = "checkbox" id="extraTrunkChoice-edit">
+                            <br> <br>
+                            Off Road Capable: <input type = "checkbox" id="offRoadChoice-edit">
+                            <br> <br>
+                            Equipment Rack: <input type = "checkbox" id="equipChoice-edit">
+                        </form>
+
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+
+                        <button type="button" class="btn btn-primary" data-dismiss="modal" aria-hidden="true" onclick = 'editVehicle()'>Submit</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script src="../../test/perf-test.js"></script>
     </body>
 </html>
