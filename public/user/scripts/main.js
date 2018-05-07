@@ -140,8 +140,7 @@ $(document).ready(function() {
     flatpickr(".datePicker", {
         enableTime: true,
         dateFormat: "Y-m-d H:i",
-        minDate: "today",
-        // defaultDate: "today",
+        minDate: "today"
     });
 
     jQuery.fn.carousel.Constructor.TRANSITION_DURATION = 5000;
@@ -647,7 +646,6 @@ class Reservation {
 
     }
     addToDom(r) {
-<<<<<<< HEAD
         let data = JSON.stringify(r);
         //console.log(r.id)
         let imageFilePath = "./media/vehicle_images/"
