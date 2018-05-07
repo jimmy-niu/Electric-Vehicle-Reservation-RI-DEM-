@@ -25,14 +25,23 @@ let outlook = require('node-outlook');
 let index = require('./public/index');
 // let auth = require('./auth');
 var dotenv = require('dotenv').config();
-var methodOverride = require('method-override')
-var passport = require('passport')
-var util = require('util')
+var methodOverride = require('method-override');
+var passport = require('passport');
+var util = require('util');
 var OutlookStrategy = require('passport-outlook').Strategy;
 var replace = require("replace");
 
 let anyDB = require('any-db');
 let conn = anyDB.createConnection('sqlite3://DEM.db');
+
+let jsoncsv = require('json-csv');
+
+let fs = require('fs');
+
+
+
+
+
 
 let engines = require('consolidate');
 app.engine('html', require('hogan-express'));
@@ -178,6 +187,14 @@ conn.query('INSERT INTO reports VALUES(null, ?, ?, ?, ?, ?)', [1, "Car is  very 
 
 conn.query('INSERT INTO users VALUES(null, ?, ?)', ["jenna.tishler@gmail.com", true]);
 conn.query('INSERT INTO users VALUES(null, ?, ?)', ["jenna_tishler@brown.edu", true]);
+
+
+//exportCSV([{a: 0, b:4, c:3},{a: 0, b:4, c:3},{a: 0, b:4, c:3},{a: 0, b:4, c:3}], '/public/temp/h.csv');
+exportUsers();
+exportVehicles();
+exportReservations();
+exportReports();
+
 /*Sets up the server on port 8080.*/
 server.listen(8080, function(){
     console.log('- Server listening on port 8080');
@@ -819,17 +836,12 @@ let Storage = multer.diskStorage({
 
 let upload = multer({ storage: Storage });
 
-let fs = require('fs');
+
 
 app.post("/admin/api/Upload", upload.single("imgUploader"), function (req, res) {
     let newName = `${req.body.license}.${req.file.mimetype.replace("image/", "")}`;
-<<<<<<< HEAD
-
-    fs.rename(`public/vehicle_images/${tempName}`, `public/vehicle_images/${newName}`, function(err){
-=======
 
     fs.rename(`public/user/media/vehicle_images/${tempName}`, `public/user/media/vehicle_images/${newName}`, function(err){
->>>>>>> origin/master
         if ( err ) {
             console.log('ERROR: ' + err);
         } else {
@@ -839,3 +851,136 @@ app.post("/admin/api/Upload", upload.single("imgUploader"), function (req, res) 
 
     });
 });
+
+
+
+
+// //Users
+// conn.query('CREATE TABLE IF NOT EXISTS users(id INTEGER PRIMARY KEY AUTOINCREMENT, email TEXT, admin BOOLEAN)');
+// //Resevervations
+// conn.query('CREATE TABLE IF NOT EXISTS vehicles(id TEXT, license TEXT, model TEXT, color TEXT, inService BOOLEAN, miles DOUBLE PRECISION, isEV BOOLEAN, extraTrunk BOOLEAN, offRoad BOOLEAN, equipRack BOOLEAN, featureScore INTEGER, image TEXT)');
+// //Vehicles
+// conn.query('CREATE TABLE IF NOT EXISTS reservations(id INTEGER PRIMARY KEY AUTOINCREMENT, user TEXT, license TEXT, model TEXT, start TEXT, end TEXT, stops TEXT, override BOOLEAN, justification TEXT, needsTrunk BOOLEAN, needsOffRoad BOOLEAN, needsRack BOOLEAN, image TEXT)');
+// //Reports
+// conn.query('CREATE TABLE IF NOT EXISTS reports(id INTEGER PRIMARY KEY AUTOINCREMENT, reservation INTEGER, report TEXT, needsService BOOLEAN, needsCleaning BOOLEAN, notCharging BOOLEAN)');
+
+function exportUsers(){
+    conn.query('SELECT * FROM users', function(error, data){
+        let users = data.rows;
+        let options = {fields:[{name:'id', label:'ID'},
+                      {name:'email', label:'Email'},
+                      {name:'admin', label:'Admin'}]};
+        jsoncsv.csvBuffered(users, options, function(err, csv){
+            console.log(csv);
+            fs.writeFile(__dirname + '/public/temp/users.csv', csv, function(err) {
+                if(err) {
+                    return console.log(err);
+                }
+                console.log("The file was saved!");
+            });
+            if(err) {
+                return console.log(err);
+            }
+        });
+    });
+}
+
+function exportVehicles(){
+    conn.query('SELECT * FROM vehicles', function(error, data){
+        let vehicles = data.rows;
+        let options = {fields:[{name:'id', label:'ID'},
+                        {name:'license', label:'License'},
+                        {name:'model', label:'Model'},
+                        {name:'color', label:'Color'},
+                        {name:'inService', label:'In Service'},
+                        {name:'miles', label:'Miles'},
+                        {name:'isEV', label:'Is EV'},
+                        {name:'extraTrunk', label:'Extra Trunk'},
+                        {name:'offRoad', label:'Off Road'},
+                        {name:'equipRack', label:'Equip Rack'}]};
+        jsoncsv.csvBuffered(vehicles, options, function(err, csv){
+            console.log(csv);
+            fs.writeFile(__dirname + '/public/temp/vehicles.csv', csv, function(err) {
+                if(err) {
+                    return console.log(err);
+                }
+                console.log("The file was saved!");
+            });
+            if(err) {
+                return console.log(err);
+            }
+        });
+    });
+}
+
+function exportReservations(){
+    conn.query('SELECT * FROM reservations', function(error, data){
+        let reservations = data.rows;
+        let options = {fields:[{name:'id', label:'ID'},
+                        {name:'user', label:'User'},
+                        {name:'license', label:'License'},
+                        {name:'model', label:'Model'},
+                        {name:'start', label:'Start'},
+                        {name:'end', label:'End'},
+                        {name:'stops', label:'Stops'},
+                        {name:'override', label:'Override'},
+                        {name:'justification', label:'Justification'},
+                        {name:'needsTrunk', label:'Extra Trunk'},
+                        {name:'needsOffRoad', label:'Off Road'},
+                        {name:'needsRack', label:'Equip Rack'}]};
+        jsoncsv.csvBuffered(reservations, options, function(err, csv){
+            console.log(csv);
+            fs.writeFile(__dirname + '/public/temp/reservations.csv', csv, function(err) {
+                if(err) {
+                    return console.log(err);
+                }
+                console.log("The file was saved!");
+            });
+            if(err) {
+                return console.log(err);
+            }
+        });
+    });
+}
+
+function exportReports(){
+    conn.query('SELECT * FROM reports', function(error, data){
+        let reports = data.rows;
+        let options = {fields:[{name:'id', label:'ID'},
+                        {name:'reservation', label:'Reservation'},
+                        {name:'report', label:'Report'},
+                        {name:'needsService', label:'Needs Service'},
+                        {name:'needsCleaning', label:'Needs Cleaning'},
+                        {name:'notCharging', label:'Not Charging'}]};
+        jsoncsv.csvBuffered(reports, options, function(err, csv){
+            console.log(csv);
+            fs.writeFile(__dirname + '/public/temp/reports.csv', csv, function(err) {
+                if(err) {
+                    return console.log(err);
+                }
+                console.log("The file was saved!");
+            });
+            if(err) {
+                return console.log(err);
+            }
+        });
+    });
+}
+
+
+
+
+// function exportCSV(data, path){
+//     jsoncsv.csvBuffered(data, {fields:[{name:'a', label:'A'}, {name:'b', label:'B'}, {name:'c', label:'C'}]},function(err, csv){
+//         console.log(csv);
+//         fs.writeFile(__dirname + path, csv, function(err) {
+//             if(err) {
+//                 return console.log(err);
+//             }
+//             console.log("The file was saved!");
+//         });
+//         if(err) {
+//             return console.log(err);
+//         }
+//     });
+// }

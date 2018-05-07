@@ -32,6 +32,7 @@
     "hogan": "^1.0.2",
     "hogan-express": "^0.5.2",
     "hogan.js": "^3.0.2",
+    "json-csv": "^1.5.0",
     "method-override": "^2.3.10",
     "mocha": "^5.1.1",
     "moment": "^2.22.1",

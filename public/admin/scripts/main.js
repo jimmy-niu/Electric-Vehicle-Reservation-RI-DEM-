@@ -120,7 +120,7 @@ function addVehicle(){
         console.time("Add Vehicle");
         adminSocket.emit("vehicleAdded", vehicle, function(){
             console.timeEnd("Add Vehicle");
-        }); 
+        });
     }
     clearForms($("#carSpecs"));
     clearForms($("#carCaps"));
@@ -232,6 +232,16 @@ function finishedUpload(data){
     console.log(data);
     $('#imageFileName').val(data);
     window.alert("Image uploaded successfully!");
+}
+
+/*
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ *  CSV Export
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ */
+
+function exportToCSV(obj){
+    var x = CSVExport(obj);
 }
 
 /*

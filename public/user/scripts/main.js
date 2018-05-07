@@ -76,6 +76,10 @@ $(document).ready(function() {
         cleanFields();
     });
 
+    userSocket.on('reassignReservation', function(data){
+         console.log("reservations reassigned");
+    });
+
     userSocket.on('newReservation', function(vehicles, reservation, isEdit, canCarpool, carpoolUsers){
         console.log('new reservation made');
         currentCar = reservation;
