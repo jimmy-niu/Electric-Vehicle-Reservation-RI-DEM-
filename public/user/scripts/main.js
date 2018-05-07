@@ -77,6 +77,21 @@ $(document).ready(function() {
         currentCar.canCarpool = canCarpool;
         currentCar.carpoolUsers = carpoolUsers;
         alternateVehicles = vehicles;
+        console.log(alternateVehicles)
+        if(alternateVehicles.rows.length === 1){
+            if(isEditing){
+                $("#select-alt-vehicle-edit").html("There is only one vehicle that meets your needs.");
+            } else {
+                console.log("one")
+                $("#select-alt-vehicle").html("There is only one vehicle that meets your needs.");
+            }
+        } else {
+            if(isEditing){
+                $("#select-alt-vehicle-edit").html("Please select a vehicle.");
+            } else {
+                $("#select-alt-vehicle").html("Please select a vehicle.");
+            }
+        }
         isEditing = isEdit;
         cleanFields();
         if(isEditing){
@@ -354,7 +369,7 @@ function altVehicles(){
                 let command = alternateVehicles.rows[i].model + " || " + alternateVehicles.rows[i].license + ` <input type = "radio" name="altVehiclesGroup-edit" onclick = "setVehicle(${i})"><br>`
                 $("#altVehiclesForm-edit").append(command);
             }
-            cleanFields();
+            //cleanFields();
         } else {
             $("#justification-help-edit").removeClass('d-none');
         }
@@ -369,7 +384,7 @@ function altVehicles(){
                 let command = alternateVehicles.rows[i].model + " || " + alternateVehicles.rows[i].license + ` <input type = "radio" name="altVehiclesGroup" onclick = "setVehicle(${i})"><br>`
                 $("#altVehiclesForm").append(command);
             }
-            cleanFields();
+            //cleanFields();
         } else {
             $("#justification-help").removeClass('d-none');
         }
@@ -647,7 +662,6 @@ class Reservation {
 
     }
     addToDom(r) {
-<<<<<<< HEAD
         let data = JSON.stringify(r);
         //console.log(r.id)
         let imageFilePath = "./media/vehicle_images/"
