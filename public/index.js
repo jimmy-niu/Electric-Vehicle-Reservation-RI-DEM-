@@ -34,31 +34,33 @@ let base =
 
         '#login-container { ' + 
           'background-color: rgba(255, 255, 255, .8);' +
-          'width: 400px; ' +
-          'height: 230px; ' +
+          'width: 30vw; ' +
+          'max-height: 50vh; ' +
+          'overflow: auto;' +
           'margin: auto; ' +
           'border-radius: 30px; ' +
-          'padding-left: 15px; ' +
+          'padding: 1vh 2vw 5vh 2vw;' + 
         '}' +
-
-        '#login-container h5 {' +
-          'padding: 20px 20px 0; ' +
-        '}' +
-
+        `#login-container h5{
+            text-align: center;
+        }` +
         '#login-container ul {' +
           'margin-top: -20px;' +
           'margin-bottom: 30px;' +
           'font-size: 14px;' +
         '}' +
 
-        '#outlook-btn { ' +
-          'text-decoration: none; ' +
-          'background-color: #17426D; ' +
-          'color: white;' + 
-          'padding: 10px 30px; ' +
-          'border-radius: 10px;' +
-          'margin-left: 17%;' +
-        '}' +
+        `#outlook-btn { 
+          text-decoration: none; 
+          text-align: center;
+          background-color: #17426D; 
+          color: white;
+          padding: 1vh 2vw 1vh 2vw;
+          border-radius: 10px;
+          width: 50%;
+          margin: 0 auto;
+          cursor: pointer;
+        }` +
 
         '#logo{ height: 8vh; padding-right: 1vw; }' +
 
@@ -92,7 +94,7 @@ module.exports = {
     '<li>Edit or cancel a reservation</li>'+
     '<li>Get email notifications</li>'+
     '<li>Integrate seamlessly with Outlook Calendar</li></ul>'+
-    '<a id="outlook-btn" href="/auth/outlook">Sign in with Outlook</a>' +
+    `<div id="outlook-btn" onclick="window.location = '/auth/outlook'">Sign in with Outlook</div>` +
     '</div>';
     return base.replace('%body%', html);
   },
