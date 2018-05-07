@@ -150,8 +150,6 @@ $(document).ready(function() {
             let a = $('.upcomingReservation').eq(i).find('.card-end').html().toString().trim();
             let n = new Date(Date.now());
             let b = n.getFullYear() + "-" + ("0"+(n.getMonth() + 1)).slice(-2) + "-" + ("0" + n.getDate()).slice(-2) + " " + ("0" + (n.getHours())).slice(-2) + ":" + ("0" + n.getMinutes()).slice(-2);
-            console.log(a);
-            console.log(b);
             let border;
             if($('.upcomingReservation').eq(i).hasClass('.border-success')){
                 border = 1;
@@ -590,19 +588,25 @@ class Reservation {
         } else {
             reservationData.border = "border-danger";
         }
+        console.log(reservationData);
         this.addToDom(reservationData);
 
     }
     addToDom(r) {
 
-        let imageFilePath = "./media/vehicle_images/"
+        let imageFilePath = "./media/vehicle_images/";
+        let stops = "";
+        let stopsArray = JSON.parse(r.stops);
+        for (let i = 0; i < stopsArray.length; i++){
+            stops += `${stopsArray[i]}<br>`;
+        }
         let DOMobject = `<div class="card border-success mb-3 ${r.id} upcomingReservation" style="width: 18rem;">
                             <img class = "card-img-top" src="${imageFilePath + r.image}">
                             <div class="card-body">
                                 <h5 class="card-title"><span class="card-model">${r.model}</span> <span class="card-license">${r.license}</span></h5>
                                 <p class="card-text"><strong>Start</strong>: <span class="card-start">${r.start}</span> <br>
                                     <strong>End</strong>:<span class="card-end"> ${r.end}</span> <br>
-                                        <strong>Route</strong>: ${JSON.parse(r.stops)} </p>
+                                        <span style = "display:none;"><strong>Route</strong>: ${JSON.parse(r.stops)} </span> </p>
                                         <span style = "display: none;" id = "res-id">${r.id}</span>
                                 <a href="#" id = "${r.id}" class="btn btn-primary edit" data-toggle="modal" data-target="#editModal" onclick = "addIDToModal(this);">Edit reservation</a>
                                 <a href="#" id = "${r.id}" class="btn btn-secondary" data-toggle="modal" data-target="#cancelModal" onclick = "setDeleteCard(this);">Cancel</a>
@@ -622,8 +626,9 @@ class OldReservation {
         this.addToDom(reservationData);
     }
     addToDom(r) {
+        let imageFilePath = "./media/vehicle_images/";
         let DOMobject = `<div class="card mb-3 ${r.border}" style="width: 18rem;">
-                            <img class = "card-img-top" src="https://media.ed.edmunds-media.com/ford/explorer/2017/oem/2017_ford_explorer_4dr-suv_platinum_rq_oem_1_815.jpg" alt="explorer placeholder image">
+                            <img class = "card-img-top" src="${imageFilePath + r.image}">
                             <div class="card-body">
                                 <h5 class="card-title">${r.model} ${r.license}</h5>
                                 <p class="card-text"><strong>Start</strong>: ${r.start}<br>

@@ -11,7 +11,7 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js" integrity="sha384-cs/chFZiN24E4KMATLdqdvsezGxaGsi4hLGOzlXwp5UZB1LY//20VyM2taTB4QvJ" crossorigin="anonymous"></script>
         <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js" integrity="sha384-uefMccjFJAIv6A+rW+L4AHf99KvxDjWSu1z9VI8SKNVmz4sk7buKt/6v9KI65qnm" crossorigin="anonymous"></script>
         <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC8Z1eImtyFGgIBO_HyUZqeN5M5DW6z0e4&libraries=places"
-        async defer></script>
+                async defer></script>
         <script src="/socket.io/socket.io.js"></script>
 
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
@@ -32,7 +32,7 @@
 
             <div>
                 <div id = "user">
-                    <span id = "user_email">Welcome, dem_test_u@outlook.com <br>
+                    <span id = "user_email">Welcome, dem_test_u_2@outlook.com <br>
                     </span>
                     <a href = "/logout" style = "font-size: 2vh; color: #D7A342">Logout</a>
                 </div>
@@ -42,17 +42,17 @@
         </div>
 
         <div id="fact-container">
-        <div class="carousel carousel-fade" data-ride="carousel" data-interval="10000">
-            <div class="carousel-item fun-fact active"><p>An electric vehicle has an expected range of 80 to 250+ miles!</p></div>
-            <div class="carousel-item fun-fact"><p>Plug-in hybrid electric vehicles offer 15-50 miles of all-electric driving and can be driven an additional 350-600 miles on the gas engine if needed.</p></div>
-            <div class="carousel-item fun-fact"><p>Fuel cell electric vehicles have a range of 300 to 350 miles!</p></div>
-            <div class="carousel-item fun-fact"><p>Fast charging stations recharge electric cars in about 30 minutes!</p></div>
-            <div class="carousel-item fun-fact"><p>90% of all charging is done at home and the workplace.</p></div>
-            <div class="carousel-item fun-fact"><p>Mobile applications can quickly locate the closest charging stations!</p></div>
-            <div class="carousel-item fun-fact"><p>Electric cars currently produce 54% less (lifetime) carbon pollution than gas-powered cars!</p></div>
-            <div class="carousel-item fun-fact"><p>Electric Vehicles typically produce far lower tailpipe emissions than gas-powered cars do!</p></div>
-            <div class="carousel-item fun-fact"><p>Electric cars typically accelerate far faster and more smoothly than gas-powered cars!</p></div>
-        </div>
+            <div class="carousel carousel-fade" data-ride="carousel" data-interval="10000">
+                <div class="carousel-item fun-fact active"><p>An electric vehicle has an expected range of 80 to 250+ miles!</p></div>
+                <div class="carousel-item fun-fact"><p>Plug-in hybrid electric vehicles offer 15-50 miles of all-electric driving and can be driven an additional 350-600 miles on the gas engine if needed.</p></div>
+                <div class="carousel-item fun-fact"><p>Fuel cell electric vehicles have a range of 300 to 350 miles!</p></div>
+                <div class="carousel-item fun-fact"><p>Fast charging stations recharge electric cars in about 30 minutes!</p></div>
+                <div class="carousel-item fun-fact"><p>90% of all charging is done at home and the workplace.</p></div>
+                <div class="carousel-item fun-fact"><p>Mobile applications can quickly locate the closest charging stations!</p></div>
+                <div class="carousel-item fun-fact"><p>Electric cars currently produce 54% less (lifetime) carbon pollution than gas-powered cars!</p></div>
+                <div class="carousel-item fun-fact"><p>Electric Vehicles typically produce far lower tailpipe emissions than gas-powered cars do!</p></div>
+                <div class="carousel-item fun-fact"><p>Electric cars typically accelerate far faster and more smoothly than gas-powered cars!</p></div>
+            </div>
         </div>
 
         <div id="content">
@@ -79,11 +79,11 @@
                                     <label for="end-date">Reservation End</label>
                                     <input class = "datePicker" id ="end-date" placeholder="Select Date.." type="text">
                                 </div>
-                                    <div class="form-group">
-                                        <label>Pickup Location</label>
-                                        <input class="form-control route-stop" id="route-stop-1" type="text" placeholder="Enter a location"/>
-                                        <!-- <input type=text class="form-control route-stop" value="Work"> -->
-                                    </div>
+                                <div class="form-group">
+                                    <label>Pickup Location</label>
+                                    <input class="form-control route-stop" id="route-stop-1" type="text" placeholder="Enter a location"/>
+                                    <!-- <input type=text class="form-control route-stop" value="Work"> -->
+                                </div>
                                 <div id="stops">
                                     <div class="form-group">
                                         <label>Destination</label>
@@ -92,11 +92,11 @@
                                     </div>
                                 </div>
                                 <p><a href="#" id="add-stop"><small>Add a destination</small></a></p>
-                                    <div class="form-group">
-                                        <label>Dropoff Location</label>
-                                        <input class="form-control route-stop" id="route-stop-3" type="text" placeholder="Enter a location"/>
-                                        <!-- <input type=text class="form-control route-stop" value="Home"> -->
-                                    </div>
+                                <div class="form-group">
+                                    <label>Dropoff Location</label>
+                                    <input class="form-control route-stop" id="route-stop-3" type="text" placeholder="Enter a location"/>
+                                    <!-- <input type=text class="form-control route-stop" value="Home"> -->
+                                </div>
                                 <div class="form-group">
                                     <label>Extra Features</label>
                                     <div class="form-check">
@@ -146,8 +146,8 @@
                     </div>
                 </div>
             </div>
-            
-             <div class="modal fade" id="editModal" role="dialog" aria-labelledby="new-res-label" aria-hidden="true">
+
+            <div class="modal fade" id="editModal" role="dialog" aria-labelledby="new-res-label" aria-hidden="true">
                 <div id = "edit-res-content" class="modal-dialog" role="document">
                     <div class="modal-content">
                         <div class="modal-header">
@@ -253,7 +253,7 @@
                             <p id = "stopsMText">Stops: </p>
                             <p id = "distanceMText">Total distance: </p>
                             <p id = "durationMText">Total duration: </p>
-                        <div id="mapCanvas" style="width: 450px; height: 300px; margin-left:auto; margin-right:auto; margin-bottom: 10px"></div>
+                            <div id="mapCanvas" style="width: 450px; height: 300px; margin-left:auto; margin-right:auto; margin-bottom: 10px"></div>
                         </div>
                         <div class="modal-footer" id="acceptDeclineButtons">
                             <button type="button" id="decline" class="btn btn-danger" data-toggle="modal" data-target="#declineModal" data-dismiss="modal">Decline</button>
@@ -262,7 +262,7 @@
                     </div>
                 </div>
             </div>
-            
+
             <div class="modal fade" id="resModal-edit" tabindex="-2" role="dialog" aria-labelledby="resModalLabel" aria-hidden="true">
                 <div class="modal-dialog" role="document">
                     <div class="modal-content">
@@ -280,7 +280,7 @@
                             <p id = "stopsMText-edit">Stops: </p>
                             <p id = "distanceMText-edit">Total distance: </p>
                             <p id = "durationMText-edit">Total duration: </p>
-                        <div id="mapCanvasEdit" style="width: 450px; height: 300px; margin-left:auto; margin-right:auto; margin-bottom: 10px"></div>
+                            <div id="mapCanvasEdit" style="width: 450px; height: 300px; margin-left:auto; margin-right:auto; margin-bottom: 10px"></div>
                         </div>
                         <div class="modal-footer" id="acceptDeclineButtons-edit">
                             <button type="button" id="decline-edit" class="btn btn-danger" data-toggle="modal" data-target="#declineModal-edit" data-dismiss="modal">Decline</button>
@@ -290,7 +290,7 @@
                 </div>
             </div> 
 
-             <div class="modal fade" id="declineModal" tabindex="-2" role="dialog" aria-labelledby="resModalLabel" aria-hidden="true">
+            <div class="modal fade" id="declineModal" tabindex="-2" role="dialog" aria-labelledby="resModalLabel" aria-hidden="true">
                 <div class="modal-dialog" role="document">
                     <div class="modal-content">
                         <div class="modal-header">
@@ -309,7 +309,7 @@
                     </div>
                 </div>
             </div>
-            
+
             <div class="modal fade" id="declineModal-edit" tabindex="-2" role="dialog" aria-labelledby="resModalLabel" aria-hidden="true">
                 <div class="modal-dialog" role="document">
                     <div class="modal-content">
@@ -330,7 +330,7 @@
                 </div>
             </div>
 
-             <div class="modal fade" id="errorModal" tabindex="-2" role="dialog" aria-labelledby="resModalLabel" aria-hidden="true">
+            <div class="modal fade" id="errorModal" tabindex="-2" role="dialog" aria-labelledby="resModalLabel" aria-hidden="true">
                 <div class="modal-dialog" role="document">
                     <div class="modal-content">
                         <div class="modal-header">
@@ -350,7 +350,7 @@
                 </div>
             </div>
 
-             <div class="modal fade" id="errorModal-edit" tabindex="-2" role="dialog" aria-labelledby="resModalLabel" aria-hidden="true">
+            <div class="modal fade" id="errorModal-edit" tabindex="-2" role="dialog" aria-labelledby="resModalLabel" aria-hidden="true">
                 <div class="modal-dialog" role="document">
                     <div class="modal-content">
                         <div class="modal-header">
@@ -392,7 +392,7 @@
                     </div>
                 </div>
             </div>
-            
+
             <div class="modal fade" id="appealModal-edit" tabindex="-2" role="dialog" aria-labelledby="appealModalLabel" aria-hidden="true">
                 <div class="modal-dialog" role="document">
                     <div class="modal-content">
@@ -437,7 +437,7 @@
                     </div>
                 </div>
             </div>
-            
+
             <div class="modal fade" id="altModal-edit" tabindex="-2" role="dialog" aria-labelledby="altModalLabel" aria-hidden="true">
                 <div class="modal-dialog" role="document">
                     <div class="modal-content">
@@ -487,14 +487,14 @@
             <h3>Past Reservations</h3>
             <div class="row" id = "old-reservations">
                 <!-- <div class="card border-success mb-3" style="width: 18rem;">
-                    <img class = "card-img-top" src="https://upload.wikimedia.org/wikipedia/commons/5/5f/DCA_Prius_1Gen_12_2011_3592.JPG" alt="prius placeholder image">
-                    <div class="card-body">
-                        <h5 class="card-title">Toyota Prius 787ZXC</h5>
-                        <p class="card-text"><strong>Start</strong>: April 15, 2018 10:00am<br>
-                            <strong>End</strong>: April 15, 2018 11:30am</p>
-                        <a href="#" class="btn btn-primary edit" data-toggle="modal" data-target="#reportModal">Make report </a>
-                    </div>
-                </div> -->
+<img class = "card-img-top" src="https://upload.wikimedia.org/wikipedia/commons/5/5f/DCA_Prius_1Gen_12_2011_3592.JPG" alt="prius placeholder image">
+<div class="card-body">
+<h5 class="card-title">Toyota Prius 787ZXC</h5>
+<p class="card-text"><strong>Start</strong>: April 15, 2018 10:00am<br>
+<strong>End</strong>: April 15, 2018 11:30am</p>
+<a href="#" class="btn btn-primary edit" data-toggle="modal" data-target="#reportModal">Make report </a>
+</div>
+</div> -->
                 <div class="modal fade" id="reportModal" tabindex="-1" role="dialog" aria-labelledby="reportModalLabel" aria-hidden="true">
                     <div class="modal-dialog" role="document">
                         <div class="modal-content">
@@ -528,52 +528,52 @@
                 </div>
 
                 <!-- <div class="card border-danger mb-3" style="width: 18rem;">
-                    <img class = "card-img-top" src="https://media.ed.edmunds-media.com/ford/explorer/2017/oem/2017_ford_explorer_4dr-suv_platinum_rq_oem_1_815.jpg" alt="explorer placeholder image">
-                    <div class="card-body">
-                        <h5 class="card-title">Ford Explorer 721ZYD</h5>
-                        <p class="card-text"><strong>Start</strong>: April 15, 2018 10:00am<br>
-                            <strong>End</strong>: April 15, 2018 11:30am</p>
-                        <a href="#" class="btn btn-primary edit" data-toggle="modal" data-target="#reportModal">Make report </a>
-                    </div>
-                </div>
+<img class = "card-img-top" src="https://media.ed.edmunds-media.com/ford/explorer/2017/oem/2017_ford_explorer_4dr-suv_platinum_rq_oem_1_815.jpg" alt="explorer placeholder image">
+<div class="card-body">
+<h5 class="card-title">Ford Explorer 721ZYD</h5>
+<p class="card-text"><strong>Start</strong>: April 15, 2018 10:00am<br>
+<strong>End</strong>: April 15, 2018 11:30am</p>
+<a href="#" class="btn btn-primary edit" data-toggle="modal" data-target="#reportModal">Make report </a>
+</div>
+</div>
 
-                <div class="card border-danger mb-3" style="width: 18rem;">
-                    <img class = "card-img-top" src="https://media.ed.edmunds-media.com/ford/explorer/2017/oem/2017_ford_explorer_4dr-suv_platinum_rq_oem_1_815.jpg" alt="explorer placeholder image">
-                    <div class="card-body">
-                        <h5 class="card-title">Ford Explorer 721ZYD</h5>
-                        <p class="card-text"><strong>Start</strong>: April 15, 2018 10:00am<br>
-                            <strong>End</strong>: April 15, 2018 11:30am</p>
-                        <a href="#" class="btn btn-primary edit" data-toggle="modal" data-target="#reportModal">Make report </a>
-                    </div>
-                </div>
+<div class="card border-danger mb-3" style="width: 18rem;">
+<img class = "card-img-top" src="https://media.ed.edmunds-media.com/ford/explorer/2017/oem/2017_ford_explorer_4dr-suv_platinum_rq_oem_1_815.jpg" alt="explorer placeholder image">
+<div class="card-body">
+<h5 class="card-title">Ford Explorer 721ZYD</h5>
+<p class="card-text"><strong>Start</strong>: April 15, 2018 10:00am<br>
+<strong>End</strong>: April 15, 2018 11:30am</p>
+<a href="#" class="btn btn-primary edit" data-toggle="modal" data-target="#reportModal">Make report </a>
+</div>
+</div>
 
-                <div class="card border-success mb-3" style="width: 18rem;">
-                    <img class = "card-img-top" src="https://upload.wikimedia.org/wikipedia/commons/5/5f/DCA_Prius_1Gen_12_2011_3592.JPG" alt="prius placeholder image">
-                    <div class="card-body">
-                        <h5 class="card-title">Toyota Prius 787ZXC</h5>
-                        <p class="card-text"><strong>Start</strong>: April 15, 2018 10:00am<br>
-                            <strong>End</strong>: April 15, 2018 11:30am</p>
-                        <a href="#" class="btn btn-primary edit" data-toggle="modal" data-target="#reportModal">Make report </a>
-                    </div>
-                </div>
+<div class="card border-success mb-3" style="width: 18rem;">
+<img class = "card-img-top" src="https://upload.wikimedia.org/wikipedia/commons/5/5f/DCA_Prius_1Gen_12_2011_3592.JPG" alt="prius placeholder image">
+<div class="card-body">
+<h5 class="card-title">Toyota Prius 787ZXC</h5>
+<p class="card-text"><strong>Start</strong>: April 15, 2018 10:00am<br>
+<strong>End</strong>: April 15, 2018 11:30am</p>
+<a href="#" class="btn btn-primary edit" data-toggle="modal" data-target="#reportModal">Make report </a>
+</div>
+</div>
 
-                <div class="card border-danger mb-3" style="width: 18rem;">
-                    <img class = "card-img-top" src="https://media.ed.edmunds-media.com/ford/explorer/2017/oem/2017_ford_explorer_4dr-suv_platinum_rq_oem_1_815.jpg" alt="explorer placeholder image">
-                    <div class="card-body">
-                        <h5 class="card-title">Ford Explorer 721ZYD</h5>
-                        <p class="card-text"><strong>Start</strong>: April 15, 2018 10:00am<br>
-                            <strong>End</strong>: April 15, 2018 11:30am</p>
-                        <a href="#" class="btn btn-primary edit" data-toggle="modal" data-target="#reportModal">Make report </a>
-                    </div>
-                </div> -->
+<div class="card border-danger mb-3" style="width: 18rem;">
+<img class = "card-img-top" src="https://media.ed.edmunds-media.com/ford/explorer/2017/oem/2017_ford_explorer_4dr-suv_platinum_rq_oem_1_815.jpg" alt="explorer placeholder image">
+<div class="card-body">
+<h5 class="card-title">Ford Explorer 721ZYD</h5>
+<p class="card-text"><strong>Start</strong>: April 15, 2018 10:00am<br>
+<strong>End</strong>: April 15, 2018 11:30am</p>
+<a href="#" class="btn btn-primary edit" data-toggle="modal" data-target="#reportModal">Make report </a>
+</div>
+</div> -->
             </div>
         </div>
         <script>
 
-        // var start = document.getElementById('startInput');
-        // var end = document.getElementById('endInput');
-        // var startautocomplete = new google.maps.places.Autocomplete(start);
-        // var endautocomplete = new google.maps.places.Autocomplete(end);
+            // var start = document.getElementById('startInput');
+            // var end = document.getElementById('endInput');
+            // var startautocomplete = new google.maps.places.Autocomplete(start);
+            // var endautocomplete = new google.maps.places.Autocomplete(end);
         </script>
     </body>
 </html>
