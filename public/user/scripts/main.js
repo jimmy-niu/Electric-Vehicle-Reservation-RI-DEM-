@@ -49,7 +49,9 @@ $(document).ready(function() {
     console.log(userEmail);
 
     userSocket.emit('join',userEmail, function(reservations){
+        console.log("hello")
         console.log(reservations);
+        //console.log(reservations.rows[0].reservations.id);
         for(var i = 0; i < reservations.rows.length; i++){
             let a = reservations.rows[i].end;
             let n = new Date(Date.now());
@@ -296,14 +298,12 @@ function override(){
 function renderCar(){
     if(isEditing){
         let id = $("#reservation-id-edit").html();
-        console.log(id)
         userSocket.emit('editReservation', currentCar, id, function(){
-            console.log('added')
             currentCar.id = id;
 
-            $("." + id).remove();
-            console.log(currentCar.isEV);
-            new Reservation(currentCar);
+            $("#start_" + id).html(currentCar.start)
+            $("#end_" + id).html(currentCar.end)
+            $("#stops_" + id).html(JSON.parse(currentCar.stops))
             sortReservations();
             currentCar = undefined;
             $("#reasoning-field-edit").val("");
@@ -312,9 +312,8 @@ function renderCar(){
         });
     } else {
         userSocket.emit('addReservation', currentCar, function(id){
-            console.log('added')
             currentCar.id = id;
-            console.log(currentCar);
+
             new Reservation(currentCar);
             sortReservations();
             currentCar = undefined;
@@ -485,7 +484,7 @@ function fillInEditModal(data){
     $("#end-date-edit").val(data.end);
 
     let stopsArr = JSON.parse(data.stops)
-    
+
     let numExtraStops = stopsArr.length - 3;
     if(numExtraStops > 0){
         for(let i = 0; i < numExtraStops; i++){
@@ -636,20 +635,22 @@ class Reservation {
     }
     addToDom(r) {
         let data = JSON.stringify(r);
+        //console.log(r.id)
         let imageFilePath = "./media/vehicle_images/"
-        let DOMobject = `<div class="card border-success mb-3 ${r.id} upcomingReservation" style="width: 18rem;">
-                            <img class = "card-img-top" src="${imageFilePath + r.image}">
-                            <div class="card-body">
-                                <h5 class="card-title"><span class="card-model">${r.model}</span> <span class="card-license">${r.license}</span></h5>
-                                <p class="card-text"><strong>Start</strong>: <span class="card-start">${r.start}</span> <br>
-                                    <strong>End</strong>:<span class="card-end"> ${r.end}</span> <br>
-                                        <strong>Route</strong>: ${JSON.parse(r.stops)} </p>
-                                        <span style = "display: none;" id = "res-id">${r.id}</span>
-                                <a href="#" id = "${r.id}" class="btn btn-primary edit" data-toggle="modal" data-target="#editModal" onclick = 'fillInEditModal(${data});'>Edit reservation</a>
-                                <a href="#" id = "${r.id}" class="btn btn-secondary" data-toggle="modal" data-target="#cancelModal" onclick = "setDeleteCard(this);">Cancel</a>
-                            </div>
-                        </div>`;
+        let DOMobject = `<div class="card ${r.border} mb-3 ${r.id} upcomingReservation" style="width: 18rem;">`
+                            + `<img class = "card-img-top" src="${imageFilePath + r.image}">`
+                            + `<div class="card-body">`
+                                + `<h5 class="card-title"><span class="card-model">${r.model}</span> <span class="card-license">${r.license}</span></h5>`
+                                + `<p class="card-text"><strong>Start</strong>: <span id="start_${r.id}" class="card-start">${r.start}</span> <br>`
+                                    + `<strong>End</strong>:<span id="end_${r.id}" class="card-end"> ${r.end}</span> <br>`
+                                        + `<strong>Route</strong>: <span id = "stops_${r.id}">${JSON.parse(r.stops)}</span> </p>`
+                                        + `<span style = "display: none;" id = "res-id">${r.id}</span>`
+                                + `<a href="#" id = "${r.id}" class="btn btn-primary edit" data-toggle="modal" data-target="#editModal" onclick = 'fillInEditModal(${data});'>Edit reservation</a>`
+                                + `<a href="#" id = "${r.id}" class="btn btn-secondary" data-toggle="modal" data-target="#cancelModal" onclick = "setDeleteCard(this);">Cancel</a>`
+                            + `</div>`
+                        + `</div>`;
         $('.cards').append(DOMobject);
+        //console.log(DOMobject)
     }
 }
 
