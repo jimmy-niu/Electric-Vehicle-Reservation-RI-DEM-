@@ -360,6 +360,9 @@ function renderCar(){
             $("#start_" + id).html(currentCar.start)
             $("#end_" + id).html(currentCar.end)
             $("#stops_" + id).html(JSON.parse(currentCar.stops))
+            $("#model_" + id).html(currentCar.model);
+            $("#license_" + id).html(currentCar.license);
+
             sortReservations();
 
             $("#reasoning-field-edit").val("");
