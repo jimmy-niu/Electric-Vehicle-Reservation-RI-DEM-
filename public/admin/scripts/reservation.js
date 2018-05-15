@@ -2,10 +2,10 @@ $(document).ready(function() {
     adminSocket.emit('updatePage', function(){});
     
     adminSocket.on('newReservation', function(reservation){
-            for(let i = 0; i < reservation.rowCount; i++){
-                new Reservation(reservation.rows[i]);
-            }
-        });
+        for(let i = 0; i < reservation.rowCount; i++){
+            new Reservation(reservation.rows[i]);
+        }
+    });
 
     adminSocket.on('loadReservations', function(reservations){
         $('#upcoming').empty();
