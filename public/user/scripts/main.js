@@ -795,6 +795,16 @@ function cleanFields(){
     autocompletes = {};
 }
 
+/**
+  * Creates a location modal for a reservation card. 
+  *
+  * @params
+  * id: The reservation id.
+  * text: The html / string that needs to go inside the modal. 
+  *
+  * @return 
+  * A string that can be appended to the DOM to create the modal.
+  */
 function getLocationModal(id, text){
     let modal = `<div id="location_modal_${id}" class="modal fade">`
     +`<div class="modal-dialog">`
@@ -815,7 +825,6 @@ function getLocationModal(id, text){
 
 //======Classes for new DOM elements======//
 class Reservation {
-
     constructor(reservationData) {
 
         if(reservationData.isEV == true){

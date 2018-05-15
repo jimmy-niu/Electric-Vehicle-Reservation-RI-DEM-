@@ -1,6 +1,16 @@
 $(document).ready(function() {
     adminSocket.emit('updatePage', function(){});
+    setSockets();
+    bindClickHandlers();
+    
+    // Hides the archived table on page load. 
+    $("#archived_title").click();
+});
 
+/**
+  * Sets the behavior on receiving reservation related messages. 
+  */
+function setSockets(){
     adminSocket.on('newReservation', function(reservation){
         for(let i = 0; i < reservation.rowCount; i++){
             new Reservation(reservation.rows[i], '#upcoming');
@@ -40,11 +50,16 @@ $(document).ready(function() {
     adminSocket.on('reservationCancellation', function(id){
         $(`.res_id_${id}`).remove();
     });
+}
 
-    bindClickHandlers();
-    $("#archived_title").click();
-});
-
+/**
+  * Takes in the clicked archive button and toggles whether
+  * the reservation is archived. This is bound to the click of the 
+  * archive div / icon. 
+  *
+  * @param
+  * The clicked reservation-archive DOM object.
+  */
 function archive(obj){
     let id = $(obj).attr("reservation_id");
     let archived = $(obj).attr("archived") === "true";
@@ -52,6 +67,9 @@ function archive(obj){
     adminSocket.emit('reservationArchived', id, !archived, function(){});
 }
 
+/**
+  * Binds several click events to javascript functions.
+  */
 function bindClickHandlers(){
     $('#export-reservations').click(function(e){
         e.preventDefault();
@@ -71,6 +89,16 @@ function bindClickHandlers(){
     });
 }
 
+/**
+  * Creates a justification modal for a reservation entry. 
+  *
+  * @params
+  * id: The reservation id.
+  * text: The html / string that needs to go inside the modal. 
+  *
+  * @return 
+  * A string that can be appended to the DOM to create the modal.
+  */
 function getJustificationModal(id, text){
     let modal = `<div id="justification_modal_${id}" class="modal fade">`
     +`<div class="modal-dialog">`
@@ -89,6 +117,16 @@ function getJustificationModal(id, text){
     return modal;
 }
 
+/**
+  * Creates a time modal for each reservation entry. 
+  *
+  * @params
+  * id: The reservation id.
+  * text: The html / string that needs to go inside the modal. 
+  *
+  * @return 
+  * A string that can be appended to the DOM to create the modal.
+  */
 function getTimeModal(id, text){
     let modal = `<div id="time_modal_${id}" class="modal fade">`
     +`<div class="modal-dialog">`
@@ -107,6 +145,13 @@ function getTimeModal(id, text){
     return modal;
 }
 
+/**
+  * Updates a reservation within the DOM.
+  *
+  * @params
+  * res_data: A json object containing one row that has the
+  * edited reservation.
+  */
 function editReservation(res_data){
     let data = res_data.rows[0];
     $(`.res_id_${data.id}`).remove();
@@ -114,6 +159,26 @@ function editReservation(res_data){
 }
 
 //======Classes for new DOM elements======//
+
+/**
+  * A Reservation takes a JSON object containing a reservation, 
+  * creates a DOM object based on it, and then appends it to the
+  * location. 
+  *
+  * @params
+  * reservationData: A json object containing a reservation. This means
+  * the following values.
+  *     id: reservation id.
+  *     start: reservation start time. 
+  *     end: reservation end time. 
+  *     user: email of reservation.
+  *     model: car model of reservation.
+  *     license: The car license
+  *     justification: An override justification if one exists, 
+  *         an empty string. 
+  * 
+  * location: the HTML location to append the new Reservation.  
+  */
 class Reservation {
     constructor(reservationData, location){
         this.addToDOM(reservationData, location);
