@@ -5,9 +5,6 @@ let http =require('http');
 let nodemailer = require('nodemailer');
 let server = http.createServer(app);
 
-// Uncomment for testing.
-// let perf = require('./test/perf-test.js');
-
 let io = require('socket.io')(server, {wsEngine: 'ws'}); //fix Windows10 issue
 io.listen(server);
 
@@ -42,15 +39,21 @@ let engines = require('consolidate');
 app.engine('html', require('hogan-express'));
 app.set('views', __dirname + '/public'); // tell Express where to find templates, in this case the '/public' directory
 app.set('view engine', 'html'); //register .html extension as template engine so we can render .html pages
-//
+
 app.use(cookieParser());
 app.use(session(
     { secret: 's3cr3t',
      resave: false,
      saveUninitialized: true
     })
-       );
+);
 
+//Sets up the server on port 8080.
+server.listen(8080, function(){
+    console.log('- Server listening on port 8080');
+});
+
+//sets up transporter for sending emails
 var transporter = nodemailer.createTransport({
     pool: true,
     maxConnections: 10,
@@ -66,60 +69,6 @@ var transporter = nodemailer.createTransport({
     }
 });
 
-// let mailOptions = {
-//     from: 'dem_do-not-reply@outlook.com',
-//     to: 'jenna_tishler@brown.edu',
-//     subject: 'Test',
-//     text: "Test"
-// }
-
-// let mailOptions2 = {
-//     from: 'dem_do-not-reply@outlook.com',
-//     to: 'jenna.tishler@gmail.com',
-//     subject: 'Test',
-//     text: "Test"
-// }
-
-// let messages = [mailOptions, mailOptions2];
-// transporter.on('idle', function(){
-//     //send next message from the pending queue
-//     while (transporter.isIdle() && messages.length > 0) {
-//         console.log("email")
-//         transporter.sendMail (messages.shift(), function(error, info){
-//             if (error) {
-//                 console.log(error);
-//             } else {
-//                 console.log('Email sent: ' + info.response);
-//             }
-//         });
-//     }
-// });
-
-// let transporter = nodemailer.createTransport({
-//     service: 'gmail',
-//     auth: {
-//         user: 'jenna_tishler@brown.edu',
-//         pass: ''
-//     }
-// });
-
-/* example of how to send email
-let mailOptions = {
-  from: 'jenna_tishler@brown.edu',
-  to: 'jenna.tishler@gmail.com',
-  subject: 'Sending Email using Node.js',
-  text: 'That was easy!'
-};
-
-transporter.sendMail(mailOptions, function(error, info){
-  if (error) {
-    console.log(error);
-  } else {
-    console.log('Email sent: ' + info.response);
-  }
-}); */
-
-
 //for testing purposes- data resets every time
 conn.query('DROP TABLE IF EXISTS reservations');
 conn.query('DROP TABLE IF EXISTS vehicles');
@@ -127,6 +76,7 @@ conn.query('DROP TABLE IF EXISTS reports');
 conn.query('DROP TABLE IF EXISTS users');
 
 
+//TABLES:
 //Users
 conn.query('CREATE TABLE IF NOT EXISTS users(id INTEGER PRIMARY KEY AUTOINCREMENT, email TEXT, admin BOOLEAN)');
 //Resevervations
@@ -175,14 +125,15 @@ conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, null, ?)',
 conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, null, ?)', ["1FADP5CU8FL121719", "739", "2015 FORD CMAX", "Black", true, 7883.3, true, false, false, false, "fordcmax.jpg"]);
 conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, null, ?)', ["1FADP5CU6FL121718", "827", "2015 FORD CMAX", "Black", true, 9055.6, true, false, false, false, "fordcmax.jpg"]);
 
-conn.query('UPDATE vehicles SET featureScore = extraTrunk + offRoad + equipRack');
-
 conn.query('INSERT INTO reports VALUES(null, ?, ?, ?, ?, ?)', [5, "Car sucks.", true, true, false]);
 conn.query('INSERT INTO reports VALUES(null, ?, ?, ?, ?, ?)', [1, "Car is  very dirty.", false, true, false]);
 
 conn.query('INSERT INTO users VALUES(null, ?, ?)', ["dem_test_a@outlook.com", true]);
 conn.query('INSERT INTO users VALUES(null, ?, ?)', ["dem_test_u@outlook.com", false]);
 conn.query('INSERT INTO users VALUES(null, ?, ?)', ["dem_test_u_2@outlook.com", false]);
+
+//calculates feature scores
+conn.query('UPDATE vehicles SET featureScore = extraTrunk + offRoad + equipRack');
 
 let adminEmails = [];
 let normalEmails = [];
@@ -201,17 +152,6 @@ function populateEmailLists(){
 }
 
 populateEmailLists();
-
-//exportCSV([{a: 0, b:4, c:3},{a: 0, b:4, c:3},{a: 0, b:4, c:3},{a: 0, b:4, c:3}], '/public/temp/h.csv');
-// exportUsers();
-// exportVehicles();
-// exportReservations();
-// exportReports();
-
-/*Sets up the server on port 8080.*/
-server.listen(8080, function(){
-    console.log('- Server listening on port 8080');
-});
 
 //handles events when an admin user is connected
 io.of('/admin').on('connection', function(socket){
@@ -254,6 +194,14 @@ io.of('/admin').on('connection', function(socket){
     });
 });
 
+/**
+ * This function adds a reservation as an event to the user's outlook calendar.
+ * @params
+ * title: String that contains user and license
+ * bodytext: String that contains license, model, stops
+ * start: start date and time
+ * end: end date and time
+ */
 function addEvent(title, bodytext, start, end) {
     console.log(bodytext)
     var newEvent = {
@@ -282,6 +230,13 @@ function addEvent(title, bodytext, start, end) {
     });
 }
 
+/**
+ * This function removes a reservation from the user's outlook calendar.
+ * @params
+ * subject: event title (user and license)
+ * start: start date and time
+ * end: end date and time
+ */
 function removeEvent(subject, start, end) {
     var queryParams = {
         '$select': 'Subject,Start,End,Id',
