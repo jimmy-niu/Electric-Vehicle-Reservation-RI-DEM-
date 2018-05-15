@@ -2,22 +2,22 @@
 
 <html lang="en">
     <head>
+
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
         <title>ADMIN: DEM Vehicle Reservation</title>
+
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
         <link rel="stylesheet" type = "text/css" href = "./styles/main.css">
+
         <script src="/socket.io/socket.io.js"></script>
 
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
 
         <script src="./scripts/jquery-3.1.1.min.js"></script>
         <script src="./scripts/jquery.form.min.js"></script>
-
         <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js" integrity="sha384-cs/chFZiN24E4KMATLdqdvsezGxaGsi4hLGOzlXwp5UZB1LY//20VyM2taTB4QvJ" crossorigin="anonymous"></script>
         <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js" integrity="sha384-uefMccjFJAIv6A+rW+L4AHf99KvxDjWSu1z9VI8SKNVmz4sk7buKt/6v9KI65qnm" crossorigin="anonymous"></script>
         <script src="./scripts/main.js"></script>
-
-
 
     </head>
     <body>
@@ -28,29 +28,22 @@
                     <span style = "font-size: 6vh;">F</span>leet Management
                 </div>
             </div>
-
             <div>
                 <div id = "user">
-                    Welcome, %user% <br>
+                    Welcome, dem_test_a@outlook.com <br>
                     <a href = "/logout" style = "font-size: 2vh; color: #D7A342">Logout</a>
                 </div>
-            </div>            
+            </div>
         </div>
-
         <div style = "padding: 1vh 2vw 1vh 2vw;">
             <div class = "Nav-Buttons">
-                <a href = "./index.html"><div class = "button drop-shadow">Reservations</div></a>
-                
-                <a href = "./reports.html"><div class = "button drop-shadow">Reports and Accounts</div></a>
-                
-                <a href = "#addVehicleModal" class = "btn btn-large btn-primary drop-shadow rightMargin" data-toggle="modal">Add Vehicle</a>
-                
-                <a href = "#" id = "export-vehicles" class = "btn btn-large btn-primary drop-shadow rightMargin">Export Vehicles</a>
+                <!-- Reservations --> <a href = "./index.html"><div class = "button drop-shadow">Reservations</div></a>
+                <!-- Reports and Accounts --> <a href = "./reports.html"><div class = "button drop-shadow">Reports and Accounts</div></a>
+                <!-- Add Vehicle --> <a href = "#addVehicleModal" class = "btn btn-large btn-primary drop-shadow rightMargin" data-toggle="modal">Add Vehicle</a>
+                <!-- Export Vehicles --> <a href = "#" id = "export-vehicles" class = "btn btn-large btn-primary drop-shadow rightMargin">Export Vehicles</a>
             </div>
-
             <div class = "content drop-shadow">
                 <h2 id = "fleet_title" class = "table-title">Current Fleet: ▼</h2>
-
                 <div id = "fleet_header" class = "fleet_header">
                     <div class = "table-header-entry">License</div>
                     <div class = "table-header-entry">Model</div>
@@ -58,15 +51,13 @@
                     <div class = "table-header-entry">Car Type</div>
                     <div class = "table-header-entry">Change Status</div>
                 </div>
-
                 <div id = "current_fleet" class = "fleet_table"></div>
             </div>
         </div>
 
         <!--        <img src = "../admin_u/media/polar_bear.png">-->
 
-        <!-- Modals here -->
-
+        <!--=========MODALS=========-->
         <div id="addVehicleModal" class="modal fade">
             <div class="modal-dialog">
                 <div class="modal-content">
@@ -75,28 +66,23 @@
                         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
                     </div>
                     <div class="modal-body">
-
                         <form id = "carSpecs">
                             <h5>Car Specifications:</h5>
-                            VIN: <input type = "text" id = "vinField" title="VIN"> <br> <br>
-                            License: <input type = "text" id = "licenseField" title="License"> <br> <br>
-                            Model: <input type = "text" id = "modelField" title="Model"> <br> <br>
+                            VIN: <input type = "text" id = "vinField" title="VIN"><br><br>
+                            License: <input type = "text" id = "licenseField" title="License"><br><br>
+                            Model: <input type = "text" id = "modelField" title="Model"><br><br>
                             Color: <input type = "text" id = "colorField" title="Color">
-                            <br> <br>
+                            <br><br>
                             Miles on Car: <input type = "number" id = "milesField" value = 0>
                             <br><br>
                         </form>
-
                         Upload Image:
                         <form id="frmUploader" enctype="multipart/form-data" method="POST" action="api/Upload/">
-                            <input id = "imageInput" type="file" accept = ".png, .jpg, .jpeg" name="imgUploader">
+                            <input id = "imageInput" type="file" accept = "image/*" name="imgUploader">
                             <input type="submit" name="submit" id="btnSubmit" value="Upload"/>
                             <input id="imageFileName" type="text" style="display: none;" value="noPicture.png"/>
                         </form>
-
-
                         <hr>
-
                         <form id = "carCaps">
                             <h5>Car Capabilities:</h5>
                             Car Status:  <select id="carStatusField">
@@ -116,10 +102,8 @@
                             Equipment Rack: <input type = "checkbox" id="equipChoice">
                         </form>
                     </div>
-
                     <div class="modal-footer">
                         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-
                         <button type="button" class="btn btn-primary" data-dismiss="modal" aria-hidden="true" onclick = 'addVehicle();'>Submit</button>
                     </div>
                 </div>
@@ -137,46 +121,41 @@
 
                         <form>
                             <h5>Car Specifications:</h5>
-                            VIN: <input type = "text" id = "vinField-edit" title="VIN"> <br> <br>
-                            License: <input type = "text" id = "licenseField-edit" title="License"> <br> <br>
-                            Model: <input type = "text" id = "modelField-edit" title="Model"> <br> <br>
+                            VIN: <input type = "text" id = "vinField-edit" title="VIN"><br><br>
+                            License: <input type = "text" id = "licenseField-edit" title="License"><br><br>
+                            Model: <input type = "text" id = "modelField-edit" title="Model"><br><br>
                             Color: <input type = "text" id = "colorField-edit" title="Color">
-                            <br> <br>
+                            <br><br>
                             Miles on Car: <input type = "number" id = "milesField-edit" value = 0>
                             <br><br>
                         </form>
-                        
                         Upload Image:
                         <form id="frmUploader" enctype="multipart/form-data" method="POST" action="api/Upload/">
                             <input id = "imageInput-edit" type="file" accept = ".png, .jpg, .jpeg" name="imgUploader">
                             <input type="submit" name="submit" id="btnSubmit-edit" value="Upload"/>
-                        </form>  
+                        </form>
                         <hr>
-
                         <form>
                             <h5>Car Capabilities:</h5>
                             Car Status:  <select id="carStatusField-edit">
                             <option value="ready">Ready</option>
                             <option value="service">Service</option>
                             </select>
-                            <br> <br>
+                            <br><br>
                             Car Type: <select id="evStatusField-edit">
                             <option value="ev">Electric / Hybrid</option>
                             <option value="gas">Gas</option>
                             </select>
-                            <br> <br>
+                            <br><br>
                             Extra Trunk Space: <input type = "checkbox" id="extraTrunkChoice-edit">
-                            <br> <br>
+                            <br><br>
                             Off Road Capable: <input type = "checkbox" id="offRoadChoice-edit">
-                            <br> <br>
+                            <br><br>
                             Equipment Rack: <input type = "checkbox" id="equipChoice-edit">
                         </form>
-
                     </div>
-
                     <div class="modal-footer">
                         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-
                         <button type="button" class="btn btn-primary" data-dismiss="modal" aria-hidden="true" onclick = 'editVehicle()'>Submit</button>
                     </div>
                 </div>

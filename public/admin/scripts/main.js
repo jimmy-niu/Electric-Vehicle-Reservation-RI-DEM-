@@ -4,12 +4,23 @@ let currentVehicle = 0;
 // Sets up the sockets.
 $(document).ready(function() {
     adminSocket.emit('updatePage', function(){
+        // Callback
     });
 
-    adminSocket.on('reservationChange', function(reservations){
-        $('#upcoming').empty();
-        for(let i = 0; i < reservations.rowCount; i++){
-            new Reservation(reservations.rows[i]);
+    adminSocket.on('userChange', function(users){
+        console.log("we are in users change!");
+        console.log(users);
+
+        $('#users').empty();
+        for(let i = 0; i < users.rowCount; i++){
+            new User(users.rows[i]);
+        }
+    });
+
+    adminSocket.on('vehicleChange', function(vehicles){
+        $('#current_fleet').empty();
+        for(let i = 0; i < vehicles.rowCount; i++){
+            new Vehicle(vehicles.rows[i]);
         }
     });
 
@@ -19,10 +30,10 @@ $(document).ready(function() {
         }
     });
 
-    adminSocket.on('vehicleChange', function(vehicles){
-        $('#current_fleet').empty();
-        for(let i = 0; i < vehicles.rowCount; i++){
-            new Vehicle(vehicles.rows[i]);
+    adminSocket.on('reservationChange', function(reservations){
+        $('#upcoming').empty();
+        for(let i = 0; i < reservations.rowCount; i++){
+            new Reservation(reservations.rows[i]);
         }
     });
 
@@ -35,16 +46,8 @@ $(document).ready(function() {
             new Report(reports.rows[i]);
         }
     });
-    
-    adminSocket.on('userChange', function(users){
-        console.log("we are in users change!");
-        console.log(users);
 
-        $('#users').empty();
-        for(let i = 0; i < users.rowCount; i++){
-            new User(users.rows[i]);
-        }
-    });
+
 
     $('#export-users').click(function(e){
         e.preventDefault();
@@ -72,31 +75,31 @@ $(document).ready(function() {
 
 function bindClickHandlers(){
     $("#upcoming_title").bind("click", function(){
-        toggle_hidden('upcoming');
-        toggle_hidden('upcoming_header');
+        toggleHidden('upcoming');
+        toggleHidden('upcoming_header');
         toggleTitle(this);
     });
 
     $("#fleet_title").bind("click", function(){
-        toggle_hidden('fleet_header');
-        toggle_hidden('current_fleet');
+        toggleHidden('fleet_header');
+        toggleHidden('current_fleet');
         toggleTitle(this);
     });
-    
+
     $("#report_title").bind("click", function(){
-        toggle_hidden('report_header');
-        toggle_hidden('reports');
+        toggleHidden('report_header');
+        toggleHidden('reports');
         toggleTitle(this);
     });
-    
+
     $("#user_title").bind("click", function(){
-        toggle_hidden('user_header');
-        toggle_hidden('users');
+        toggleHidden('user_header');
+        toggleHidden('users');
         toggleTitle(this);
     });
 }
 
-function toggle_hidden(id){
+function toggleHidden(id){
     document.getElementById(id).classList.toggle('hidden');
 }
 
@@ -109,11 +112,6 @@ function toggleTitle(object){
     }
 }
 
-function insertVehicleImage(id, imgSrc){
-    let img = `<img src = "${imgSrc}"`
-    $(`#${id}`).append()
-}
-
 function clearForms(obj){
     obj.trigger("reset");
 }
@@ -124,13 +122,11 @@ function modifyUser() {
     let isAdmin = undefined;
     if($('#adminChoice').is(':checked') || $('#userChoice').is(':checked')) {
         isAdmin = $('#adminChoice').is(':checked');
-
     }
 
     let isAdd = undefined;
     if($('#removeChoice').is(':checked') || $('#addChoice').is(':checked')) {
         isAdd = $('#addChoice').is(':checked');
-
     }
 
     if(email != undefined && isAdd != undefined){
@@ -162,9 +158,45 @@ function addVehicle(){
         adminSocket.emit("vehicleAdded", vehicle, function(){
         });
     }
+
     clearForms($("#carSpecs"));
     clearForms($("#carCaps"));
     clearForms($("#frmUploader"));
+}
+
+function editVehicle(){
+    let id = $('#vinField-edit').val();
+    let license = $('#licenseField-edit').val();
+    let model = $('#modelField-edit').val();
+    let color = $('#colorField-edit').val();
+    let miles = $('#milesField-edit').val();
+    let status  = ($('#carStatusField-edit').val() === "service");
+    let carType = ($('#evStatusField-edit').val() === 'ev');
+    let trunk = $('#extraTrunkChoice-edit').is(':checked');
+    let offRoad = $('#offRoadChoice-edit').is(':checked');
+    let equipmentRack = $('#equipChoice-edit').is(':checked');
+
+    if(id !== '' && license !== '' && model !== '' && color !== ''){
+        let vehicle = {id: id, license: license, model: model, color: color, miles: miles, inService: status,
+                       isEV: carType, extraTrunk: trunk, offRoad: offRoad, equipRack: equipmentRack};
+        adminSocket.emit('vehicleEdited', vehicle);
+    }
+}
+
+function insertVehicleImage(id, imgSrc){
+    let img = `<img src = "${imgSrc}"`
+    $(`#${id}`).append()
+}
+
+function deleteVehicle(license){
+    adminSocket.emit("vehicleRemoved", license, function(){
+    });
+    $('.'+license).remove();
+}
+
+function updateVehicleStatus(license, status){
+    adminSocket.emit('vehicleStatusUpdated', license, status, function(){
+    });
 }
 
 function fillInEditModal(vehicleData){
@@ -236,14 +268,27 @@ function updateVehicleStatus(license, status){
     });
 }
 
-function setJustificationModal(text){
-    $('#justificationModalText').empty();
-    $('#justificationModalText').append(text);
+function getJustificationModal(id, text){
+    let modal = `<div id="justification_modal_${id}" class="modal fade">` 
+    +`<div class="modal-dialog">` 
+    +   `<div class="modal-content">`
+    +       `<div class="modal-header">`
+    +           `<h3>Override Justification</h3>`
+    +           `<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>`
+    +       `</div>`
+    +       `<div class="modal-body"> ${text} </div>`
+    +       `<div class="modal-footer">`
+    +            `<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>`
+    +         `</div>`
+    +      `</div>`
+    +   `</div>`
+    +`</div>`;
+    return modal;
 }
 
 /*
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- *  Classes used to make reservations.
+ *  Classes used to make dom objects.
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  */
 class Reservation {
@@ -251,18 +296,25 @@ class Reservation {
         this.addToDOM(reservationData);
     }
     addToDOM(r){
-        let justification = r.justification;
-        if(justification !== ''){
-            justification = `<a href = "#justificationModal" class = "btn btn-large btn-primary drop-shadow" data-toggle="modal" onclick = "setJustificationModal('${r.justification}')">Click To See</a>`
+        let justification_button = "";
+        let modal = "";
+
+        if(r.justification !== '' && r.justification !== null && r.justification !== undefined){
+            modal = getJustificationModal(r.license, r.justification);
+
+            justification_button = `<a href = "#justification_modal_${r.license}" class = "btn btn-large btn-primary drop-shadow" data-toggle="modal">Click To See</a>`;
         }
+
+
         //console.log(r);
         let DOMobject = `<div class = "col-entry reservation-user ${r.license}">${r.user}</div>`
         + `<div class = "col-entry reservation-start ${r.license}">${r.start}</div>`
         + `<div class = "col-entry reservation-end ${r.license}">${r.end}</div>`
         + `<div class = "col-entry carModel ${r.license}">${r.model}</div>`
         + `<div class = "col-entry reservation-license ${r.license}">${r.license}</div>`
-        + `<div class = "col-entry reservation-pickup> ${r.license}">${justification}</div>`;
-
+        + `<div class = "col-entry reservation-pickup> ${r.license}">${justification_button}</div>`
+        + modal;
+        
         $('#upcoming').append(DOMobject);
     }
 }
@@ -271,6 +323,7 @@ class Vehicle {
     constructor(vehicleData){
         this.addToDOM(vehicleData);
     }
+
     addToDOM(v){
         let carType = "Gas";
         if(v.isEV){
@@ -286,16 +339,7 @@ class Vehicle {
         + `<a href="#editVehicle" data-toggle="modal" data-target="#editVehicleModal" onclick = 'fillInEditModal(${data});'<li><i class="fa fa-wrench"></i> Edit Car</li></a>`
         + `<div onclick = 'deleteVehicle("${v.license}")'><li><i class="fa fa-archive"></i> Retire</li></div>`
         + `</ul></span></div>`;
-
         $('#current_fleet').append(DOMobject);
-    }
-}
-
-function getBooleanStr(aNumber){
-    if(aNumber === 1){
-        return "Yes";
-    } else {
-        return "No";
     }
 }
 
@@ -310,7 +354,6 @@ class Report {
         + `<div class = "col-entry needs-cleaning ${r.id}">${getBooleanStr(r.needsCleaning)}</div>`
         + `<div class = "col-entry needs-service ${r.id}">${getBooleanStr(r.needsService)}</div>`
         + `<div class = "col-entry charging ${r.id}">${getBooleanStr(r.notCharging)}</div>`;
-
         $('#reports').append(DOMobject);
     }
 }
@@ -323,8 +366,15 @@ class User {
     addToDOM(r){
         let DOMobject = `<div class = "col-entry ${r.id}">${r.email}</div>`
         + `<div class = "col-entry ${r.id}">${getBooleanStr(r.admin)}</div>`
-        
         $('#users').append(DOMobject);
+    }
+}
+
+function getBooleanStr(aNumber){
+    if(aNumber === 1){
+        return "Yes";
+    } else {
+        return "No";
     }
 }
 
@@ -339,7 +389,7 @@ function setUploader(){
     $('#frmUploader').unbind("submit").bind("submit", function(e){
         e.preventDefault();
         if($('#licenseField').val() === "" || $('#licenseField').val() === undefined){
-            window.alert("Please enter a license plate number before uploading the vehicle!")
+            window.alert("Please enter a license plate number before uploading the vehicle.")
         } else {
             let options = {
                 data: {license: ""},
@@ -354,28 +404,7 @@ function setUploader(){
 function finishedUpload(data){
     console.log(data);
     $('#imageFileName').val(data);
-    window.alert("Image uploaded successfully!");
-}
-
-/*
- * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- *  CSV Export
- * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- */
-
-// function exportUsers(){
-//     adminSocket.emit('exportUsers', function(){
-//
-//     });
-// }
-function exportVehicles(){
-    //adminSocket.emit('exportVehicles');
-}
-function exportReservations(){
-    //adminSocket.emit('exportReservations');
-}
-function exportReports(){
-    //adminSocket.emit('exportReports');
+    window.alert("Image uploaded successfully.");
 }
 
 /*

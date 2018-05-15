@@ -16,9 +16,6 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js" integrity="sha384-cs/chFZiN24E4KMATLdqdvsezGxaGsi4hLGOzlXwp5UZB1LY//20VyM2taTB4QvJ" crossorigin="anonymous"></script>
         <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js" integrity="sha384-uefMccjFJAIv6A+rW+L4AHf99KvxDjWSu1z9VI8SKNVmz4sk7buKt/6v9KI65qnm" crossorigin="anonymous"></script>
         <script src="./scripts/main.js"></script>
-
-
-
     </head>
     <body>
         <div class = "header drop-shadow">
@@ -28,31 +25,25 @@
                     <span style = "font-size: 6vh;">R</span>eports and Account Management
                 </div>
             </div>
-
             <div>
                 <div id = "user">
-                    Welcome, %user% <br>
+                    Welcome, dem_test_a@outlook.com <br>
                     <a href = "/logout" style = "font-size: 2vh; color: #D7A342">Logout</a>
                 </div>
-            </div>            
+            </div>
         </div>
 
         <div style = "padding: 1vh 2vw 1vh 2vw;">
             <div class = "Nav-Buttons">
-                <a href = "./index.html"><div class = "button drop-shadow">Reservations</div></a>
-
-                <a href = "./fleet.html"><div class = "button drop-shadow">Fleet Management</div></a>
-
-                <a href = "#modifyUserModal" class = "btn btn-large btn-primary drop-shadow rightMargin" data-toggle="modal">Add/Remove User</a>
-
-                <a href = "#" id = "export-users" class = "btn btn-large btn-primary drop-shadow rightMargin">Export Users</a>
-
-                <a href = "#" id = "export-reports" class = "btn btn-large btn-primary drop-shadow rightMargin">Export Reports</a>
+                <!-- Reservations --> <a href = "./index.html"><div class = "button drop-shadow">Reservations</div></a>
+                <!-- Fleet Management --> <a href = "./fleet.html"><div class = "button drop-shadow">Fleet Management</div></a>
+                <!-- Add/Remove User --> <a href = "#modifyUserModal" class = "btn btn-large btn-primary drop-shadow rightMargin" data-toggle="modal">Add/Remove User</a>
+                <!-- Export Users --> <a href = "#" id = "export-users" class = "btn btn-large btn-primary drop-shadow rightMargin">Export Users</a>
+                <!-- Export Reports --> <a href = "#" id = "export-reports" class = "btn btn-large btn-primary drop-shadow rightMargin">Export Reports</a>
             </div>
 
             <div class = "content drop-shadow">
                 <h2 id = "report_title" class = "table-title">Reports: ▼</h2>
-
                 <div id = "report_header" class = "report_header">
                     <div class = "table-header-entry">Reservation Id</div>
                     <div class = "table-header-entry">Report</div>
@@ -60,23 +51,22 @@
                     <div class = "table-header-entry">Needs Cleaning</div>
                     <div class = "table-header-entry">Not Charging?</div>
                 </div>
-
                 <div id = "reports" class = "report_table"></div>
             </div>
             <br><br>
             <div class = "content drop-shadow">
                 <h2 id = "user_title" class = "table-title">Accounts: ▼</h2>
-
                 <div id = "user_header" class = "user_header">
                     <div class = "table-header-entry">User Email</div>
                     <div class = "table-header-entry">Admin Access?</div>
                 </div>
-
                 <div id = "users" class = "user_table"></div>
             </div>
         </div>
 
-        <!--        Modals Below-->
+
+
+        <!--=========MODALS=========-->
         <div id="modifyUserModal" class="modal fade">
             <div class="modal-dialog">
                 <div class="modal-content">
@@ -84,38 +74,26 @@
                         <h3>Manage Users</h3>
                         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
                     </div>
-
                     <div class="modal-body">
-
                         <form id = "userForm">
                             <h5>Type of Account:</h5>
-                            Admin: <input type = "radio" name="adminUser" id="adminChoice" value="admin" title="Admin">
-                            <br>
-
+                            Admin: <input type = "radio" name="adminUser" id="adminChoice" value="admin" title="Admin"><br>
                             User: <input type = "radio" name="adminUser" id="userChoice" value="user" title="User">
-
                             <hr>
-
                             <h5>Modification:</h5>
-                            Add: <input type = "radio" name="addRemove" id="addChoice" value="add" title="Add choice">
-                            <br>
+                            Add: <input type = "radio" name="addRemove" id="addChoice" value="add" title="Add choice"><br>
                             Remove: <input type = "radio" name="addRemove" id="removeChoice" value="remove" title="Remove choice">
-
                             <hr>
                             Email of User: <input type = "text" id = "emailField" title="User Email">
-
                         </form>
-
                     </div>
 
                     <div class="modal-footer">
                         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-
                         <button type="button" class="btn btn-primary" data-dismiss="modal" aria-hidden="true" onclick = 'modifyUser();'>Submit</button>
                     </div>
                 </div>
             </div>
         </div>
-
     </body>
 </html>
