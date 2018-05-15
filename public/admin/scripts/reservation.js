@@ -1,6 +1,6 @@
 $(document).ready(function() {
     adminSocket.emit('updatePage', function(){});
-    
+
     adminSocket.on('newReservation', function(reservation){
         for(let i = 0; i < reservation.rowCount; i++){
             new Reservation(reservation.rows[i], '#upcoming');
@@ -13,14 +13,14 @@ $(document).ready(function() {
             new Reservation(reservations.rows[i], '#upcoming');
         }
     });
-    
+
     adminSocket.on('loadArchived', function(reservations){
         $('#archived').empty();
         for(let i = 0; i < reservations.rowCount; i++){
             new Reservation(reservations.rows[i], '#archived');
         }
     });
-    
+
     adminSocket.on('singleArchived', function(id, status){
         if(status){
             let obj = $(`.res_id_${id}`);
@@ -32,15 +32,15 @@ $(document).ready(function() {
             $("#upcoming").append(obj);
         }
     });
-    
+
     adminSocket.on('reservationChange', function(res_data){
         editReservation(res_data);
     });
-    
+
     adminSocket.on('reservationCancellation', function(id){
         $(`.res_id_${id}`).remove();
     });
-    
+
     bindClickHandlers();
     $("#archived_title").click();
 });
@@ -57,13 +57,13 @@ function bindClickHandlers(){
         e.preventDefault();
         window.location.href = 'download/reservations';
     });
-    
+
     $("#upcoming_title").bind("click", function(){
         toggleHidden('upcoming');
         toggleHidden('upcoming_header');
         toggleTitle(this);
     });
-    
+
     $("#archived_title").bind("click", function(){
         toggleHidden('archived');
         toggleHidden('archived_header');
@@ -113,15 +113,16 @@ function editReservation(res_data){
     new Reservation(data);
 }
 
+//======Classes for new DOM elements======//
 class Reservation {
     constructor(reservationData, location){
         this.addToDOM(reservationData, location);
     }
-    
+
     addToDOM(r, location){
         let justification_button = "";
         let modal = "";
-        
+
         let time_button = `<a href = "#time_modal_${r.id}" data-toggle="modal">${r.start} ... </a>`;
         let time_text = `<strong> Start: </strong> ${r.start} <br> <strong> End: </strong> ${r.end}`;
         let time_modal = getTimeModal(r.id, time_text);
@@ -141,7 +142,7 @@ class Reservation {
         + `<div class = "col-entry reservation-license res_id_${r.id}">${r.license}</div>`
         + `<div class = "col-entry reservation-pickup> res_id_${r.id}">${justification_button}</div>`
         + modal + time_modal;
-    
+
         $(location).append(DOMobject);
     }
 }

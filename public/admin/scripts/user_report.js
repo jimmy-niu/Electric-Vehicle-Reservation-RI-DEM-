@@ -1,6 +1,6 @@
 $(document).ready(function() {
     adminSocket.emit('updatePage', function(){});
-    
+
     adminSocket.on('userChange', function(users, message){
         $('#users').empty();
         for(let i = 0; i < users.rowCount; i++){
@@ -16,19 +16,20 @@ $(document).ready(function() {
             new Report(reports.rows[i]);
         }
     });
-    
+
     adminSocket.on('newReport', function(report){
         for(let i = 0; i < report.rowCount; i++){
             new Report(report.rows[i]);
         }
     });
 
+    //Set onclick to download CSVs
     $('#export-users').click(function(e){
         e.preventDefault();
         window.location.href = 'download/users';
     });
 
-    
+
     $('#export-reports').click(function(e){
         e.preventDefault();
         window.location.href = 'download/reports';
@@ -74,11 +75,7 @@ function modifyUser() {
     clearForms($('#userForm'));
 }
 
-/*
- * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- *  Classes used to append to the DOM. 
- * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- */
+//======Classes for new DOM elements======//
 class Report {
     constructor(reportData){
         this.addToDOM(reportData);

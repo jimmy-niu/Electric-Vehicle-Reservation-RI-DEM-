@@ -1,14 +1,14 @@
 $(document).ready(function() {
     adminSocket.emit('updatePage', function(){
     });
-    
+
     adminSocket.on('vehicleChange', function(vehicles){
         $('#current_fleet').empty();
         for(let i = 0; i < vehicles.rowCount; i++){
             new Vehicle(vehicles.rows[i]);
         }
     });
-    
+
     bindClickHandlers();
     setUploader();
 });
@@ -18,9 +18,9 @@ function bindClickHandlers(){
         e.preventDefault();
         window.location.href = 'download/vehicles';
     });
-    
+
     $("#fleet_title").bind("click", function(){
-        toggleHidden('fleet_header');   
+        toggleHidden('fleet_header');
         toggleHidden('current_fleet');
         toggleTitle(this);
     });
@@ -78,13 +78,13 @@ function fillInEditModal(vehicleData){
         $('#carStatusField-edit').val("ready");
         $('#vehicle-edit-submit').click(function(e){
             e.preventDefault();
-            editVehicle(false);
+            editVehicle(false); //Edit vehicle with oldStatus false if the vehicle was not being serviced.
         });
     } else {
         $('#carStatusField-edit').val("service");
         $('#vehicle-edit-submit').click(function(e){
             e.preventDefault();
-            editVehicle(true);
+            editVehicle(true); //Edit vehicle with oldStatus true if the vehicle was being serviced.
         });
     }
 
@@ -146,11 +146,7 @@ function updateVehicleStatus(license, status){
     });
 }
 
-/*
- * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- *  Class used to append to the DOM. 
- * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- */
+//======Classes for new DOM elements======//
 class Vehicle {
     constructor(vehicleData){
         this.addToDOM(vehicleData);
@@ -175,11 +171,7 @@ class Vehicle {
     }
 }
 
-/*
- * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- *  Functions used for image uploading
- * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- */
+//======Image Uploading======//
 function setUploader(){
     // bind to the form's submit event
     $('#frmUploader').unbind("submit").bind("submit", function(e){

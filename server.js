@@ -31,8 +31,8 @@ var replace = require("replace");
 let anyDB = require('any-db');
 let conn = anyDB.createConnection('sqlite3://DEM.db');
 
+//Required for file writting.
 let jsoncsv = require('json-csv');
-
 let fs = require('fs');
 
 let engines = require('consolidate');
@@ -69,7 +69,7 @@ var transporter = nodemailer.createTransport({
     }
 });
 
-//for testing purposes- data resets every time
+//FOR TESTING. REMOVE FOR FINAL PRODUCT.
 conn.query('DROP TABLE IF EXISTS reservations');
 conn.query('DROP TABLE IF EXISTS vehicles');
 conn.query('DROP TABLE IF EXISTS reports');
@@ -153,7 +153,8 @@ function populateEmailLists(){
 
 populateEmailLists();
 
-//handles events when an admin user is connected
+//======Event Handling======//
+//Admin event handling on connection
 io.of('/admin').on('connection', function(socket){
     socket.on('vehicleAdded', function(vehicle,callback){
         addVehicle(vehicle);
@@ -192,6 +193,50 @@ io.of('/admin').on('connection', function(socket){
     });
     socket.on('userRemoved', function(email){
         removeUser(email);
+    });
+});
+
+//User event handling on connection
+io.of('/user').on('connection', function(socket) {
+    //used when the user first logs in, sends back all reservations for that user, ordered by date/time
+    socket.on('join', function(user, callback){
+        conn.query('SELECT *, vehicles.isEV, reservations.id FROM reservations INNER JOIN vehicles ON reservations.license = vehicles.license WHERE user = ? ORDER BY end ASC', [user], function(error, data){
+            callback(data);
+        });
+    });
+
+    //used when the user submits information for a new reservation
+    socket.on('reservation', function(reservationInfo, callback){
+        //this function will asign a vehicle for the reservation
+        assignVehicle(socket, reservationInfo, null, false);
+    });
+
+    //used when user submits information an edited reservation
+    socket.on('edit', function(reservationInfo, oldData){
+        //this function will reassign a vehicle for the reservation
+        assignVehicle(socket, reservationInfo, oldData, true);
+    });
+
+    //used when the user confirms creation of new reservation
+    socket.on('addReservation', function(reservationInfo, callback){
+        newReservation(reservationInfo, callback);
+    });
+
+    //used when the user confirms the edit of a reservation
+    socket.on('editReservation', function(reservationInfo, id, oldData, callback){
+        //updates reservation entry in database
+        editReservation(reservationInfo, id, oldData, callback);
+    })
+
+    //used when the user cancels a reservation
+    socket.on('cancel', function(reservationID, user, model, license, start, end){
+        //removes reservation from database
+        cancelReservation(reservationID, user, model, license, start, end);
+    });
+
+    //used when the user submits a report about a reservation
+    socket.on('reportAdded', function(reservationID, report, needsService, needsCleaning, notCharging){
+        submitFeedback(reservationID, report, needsService, needsCleaning, notCharging);
     });
 });
 
@@ -299,54 +344,7 @@ function nukeEvents() {
     });
 }
 
-//handles events when a regular user is connnected
-io.of('/user').on('connection', function(socket) {
-    //used when the user first logs in, sends back all reservations for that user, ordered by date/time
-    socket.on('join', function(user, callback){
-        conn.query('SELECT *, vehicles.isEV, reservations.id FROM reservations INNER JOIN vehicles ON reservations.license = vehicles.license WHERE user = ? ORDER BY end ASC', [user], function(error, data){
-            callback(data);
-        });
-    });
-
-    //used when the user submits information for a new reservation
-    socket.on('reservation', function(reservationInfo, callback){
-        //this function will asign a vehicle for the reservation
-        assignVehicle(socket, reservationInfo, null, false);
-    });
-
-    //used when user submits information an edited reservation
-    socket.on('edit', function(reservationInfo, oldData){
-        //this function will reassign a vehicle for the reservation
-        assignVehicle(socket, reservationInfo, oldData, true);
-    });
-
-    //used when the user confirms creation of new reservation
-    socket.on('addReservation', function(reservationInfo, callback){
-        newReservation(reservationInfo, callback);
-    });
-
-    //used when the user confirms the edit of a reservation
-    socket.on('editReservation', function(reservationInfo, id, oldData, callback){
-        //updates reservation entry in database
-        editReservation(reservationInfo, id, oldData, callback);
-    })
-
-    //used when the user cancels a reservation
-    socket.on('cancel', function(reservationID, user, model, license, start, end){
-        //removes reservation from database
-        cancelReservation(reservationID, user, model, license, start, end);
-    });
-
-    //used when the user submits a report about a reservation
-    socket.on('reportAdded', function(reservationID, report, needsService, needsCleaning, notCharging){
-        submitFeedback(reservationID, report, needsService, needsCleaning, notCharging);
-    });
-});
-
-/**
- * Sets up the landing page to index.html.
- */
-
+//======Landing Page======//
 var token = undefined;
 
 app.use(passport.initialize());
@@ -376,6 +374,7 @@ passport.use(new OutlookStrategy({
 }
                                 ));
 
+//======Routing======//
 app.get('/', function(req, res) {
     res.send(index.loginPagePassport());
 });
@@ -421,12 +420,15 @@ app.get('/auth/outlook',
         function(req, res) {
 });
 
+//Requests from admin to download CSV data.
 app.get('/admin/download/users',
     function(req, res) {
     var user_email = req.user._json.EmailAddress;
     if (adminEmails.includes(user_email)) {
         exportUsers(function(){
+            //Dowload file
             res.download(__dirname + '/public/admin/temp/users.csv',function(){
+                //Delete file when done.
                 fs.unlink(__dirname + '/public/admin/temp/users.csv');
             });
         });
@@ -435,7 +437,6 @@ app.get('/admin/download/users',
         res.redirect("/");
     }
 });
-
 app.get('/admin/download/vehicles',
     function(req, res) {
     var user_email = req.user._json.EmailAddress;
@@ -450,7 +451,6 @@ app.get('/admin/download/vehicles',
         res.redirect("/");
     }
 });
-
 app.get('/admin/download/reservations',
     function(req, res) {
     var user_email = req.user._json.EmailAddress;
@@ -465,7 +465,6 @@ app.get('/admin/download/reservations',
         res.redirect("/");
     }
 });
-
 app.get('/admin/download/reports',
     function(req, res) {
     var user_email = req.user._json.EmailAddress;
@@ -719,8 +718,8 @@ function assignVehicle(socket, reservationInfo, oldData, isEdit){
 /**
  * This function adds the new reservation to the database, adds the event to the user's calendar,
  * and sends the new reservation info the to admins. Also calls a callback function that adds the
- * reservation visually on the front end. 
- * 
+ * reservation visually on the front end.
+ *
  * @params
  * reservationInfo: contains all of the info about the new reservation
  * callback: function that tells the front end to add the reservation visually
@@ -840,7 +839,7 @@ function updateVehicleMiles(license, miles){
 }
 
 /**
- * This function acts like newReservation but creates a new reservation from the data of a given,existing reservation for all reservations with the given license, deleting the old one.
+ * This function acts like assignVehicle but creates a new reservation from the data of a given,existing reservation for all reservations with the given license, deleting the old one.
  * @params
  * license: the licencse of the old vehicle
  */

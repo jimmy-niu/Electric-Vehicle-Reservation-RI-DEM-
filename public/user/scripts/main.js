@@ -46,9 +46,9 @@ function setClickHandlers(){
     //button handlers to add more destination fields
     $("#add-stop").click(addDestination);
     $("#add-stop-edit").click(addDestination);
-    
+
     $('#modal1').on('hidden.bs.modal', function (e) {});
-    
+
     $("#resModal").on("shown.bs.modal", function () {
         google.maps.event.trigger(map, "resize");
     });
@@ -104,12 +104,12 @@ function setSockets(){
         console.log("reservations reassigned");
     });
 
-    //listens for newReservation event to be emitted by the server 
+    //listens for newReservation event to be emitted by the server
     userSocket.on('newReservation', function(vehicles, reservation, isEdit){
         //sets current info to the info about the new reservation
         currentReservation = reservation;
 
-        //sets alternativeVehicles to the alternative vehicles for this new reservation 
+        //sets alternativeVehicles to the alternative vehicles for this new reservation
         alternateVehicles = vehicles;
 
         //different text depending only whether there are any alternative vehicles
@@ -138,7 +138,7 @@ function setSockets(){
         $("#stopsMText").html($("#stopsMText").html() + "<br>" + stop);
 
         //make vehicle assignment modal appear
-        $("#resModal").modal(); 
+        $("#resModal").modal();
     });
 
     userSocket.on('editReservation', function(vehicles, reservation, oldData, isEdit){
@@ -148,7 +148,7 @@ function setSockets(){
         //sets global variable to the info about the how the reservation used to be
         currentResOldData = oldData;
 
-        //sets alternativeVehicles to the alternative vehicles for this new reservation 
+        //sets alternativeVehicles to the alternative vehicles for this new reservation
         alternateVehicles = vehicles;
 
         //different text depending only whether there are any alternative vehicles
@@ -177,7 +177,7 @@ function setSockets(){
         $("#stopsMText-edit").html($("#stopsMText-edit").html() + "<br>" + stop);
 
         //make vehicle assignment modal for edit appear
-        $("#resModal-edit").modal(); 
+        $("#resModal-edit").modal();
     });
 
     //listens for server to emit noVehicle event
@@ -393,7 +393,7 @@ function newReservation() {
  * id: the id of the reservation user is editing
  */
 function fillInEditModal(id){
-    isEditing = true; 
+    isEditing = true;
 
     let data = JSON.parse($("#res_data_" + id).html());
 
@@ -523,7 +523,7 @@ function editReservation() {
 }
 
 /**
- * This function sends the reservation details to the back end so the reservation can be 
+ * This function sends the reservation details to the back end so the reservation can be
  * added to the database, and displays the reservation card on the front end.
  */
 function renderCar(){
@@ -583,7 +583,7 @@ function renderCar(){
 
 /*
  * This function pops up an alert for the user if their reservation is at the same time and
- * has the same route as someone else's reservation. 
+ * has the same route as someone else's reservation.
  * @params
  * user: the user who is making/editing the current reservation
  * canCarpool: true if there exists other users the user can carpool with for this reservation
@@ -602,7 +602,7 @@ function carpoolAlert(user, canCarpool, carpoolUsers){
 }
 
 /*
- * This function is called if the user clicked the confirm alternative vehicle button, 
+ * This function is called if the user clicked the confirm alternative vehicle button,
  * therefore overriding their originally assigned vehicle.
  */
 function override(){
@@ -619,8 +619,8 @@ function override(){
 }
 
 /*
- * This function is called when the user selects an alternative vehicle. It updates the current 
- * reservation to contain this new information. 
+ * This function is called when the user selects an alternative vehicle. It updates the current
+ * reservation to contain this new information.
  * @params
  * index: the index in the list alternativeVehicles of the car the user chose
  */
@@ -735,6 +735,9 @@ function clearReportModal(id){
     $('#report-id').html(id);
 }
 
+/*
+ * This function sorts upcomingReservations in order of reservation time and date.
+ */
 function sortReservations(){
     var cards = $('.cards');
     var reservations = $('.upcomingReservation');
@@ -810,6 +813,7 @@ function getLocationModal(id, text){
     return modal;
 }
 
+//======Classes for new DOM elements======//
 class Reservation {
 
     constructor(reservationData) {
@@ -826,25 +830,25 @@ class Reservation {
         let data = JSON.stringify(r);
 
         let imageFilePath = "./media/vehicle_images/";
-        
+
         let stopsArray = JSON.parse(r.stops);
         let stop = "<ol>";
         for(let i=0; i<stopsArray.length; i++){
             stop += `<li>${stopsArray[i]}</li>`;
         }
         stop += "</ol>";
-        
+
         let location_button = `<a href = "#location_modal_${r.id}" data-toggle="modal">${stopsArray[0].substring(0, 16)}... </a>`;
         let location_modal = getLocationModal(r.id, stop);
-        
+
         let DOMobject = `<div class="card ${r.border} mb-3 ${r.id} upcomingReservation" style="width: 18rem;">`
         + `<img class = "card-img-top" src="${imageFilePath + r.image}">`
         + `<div class="card-body">`
         + `<h5 class="card-title"><span id="model_${r.id}" class="card-model">${r.model}</span> <span id="license_${r.id}" class="card-license">${r.license}</span></h5>`
         + `<p class="card-text"><strong>Start</strong>: <span id="start_${r.id}" class="card-start">${r.start}</span> <br>`
         + `<strong>End</strong>:<span id="end_${r.id}" class="card-end">${r.end}</span> <br>`
-        + `<strong>Route</strong>: <span id = "stops_${r.id}">${location_button}</span> </p>` 
-        + `${location_modal}` 
+        + `<strong>Route</strong>: <span id = "stops_${r.id}">${location_button}</span> </p>`
+        + `${location_modal}`
         + `<span style = "display: none;" id = "res_data_${r.id}">${data}</span>`
         + `<a href="#" class="btn btn-primary edit" data-toggle="modal" data-target="#editModal" onclick = 'fillInEditModal(${r.id});'>Edit reservation</a>`
         + `<a href="#" class="btn btn-secondary" data-toggle="modal" data-target="#cancelModal" onclick = "setCancelID(${r.id});">Cancel</a>`
@@ -853,7 +857,6 @@ class Reservation {
         $('.cards').append(DOMobject);
     }
 }
-
 class OldReservation {
     constructor(reservationData) {
         if(reservationData.isEV == true){
