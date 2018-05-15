@@ -930,9 +930,8 @@ app.post("/admin/api/Upload", upload.single("imgUploader"), function (req, res) 
 
     fs.rename(`public/user/media/vehicle_images/${tempName}`, `public/user/media/vehicle_images/${newName}`, function(err){
         if ( err ) {
-            console.log('ERROR: ' + err);
+            res.send("ERROR: " + err);
         } else {
-            console.log(newName);
             res.send(newName);
         }
 
