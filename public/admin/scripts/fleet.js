@@ -1,5 +1,3 @@
-let adminSocket = io.connect('http://localhost:8080/admin', {forceNew: true});
-
 $(document).ready(function() {
     adminSocket.emit('updatePage', function(){
     });
@@ -162,8 +160,12 @@ function updateVehicleStatus(license, status){
     });
 }
 
-
-
+/*
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ *  Class used to appending to the DOM. 
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ */
+ 
 class Vehicle {
     constructor(vehicleData){
         this.addToDOM(vehicleData);
