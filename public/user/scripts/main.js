@@ -420,20 +420,22 @@ function altVehicles(){
 function newReservation() {
     var bounds = new google.maps.LatLngBounds();
     var ac_sorted = Object.values(sortOnKeys(autocompletes))
-
+    alert(JSON.stringify(sortOnKeys(autocompletes)));
     var directionsService = new google.maps.DirectionsService;
     directionsDisplay.setMap(map);
 
     var waypoints = [];
-    for (var i = 1; i < ac_sorted.length - 1; i++) {
-        waypoints.push({
-            location: new google.maps.LatLng(ac_sorted[i].geometry.location.lat(), ac_sorted[i].geometry.location.lng()),
-            stopover: true
-        })
+    for (var i = 1; i < ac_sorted.length; i++) {
+        if (i != 2) {
+            waypoints.push({
+                location: new google.maps.LatLng(ac_sorted[i].geometry.location.lat(), ac_sorted[i].geometry.location.lng()),
+                stopover: true
+            });
+        }
     }
     directionsService.route({
         origin: new google.maps.LatLng(ac_sorted[0].geometry.location.lat(), ac_sorted[0].geometry.location.lng()),
-        destination: new google.maps.LatLng(ac_sorted[ac_sorted.length - 1].geometry.location.lat(), ac_sorted[ac_sorted.length - 1].geometry.location.lng()),
+        destination: new google.maps.LatLng(ac_sorted[2].geometry.location.lat(), ac_sorted[2].geometry.location.lng()),
         waypoints: waypoints,
         travelMode: 'DRIVING'
     }, function(response, status) {
@@ -563,20 +565,21 @@ function editReservation() {
     var totalDuration = 0;
     var bounds = new google.maps.LatLngBounds();
     var ac_sorted = Object.values(sortOnKeys(autocompletes_edit));
-    
     var directionsService = new google.maps.DirectionsService;
     directionsDisplay.setMap(map_edit);
 
     var waypoints = [];
-    for (var i = 1; i < ac_sorted.length - 1; i++) {
-        waypoints.push({
-            location: new google.maps.LatLng(ac_sorted[i].geometry.location.lat(), ac_sorted[i].geometry.location.lng()),
-            stopover: true
-        })
+    for (var i = 1; i < ac_sorted.length; i++) {
+        if (i != 2) {
+            waypoints.push({
+                location: new google.maps.LatLng(ac_sorted[i].geometry.location.lat(), ac_sorted[i].geometry.location.lng()),
+                stopover: true
+            });
+        }
     }
     directionsService.route({
         origin: new google.maps.LatLng(ac_sorted[0].geometry.location.lat(), ac_sorted[0].geometry.location.lng()),
-        destination: new google.maps.LatLng(ac_sorted[ac_sorted.length - 1].geometry.location.lat(), ac_sorted[ac_sorted.length - 1].geometry.location.lng()),
+        destination: new google.maps.LatLng(ac_sorted[2].geometry.location.lat(), ac_sorted[2].geometry.location.lng()),
         waypoints: waypoints,
         travelMode: 'DRIVING'
     }, function(response, status) {
