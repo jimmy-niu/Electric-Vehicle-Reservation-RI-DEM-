@@ -142,7 +142,7 @@ function populateEmailLists(){
     conn.query('SELECT * FROM users', function(error, data){
         console.log(data);
         for(let i = 0; i < data.rowCount; i++) {
-            if(data.rows[i].admin === 1){
+            if(data !== undefined && data.rows[i].admin === 1){
                 adminEmails.push(data.rows[i].email);
             } else {
                 normalEmails.push(data.rows[i].email);
@@ -648,7 +648,7 @@ function getSpecificReports(reservation){
 
 function addUser(email, admin){
     conn.query('SELECT * FROM users WHERE email = ?', [email], function(error,data){
-        if(data.rowCount === 0){
+        if(data !== undefined && data.rowCount === 0){
             conn.query('INSERT INTO users VALUES(null, ?, ?)',[email, admin],function(error, data){
                 if(admin === 1){
                     updateUsers(`${email} added as an admin.`);
@@ -657,7 +657,7 @@ function addUser(email, admin){
                 }
             });
         } else{
-            if(data.rows[0].admin === 1){
+            if(data !== undefined && data.rows[0].admin === 1){
                 updateUsers(`${email} is already an admin.`);
             } else {
                 updateUsers(`${email} is already a user.`);
@@ -709,7 +709,7 @@ function newReservation(socket, reservationInfo, isEdit){
         for(var i = 0; i < data.rows.length; i++){
             //if reservations overlaps and is from same user
             //unless is editing then allows overlap with same id
-            if(data.rows[i].user === reservationInfo.user){
+            if(data !== undefined && data.rows[i].user === reservationInfo.user){
                 if(!isEdit || data.rows[i].id != reservationInfo.id){
                     isOverlap = true;
                 }
@@ -734,7 +734,7 @@ function newReservation(socket, reservationInfo, isEdit){
             // }
 
             conn.query('SELECT license, model, vehicles.isEV, image FROM vehicles WHERE extraTrunk >= ? AND offRoad >= ? AND equipRack >= ? AND license NOT IN (SELECT license FROM reservations WHERE start <= ? AND end >= ?) ORDER BY isEV DESC, featureScore ASC, miles ASC', [needsTrunk, needsOffRoad, needsRack, reservationInfo.end, reservationInfo.start], function(error, data){
-                if(data.rows.length !== 0){
+                if(data !== undefined && data.rows.length !== 0){
                     reservationInfo.model = data.rows[0].model;
                     reservationInfo.license = data.rows[0].license;
                     reservationInfo.isEV = data.rows[0].isEV;
@@ -839,7 +839,7 @@ function reassignReservations(license){
             let reservationInfo = data.rows[i];
             conn.query('SELECT license, model, image FROM vehicles WHERE extraTrunk >= ? AND license != ? AND offRoad >= ? AND equipRack >= ? AND license NOT IN (SELECT license FROM reservations WHERE start <= ? AND end >= ?) ORDER BY isEV DESC, (extraTrunk + offRoad + equipRack) ASC, miles ASC', [reservationInfo.needsTrunk, license, reservationInfo.needsOffRoad, reservationInfo.needsRack, reservationInfo.end, reservationInfo.start], function(error, data){
                 console.log(data);
-                if(data.rows.length !== 0){
+                if(data !== undefined && data.rows.length !== 0){
                     conn.query('UPDATE reservations SET license = ?, model = ?, image = ? WHERE id = ?',[data.rows[0].license, data.rows[0].model, data.rows[0].image, reservationInfo.id],function(error, data){
                         conn.query('SELECT * FROM reservations WHERE id = ?', [reservationInfo.id], function(error, data){
 
