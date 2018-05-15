@@ -118,6 +118,141 @@ function modifyUser() {
 }
 
 
+function addVehicle(){
+    let id = $('#vinField').val();
+    let license = $('#licenseField').val();
+    let model = $('#modelField').val();
+    let color = $('#colorField').val();
+    let miles = $('#milesField').val();
+    let status  = ($('#carStatusField').val() === "service");
+    let carType = ($('#evStatusField').val() === 'ev');
+    let trunk = $('#extraTrunkChoice').is(':checked');
+    let offRoad = $('#offRoadChoice').is(':checked');
+    let equipmentRack = $('#equipChoice').is(':checked');
+    let image = $('#imageFileName').val();
+
+    if(id !== '' && license !== '' && model !== '' && color !== ''){
+        let vehicle = {id: id, license: license, model: model, color: color, miles: miles, status: status,
+                       isEv: carType, trunk: trunk, offRoad: offRoad, equipmentRack: equipmentRack, image: image};
+        adminSocket.emit("vehicleAdded", vehicle, function(){
+        });
+    }
+
+    clearForms($("#carSpecs"));
+    clearForms($("#carCaps"));
+    clearForms($("#frmUploader"));
+}
+
+// function editVehicle(){
+//     let id = $('#vinField-edit').val();
+//     let license = $('#licenseField-edit').val();
+//     let model = $('#modelField-edit').val();
+//     let color = $('#colorField-edit').val();
+//     let miles = $('#milesField-edit').val();
+//     let status  = ($('#carStatusField-edit').val() === "service");
+//     let carType = ($('#evStatusField-edit').val() === 'ev');
+//     let trunk = $('#extraTrunkChoice-edit').is(':checked');
+//     let offRoad = $('#offRoadChoice-edit').is(':checked');
+//     let equipmentRack = $('#equipChoice-edit').is(':checked');
+//
+//     if(id !== '' && license !== '' && model !== '' && color !== ''){
+//         let vehicle = {id: id, license: license, model: model, color: color, miles: miles, inService: status,
+//                        isEV: carType, extraTrunk: trunk, offRoad: offRoad, equipRack: equipmentRack};
+//         adminSocket.emit('vehicleEdited', vehicle, function(){
+//             //Callback
+//         });
+//     }
+// }
+
+function insertVehicleImage(id, imgSrc){
+    let img = `<img src = "${imgSrc}"`;
+    $(`#${id}`).append();
+}
+
+function deleteVehicle(license){
+    adminSocket.emit("vehicleRemoved", license, function(){
+        //Callback
+    });
+    $('.'+license).remove();
+}
+
+function updateVehicleStatus(license, status){
+    adminSocket.emit('vehicleStatusUpdated', license, status, function(){
+    });
+}
+
+function fillInEditModal(vehicleData){
+    $('#vinField-edit').val(vehicleData.id);
+    $('#licenseField-edit').val(vehicleData.license);
+    $('#modelField-edit').val(vehicleData.model);
+    $('#colorField-edit').val(vehicleData.color);
+    $('#milesField-edit').val(vehicleData.miles);
+    if(vehicleData.inService == 0){
+        $('#carStatusField-edit').val("ready");
+        $('#vehicle-edit-submit').click(function(e){
+            e.preventDefault();
+            editVehicle(false);
+        });
+    } else {
+        $('#carStatusField-edit').val("service");
+        $('#vehicle-edit-submit').click(function(e){
+            e.preventDefault();
+            editVehicle(true);
+        });
+    }
+
+    if(vehicleData.isEV == 1){
+        $('#evStatusField-edit').val("ev");
+    } else {
+        $('#evStatusField-edit').val("gas");
+    }
+
+    if(vehicleData.extraTrunk == 1){
+        $('#extraTrunkChoice-edit').prop("checked", true);
+    } else {
+        $('#extraTrunkChoice-edit').prop("checked", false);
+    }
+
+    if(vehicleData.offRoad == 1){
+        $('#offRoadChoice-edit').prop("checked", true);
+    } else {
+        $('#offRoadChoice-edit').prop("checked", false);
+    }
+
+    if(vehicleData.equipmentRack == 1){
+        $('#equipChoice-edit').prop("checked", true);
+    } else {
+        $('#equipChoice-edit').prop("checked", false);
+    }
+
+}
+
+function editVehicle(oldStatus){
+    console.log("old" + oldStatus);
+    let id = $('#vinField-edit').val();
+    let license = $('#licenseField-edit').val();
+    let model = $('#modelField-edit').val();
+    let color = $('#colorField-edit').val();
+    let miles = $('#milesField-edit').val();
+    let status  = ($('#carStatusField-edit').val() === "service");
+    let carType = ($('#evStatusField-edit').val() === 'ev');
+    let trunk = $('#extraTrunkChoice-edit').is(':checked');
+    let offRoad = $('#offRoadChoice-edit').is(':checked');
+    let equipmentRack = $('#equipChoice-edit').is(':checked');
+
+    if(id !== '' && license !== '' && model !== '' && color !== ''){
+        let vehicle = {id: id, license: license, model: model, color: color, miles: miles, inService: status,
+                       isEV: carType, extraTrunk: trunk, offRoad: offRoad, equipRack: equipmentRack};
+        adminSocket.emit('vehicleEdited', vehicle, oldStatus);
+    }
+}
+
+function deleteVehicle(license){
+    adminSocket.emit("vehicleRemoved", license, function(){
+    });
+    $('.'+license).remove();
+}
+
 
 
 function getJustificationModal(id, text){
