@@ -18,8 +18,8 @@
         <link rel="stylesheet" href="./styles/main.css">
 
         <!-- Google Maps integration -->
-        <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCkO-QHCX9_TOtsTOpkh1ssAJRG0ZZYLec&libraries=places&callback=initialize"
-                async defer></script>
+        <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC8Z1eImtyFGgIBO_HyUZqeN5M5DW6z0e4&libraries=places"
+                defer></script>
 
         <!-- Sockets -->
         <script src="/socket.io/socket.io.js"></script>
@@ -28,6 +28,7 @@
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
         <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.1/moment.min.js" type="text/javascript"></script>
         <!-- Custom JS -->
         <script src="./scripts/main.js"></script>
     </head>
@@ -46,9 +47,7 @@
             <!-- User Greeting -->
             <div>
                 <div id = "user">
-                    <span id = "user_email">Welcome, dem_test_a@outlook.com <br>
-
-                    </span>
+                    <span id = "user_email">Welcome, dem_test_a@outlook.com <br> </span>
                     <!-- Logout button -->
                     <a href = "/logout" style = "font-size: 2vh; color: #D7A342">Logout</a>
                 </div>
@@ -255,7 +254,7 @@
                             <h5 class="modal-title" id="resModalLabel">Your Reserved Vehicle</h5>
 
                             <!-- Close button for reserved vehicle modal-->
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close" onclick="cancelReservationProcess()">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                 <span aria-hidden="true">&times;</span>
                             </button>
                         </div>
@@ -306,7 +305,7 @@
                             <h5 class="modal-title" id="resModalLabel-edit">Your Reserved Vehicle</h5>
 
                             <!-- Close button for reserved vehicle modal -->
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close" onclick="cancelReservationProcess()">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                 <span aria-hidden="true">&times;</span>
                             </button>
                         </div>
@@ -633,7 +632,7 @@
                                 <!-- Make sure user actually wants to cancel reservation -->
                                 Are you sure you want to cancel your reservation?  This action cannot be undone.
                             </div>
-                            <span id="cancelres_id" class='d.none'></span>
+                            <span id="cancelres_id" class='none'></span>
                             <div class="modal-footer">
                                 <!-- Cancel the cancellation (go back) -->
                                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Go back</button>
@@ -666,6 +665,8 @@
                             <div class="modal-header">
                                 <!-- Title for vehicle report modal -->
                                 <h5 class="modal-title" id="reportModalLabel">Make Report</h5>
+
+                                <span class="d-none" id="report-id"></span>
 
                                 <!-- Close button for vehicle report modal -->
                                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
