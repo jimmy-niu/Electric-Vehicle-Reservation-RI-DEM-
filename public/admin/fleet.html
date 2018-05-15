@@ -78,7 +78,7 @@
                         </form>
                         Upload Image:
                         <form id="frmUploader" enctype="multipart/form-data" method="POST" action="api/Upload/">
-                            <input id = "imageInput" type="file" accept = ".png, .jpg, .jpeg" name="imgUploader">
+                            <input id = "imageInput" type="file" accept = "image/*" name="imgUploader">
                             <input type="submit" name="submit" id="btnSubmit" value="Upload"/>
                             <input id="imageFileName" type="text" style="display: none;" value="noPicture.png"/>
                         </form>
