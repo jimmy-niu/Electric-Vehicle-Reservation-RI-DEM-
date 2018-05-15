@@ -168,7 +168,7 @@ class Vehicle {
         + `<div class = "col-entry ${v.license}"><span class="dropdown">`
         + `<button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Change Status</button>`
         + `<ul class="dropdown-menu">`
-        + `<a href="#editVehicle" data-toggle="modal" data-target="#editVehicleModal" onclick = 'fillInEditModal(${data});'<li><i class="fa fa-wrench"></i> Edit Car</li></a>`
+        + `<a href="#editVehicle" data-toggle="modal" data-target="#editVehicleModal" onclick = 'fillInEditModal(${data});'> <li><i class="fa fa-wrench"></i> Edit Car</li></a>`
         + `<div onclick = 'deleteVehicle("${v.license}")'><li><i class="fa fa-archive"></i> Retire</li></div>`
         + `</ul></span></div>`;
         $('#current_fleet').append(DOMobject);
