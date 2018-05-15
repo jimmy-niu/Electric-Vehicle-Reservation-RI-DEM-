@@ -59,7 +59,6 @@ function getJustificationModal(id, text){
 function editReservation(res_data){
     console.log("in edit reservation data");
     console.log(res_data);
-    
 }
 
 function getReservationDom(reservationData){
