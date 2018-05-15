@@ -62,7 +62,7 @@ var transporter = nodemailer.createTransport({
     port: 587, // port for secure SMTP
     auth: {
         user: 'dem_do-not-reply@outlook.com',
-        pass: 'DEMnoreply123'
+        pass: 'DEMnoreply123' //this shouldn't be hardcoded in- you should set up an environment variable or something
     },
     tls: {
         ciphers:'SSLv3'
@@ -112,15 +112,15 @@ conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, null, ?)',
 conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, null, ?)', ["2GNF1CEK9C6333734", "1869", "2011 CHEVROLET EQUINOX", "Black/White", true, 27513.0, false, true, true, false, "2011chevroletequinox.jpg"]);
 conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, null, ?)', ["1FMCU59H18KA54880", "1994", "2008 FORD ESCAPE", "Black/White", true, 235952.9, false, true, true, false, "2008fordescape.jpg"]);
 conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, null, ?)', ["1FMCU59H38KA54881", "2140", "2008 FORD ESCAPE", "Black/White", true, 77522.0, false, true, true, false, "2008fordescape.jpg"]);
-//conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', ["1FTYR10D67PA83081", "2224", "2007 FORD RANGER", "Black/White", true, 40558.2, false, true, true, true, "2007fordranger.jpg"]);
+//conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, null, ?)', ["1FTYR10D67PA83081", "2224", "2007 FORD RANGER", "Black/White", true, 40558.2, false, true, true, true, "2007fordranger.jpg"]);
 conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, null, ?)', ["1G1RA6E47EU133964", "2242", "2014 CHEVROLET VOLT", "Black", true, 9391.1, true, false, false, false, "2014chevroletvolt.jpg"]);
 conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, null, ?)', ["1FADP5CU6FL121721", "2254", "2016 FORD CMAX", "Black", true, 17993.8, true, false, false, false, "fordcmax.jpg"]);
 conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, null, ?)', ["JHMES96663S028859", "2468", "2004 HONDA CIVIC", "Black/White", true, 363.6, false, false, false, false, "2004hondacivic"]);
 conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, null, ?)', ["1FADP5CU8FL121722", "2472", "2015 FORD CMAX", "Black", true, 9327.3, true, false, false, false, "fordcmax.jpg"]);
 conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, null, ?)', ["1FADP5CU2FL121716", "2473", "2015 FORD CMAX", "Black", true, 13772.9, true, false, false, false, "fordcmax.jpg"]);
 conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, null, ?)', ["1GBDV13W07D219007", "2579", "2007 CHEVROLET UPLANDER", "Black/White", true, 36831.4, false, true, false, false, "2007chevroletuplander.jpg"]);
-//conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', ["1FTPW14587FB58781", "2709", "2007 FORD F150", "Black/White", true, 167668.3, false, true, true, true, "2007fordf150.jpg"]);
-//conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', ["1FTYR10D47PA83080", "315", "2007 FORD RANGER", "Black/White", true, 43196.2, false, true, true, true, "2007fordranger.jpg"]);
+//conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, null, ?)', ["1FTPW14587FB58781", "2709", "2007 FORD F150", "Black/White", true, 167668.3, false, true, true, true, "2007fordf150.jpg"]);
+//conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, null, ?)', ["1FTYR10D47PA83080", "315", "2007 FORD RANGER", "Black/White", true, 43196.2, false, true, true, true, "2007fordranger.jpg"]);
 conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, null, ?)', ["1FADP5CU0FL121715", "704", "2015 FORD CMAX", "Black", true, 5868.7, true, false, false, false, "fordcmax.jpg"]);
 conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, null, ?)', ["1FADP5CU8FL121719", "739", "2015 FORD CMAX", "Black", true, 7883.3, true, false, false, false, "fordcmax.jpg"]);
 conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, null, ?)', ["1FADP5CU6FL121718", "827", "2015 FORD CMAX", "Black", true, 9055.6, true, false, false, false, "fordcmax.jpg"]);
@@ -168,16 +168,15 @@ io.of('/admin').on('connection', function(socket){
         updateUsers();
         callback();
     });
-    
+
     socket.on('reservationArchived', setReservationArchived);
 
     socket.on('vehicleRemoved', function(license, callback){
         removeVehicle(license);
         callback();
     });
-    socket.on('vehicleEdited', function(vehicle){
-        editVehicle(vehicle);
-        //callback();
+    socket.on('vehicleEdited', function(vehicle, oldStatus){
+        editVehicle(vehicle, oldStatus);
     });
     socket.on('vehicleStatusUpdated', function(license, status, callback){
         updateVehicleStatus(license, status);
@@ -332,9 +331,9 @@ io.of('/user').on('connection', function(socket) {
     })
 
     //used when the user cancels a reservation
-    socket.on('cancel', function(reservationID, user, model, license, start, end, callback){
+    socket.on('cancel', function(reservationID, user, model, license, start, end){
         //removes reservation from database
-        cancelReservation(reservationID);
+        cancelReservation(reservationID, user, model, license, start, end);
     });
 
     //used when the user submits a report about a reservation
@@ -568,17 +567,14 @@ function addVehicle(vehicle){
     console.log(vehicle);
 }
 
-function editVehicle(vehicle){
-    console.log(vehicle)
+function editVehicle(vehicle, oldStatus){
     conn.query('UPDATE vehicles SET license = ?, model = ?, color = ?, miles = ?, inService = ?, isEV = ?, extraTrunk = ?, offRoad = ?, equipRack = ?, image = ? WHERE id = ?',[vehicle.license, vehicle.model, vehicle.color, vehicle.miles, vehicle.inService, vehicle.isEV, vehicle.extraTrunk, vehicle.offRoad, vehicle.equipRack, vehicle.image, vehicle.id],function(error, data){
         conn.query('UPDATE vehicles SET featureScore = extraTrunk + offRoad + equipRack WHERE id = ?', [vehicle.id], function(){
-            console.log('reached1');
-            console.log(vehicle.inService);
-            if(vehicle.inService === true){
-                console.log('reached2');
+            console.log(oldStatus);
+            if(vehicle.inService === true && oldStatus === false){
                 reassignReservations(vehicle.license);
-               
-            }  
+
+            }
             updateVehicles();
         });
     });
@@ -651,10 +647,10 @@ function removeUser(email){
 
 /**
  * This function checks if the reservation overlaps with another one of the same user's reservations,
- * checks if the user can carpool with others, and assigns a vehicle to the reservation. The assigned 
- * vehicle and list of alternative vehicles is sent back to the client. 
- * 
- * @params 
+ * checks if the user can carpool with others, and assigns a vehicle to the reservation. The assigned
+ * vehicle and list of alternative vehicles is sent back to the client.
+ *
+ * @params
  * socket: socket of user making the reservation
  * reservationInfo: data user submitted about reservation
  * isEdit: true if the user is editing an existing reservation
@@ -755,7 +751,7 @@ function editReservation(reservationInfo, id, oldData, callback){
             var startISO = startDate.toISOString().split('.')[0]+"Z";
             var endISO = endDate.toISOString().split('.')[0]+"Z";
             removeEvent(reservationInfo.user + "'s upcoming DEM trip (" + oldData.license + ")", startISO, endISO);
-            
+
             //adds calendar event with updated information
             var start = new Date(reservationInfo.start);
             var end = new Date(reservationInfo.end);
@@ -769,18 +765,20 @@ function editReservation(reservationInfo, id, oldData, callback){
  * @params
  * id: the id of the reservation to be cancelled
  */
-function cancelReservation(id){
+function cancelReservation(id, user, model, license, start, end, callback){
     conn.query('DELETE FROM reservations WHERE id = ?', [id]);
 
     //removes event from user's calendar
     var startDate = new Date(start);
     var endDate = new Date(end);
+    console.log(start)
+    console.log(startDate)
     var startISO = startDate.toISOString().split('.')[0]+"Z";
     var endISO = endDate.toISOString().split('.')[0]+"Z";
     removeEvent(user + "'s upcoming DEM trip (" + license + ")", startISO, endISO);
 
     //tells admin clients which reservation to delete from table
-    io.of('/admin').emit('reservationCancellation', reservationID);
+    io.of('/admin').emit('reservationCancellation', id);
 }
 
 /**
@@ -828,6 +826,11 @@ function updateVehicleMiles(license, miles){
     conn.query('UPDATE vehicles SET miles = miles + ? WHERE license = ?', [miles, license]);
 }
 
+/**
+ * This function acts like newReservation but creates a new reservation from the data of a given,existing reservation for all reservations with the given license, deleting the old one.
+ * @params
+ * license: the licencse of the old vehicle
+ */
 function reassignReservations(license){
     conn.query('SELECT * FROM reservations WHERE license = ? ORDER BY id ASC', [license], function(error, data){
         for(let i = 0; i < data.rowCount; i ++){
@@ -835,14 +838,46 @@ function reassignReservations(license){
             conn.query('SELECT license, model, image FROM vehicles WHERE inService != ? AND extraTrunk >= ? AND license != ? AND offRoad >= ? AND equipRack >= ? AND license NOT IN (SELECT license FROM reservations WHERE start <= ? AND end >= ?) ORDER BY isEV DESC, (extraTrunk + offRoad + equipRack) ASC, miles ASC', [true, reservationInfo.needsTrunk, license, reservationInfo.needsOffRoad, reservationInfo.needsRack, reservationInfo.end, reservationInfo.start], function(error, data){
                 console.log(data);
                 if(data !== undefined && data.rows.length !== 0){
+                    let mailOptions = {
+                        from: 'dem_do-not-reply@outlook.com',
+                        to: reservationInfo.user,
+                        subject: 'Important Change to Your Reservation',
+                        html: '<p>The vehicle you had reserved is now unavailable. You have been assigned a new vehicle. If you would like to change your vehicle, you can edit your reservation on the website.</p>'
+                            + '<h4>Old Vehicle: </h4>' + '<p>' + reservationInfo.model + " " + license + '</p>' + '<h4>Start: </h4>' + '<p>' + reservationInfo.start + '</p>' + '<h4>End: </h4>' + '<p>'
+                            + reservationInfo.end + '</p>' + '<h4>New Vehicle:</h4>' + '<p>' + data.rows[0].model + " " + data.rows[0].license + '</p>'
+                    };
+                    transporter.sendMail(mailOptions, function(error, info){
+                        if (error) {
+                            console.log(error);
+                        } else {
+                            console.log('Email sent: ' + info.response);
+                        }
+                    });
+
+
                     conn.query('UPDATE reservations SET license = ?, model = ?, image = ? WHERE id = ?',[data.rows[0].license, data.rows[0].model, data.rows[0].image, reservationInfo.id],function(error, data){
                         conn.query('SELECT * FROM reservations WHERE id = ?', [reservationInfo.id], function(error, data){
                             io.of('/admin').emit("newReservation", data);
                         });
                     });
                 } else {
-                    cancelReservation();
-                    //Send email
+                    cancelReservation(reservationInfo.id, reservationInfo.user, reservationInfo.model, reservationInfo.license, reservationInfo.start, reservationInfo.end);
+
+                    let mailOptions = {
+                        from: 'dem_do-not-reply@outlook.com',
+                        to: reservationInfo.user,
+                        subject: 'Important Change to Your Reservation',
+                        html: '<p>The vehicle you had reserved is now unavailable. Unfortunately, there are no other vehicles available at this time that meet your needs. You can use the website to make a new '
+                        + 'reservation with different criteria.</p>' + '<h3>Cancelled Reservation Details:</h3>' + '<h4>Vehicle: </h4>' + '<p>' + reservationInfo.model + " " + license + '</p>' + '<h4>Start: </h4>'
+                        + '<p>' + reservationInfo.start + '</p>' + '<h4>End: </h4>' + '<p>' + reservationInfo.end + '</p>'
+                    };
+                    transporter.sendMail(mailOptions, function(error, info){
+                        if (error) {
+                            console.log(error);
+                        } else {
+                            console.log('Email sent: ' + info.response);
+                        }
+                    });
                 }
             });
         }
@@ -850,7 +885,7 @@ function reassignReservations(license){
 }
 
 
-// Code Below is Used for Image Processing
+//======Image Processing======//
 let tempName = "";
 let Storage = multer.diskStorage({
     destination: function (req, file, callback) {
@@ -880,8 +915,12 @@ app.post("/admin/api/Upload", upload.single("imgUploader"), function (req, res) 
     });
 });
 
-
-
+//======CSV EXPORTING======//
+/**
+ * This function exports all user data to a csv in /admin/temp.
+ * @params
+ * callback: callback function that alerts the user side when a file has been created.
+ */
 function exportUsers(callback){
     conn.query('SELECT * FROM users', function(error, data){
         let users = data.rows;
@@ -894,7 +933,7 @@ function exportUsers(callback){
                 if(err) {
                     return console.log(err);
                 }
-                console.log("The file was saved!");
+                console.log("The file was saved");
                 callback();
             });
             if(err) {
@@ -903,7 +942,6 @@ function exportUsers(callback){
         });
     });
 }
-
 function exportVehicles(callback){
     conn.query('SELECT * FROM vehicles', function(error, data){
         let vehicles = data.rows;
@@ -923,7 +961,7 @@ function exportVehicles(callback){
                 if(err) {
                     return console.log(err);
                 }
-                console.log("The file was saved!");
+                console.log("The file was saved");
                 callback();
             });
             if(err) {
@@ -932,7 +970,6 @@ function exportVehicles(callback){
         });
     });
 }
-
 function exportReservations(callback){
     conn.query('SELECT * FROM reservations', function(error, data){
         let reservations = data.rows;
@@ -954,7 +991,7 @@ function exportReservations(callback){
                 if(err) {
                     return console.log(err);
                 }
-                console.log("The file was saved!");
+                console.log("The file was saved");
                 callback();
             });
             if(err) {
@@ -963,7 +1000,6 @@ function exportReservations(callback){
         });
     });
 }
-
 function exportReports(callback){
     conn.query('SELECT * FROM reports', function(error, data){
         let reports = data.rows;
@@ -979,7 +1015,7 @@ function exportReports(callback){
                 if(err) {
                     return console.log(err);
                 }
-                console.log("The file was saved!");
+                console.log("The file was saved");
                 callback();
             });
             if(err) {
