@@ -694,7 +694,7 @@ function getSpecificReports(reservation){
 }
 
 function addUser(email, admin){
-    conn.query('INSERT INTO users VALUES(null, ?, ?)',[email, admin],function(error, data){
+    conn.query('INSERT INTO users VALUES(null, ?, ?) IF NOT EXISTS(SELECT * FROM users WHERE email = ?)',[email, admin, email],function(error, data){
         updateUsers();
     });
 }
@@ -1029,21 +1029,3 @@ function exportReports(callback){
         });
     });
 }
-
-
-
-
-// function exportCSV(data, path){
-//     jsoncsv.csvBuffered(data, {fields:[{name:'a', label:'A'}, {name:'b', label:'B'}, {name:'c', label:'C'}]},function(err, csv){
-//         console.log(csv);
-//         fs.writeFile(__dirname + path, csv, function(err) {
-//             if(err) {
-//                 return console.log(err);
-//             }
-//             console.log("The file was saved!");
-//         });
-//         if(err) {
-//             return console.log(err);
-//         }
-//     });
-// }
