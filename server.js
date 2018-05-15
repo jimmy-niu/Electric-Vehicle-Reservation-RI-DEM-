@@ -340,7 +340,7 @@ io.of('/user').on('connection', function(socket) {
 
     //used when the user submits a report about a reservation
     socket.on('reportAdded', function(reservationID, report, needsService, needsCleaning, notCharging){
-        submitFeedback(reservationID, resport, needsService, needsCleaning, notCharging);
+        submitFeedback(reservationID, report, needsService, needsCleaning, notCharging);
     });
 });
 
@@ -575,7 +575,12 @@ function updateVehicleStatus(license, status){
         updateVehicles();
     });
 }
-function updateReports(){
+function sendNewReport(id){
+    conn.query('SELECT * FROM reports WHERE id = ?',[id], function(error, data){
+        io.of('/admin').emit('newReport', data);
+    });
+}
+function updateReports(id){
     conn.query('SELECT * FROM reports', function(error, data){
         io.of('/admin').emit('reportChange', data);
     });
@@ -806,7 +811,7 @@ function submitFeedback(reservationID, report, needsService, needsCleaning, notC
     //adds report to database
     conn.query("INSERT INTO reports VALUES(null, ?, ?, ?, ?, ?)", [reservationID, report, needsService, needsCleaning, notCharging], function(error, data){
         //sends report to admins
-        updateReports();
+        sendNewReport(data.lastInsertId);
     });
 
     //gets reservation details to include in email
