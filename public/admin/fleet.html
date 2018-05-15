@@ -30,7 +30,7 @@
             </div>
             <div>
                 <div id = "user">
-                    Welcome, dem_test_a@outlook.com <br>
+                    Welcome, %user% <br>
                     <a href = "/logout" style = "font-size: 2vh; color: #D7A342">Logout</a>
                     <a href = "../admin_u/index_admin.html" style = "font-size: 1vh; color: #D7A342">Change to user view</a>
                 </div>
@@ -132,7 +132,7 @@
                         </form>
                         Upload Image:
                         <form id="frmUploader" enctype="multipart/form-data" method="POST" action="api/Upload/">
-                            <input id = "imageInput-edit" type="file" accept = ".png, .jpg, .jpeg" name="imgUploader">
+                            <input id = "imageInput-edit" type="file" accept = "image/*" name="imgUploader">
                             <input type="submit" name="submit" id="btnSubmit-edit" value="Upload"/>
                         </form>
                         <hr>
