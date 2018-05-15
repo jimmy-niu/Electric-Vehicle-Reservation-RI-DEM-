@@ -1,6 +1,14 @@
 $(document).ready(function() {
     adminSocket.emit('updatePage', function(){});
+    setSockets();
+    bindClickHandlers();
+});
 
+/**
+  * Sets the behavior on receiving users/reports related 
+  * websocket messages. 
+  */
+function setSockets(){
     adminSocket.on('userChange', function(users, message){
         $('#users').empty();
         for(let i = 0; i < users.rowCount; i++){
@@ -22,22 +30,11 @@ $(document).ready(function() {
             new Report(report.rows[i]);
         }
     });
+}
 
-    //Set onclick to download CSVs
-    $('#export-users').click(function(e){
-        e.preventDefault();
-        window.location.href = 'download/users';
-    });
-
-
-    $('#export-reports').click(function(e){
-        e.preventDefault();
-        window.location.href = 'download/reports';
-    });
-
-    bindClickHandlers();
-});
-
+/**
+  * Binds several click events to javascript functions.
+  */
 function bindClickHandlers(){
     $("#report_title").bind("click", function(){
         toggleHidden('report_header');
@@ -50,8 +47,28 @@ function bindClickHandlers(){
         toggleHidden('users');
         toggleTitle(this);
     });
+    
+    //Set onclick to download CSVs
+    $('#export-users').click(function(e){
+        e.preventDefault();
+        window.location.href = 'download/users';
+    });
+
+
+    $('#export-reports').click(function(e){
+        e.preventDefault();
+        window.location.href = 'download/reports';
+    });
 }
 
+/**
+  * modifyUser reads the value of the modify user form, which
+  * shows up when modify user is clicked. This is bound to the 
+  * submit of said form. 
+  *
+  * Once the data is read, a websocket connection is sent to the 
+  * server and the users sql table is updated. 
+  */
 function modifyUser() {
     let email = $('#emailField').val();
 
@@ -76,6 +93,24 @@ function modifyUser() {
 }
 
 //======Classes for new DOM elements======//
+
+/**
+  * A Report takes a JSON object containing a report and 
+  * creates a DOM object based on it, and then appends it to the
+  * reports table. 
+  *
+  * @params
+  * reportData: A json object containing a report. reportData has
+  * the following values.
+  *     reservation: the reservation id.
+  *     report: the text content of the report. 
+  *     needsCleaning: A 1/0 boolean stating whether the car 
+  *         was indicated to need cleaning. 
+  *     needsService: A 1/0 boolean stating whether the car 
+  *         was indicated to need service. 
+  *     notCharging: A 1/0 boolean stating whether the car 
+  *         was indicated to be left not charging. 
+  */
 class Report {
     constructor(reportData){
         this.addToDOM(reportData);
@@ -92,6 +127,19 @@ class Report {
     }
 }
 
+/**
+  * A User takes a JSON object containing a user and 
+  * creates a DOM object based on it, and then appends it to the
+  * users table. 
+  *
+  * @params
+  * userData: A json object containing a user. userData has
+  * the following values.
+  *     id: the unique user id.
+  *     email: the email of the user. 
+  *     admin: A 1/0 boolean stating whether the user has admin
+  *         privledges.
+  */
 class User {
     constructor(userData){
         this.addToDOM(userData);

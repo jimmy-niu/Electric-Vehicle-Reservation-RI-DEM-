@@ -53,21 +53,6 @@ function setSockets(){
 }
 
 /**
-  * Takes in the clicked archive button and toggles whether
-  * the reservation is archived. This is bound to the click of the 
-  * archive div / icon. 
-  *
-  * @param
-  * The clicked reservation-archive DOM object.
-  */
-function archive(obj){
-    let id = $(obj).attr("reservation_id");
-    let archived = $(obj).attr("archived") === "true";
-    $(obj).attr("archived", !archived);
-    adminSocket.emit('reservationArchived', id, !archived, function(){});
-}
-
-/**
   * Binds several click events to javascript functions.
   */
 function bindClickHandlers(){
@@ -87,6 +72,21 @@ function bindClickHandlers(){
         toggleHidden('archived_header');
         toggleTitle(this);
     });
+}
+
+/**
+  * Takes in the clicked archive button and toggles whether
+  * the reservation is archived. This is bound to the click of the 
+  * archive div / icon. 
+  *
+  * @param
+  * The clicked reservation-archive DOM object.
+  */
+function archive(obj){
+    let id = $(obj).attr("reservation_id");
+    let archived = $(obj).attr("archived") === "true";
+    $(obj).attr("archived", !archived);
+    adminSocket.emit('reservationArchived', id, !archived, function(){});
 }
 
 /**
@@ -197,8 +197,6 @@ class Reservation {
             justification_button = `<a href = "#justification_modal_${r.id}" class = "btn btn-large btn-primary drop-shadow" data-toggle="modal">Click To See</a>`;
         }
 
-
-        //console.log(r);
         let DOMobject = `<div class = "col-entry reservation-archive res_id_${r.id}" reservation_id = "${r.id}" archived = ${getBoolean(r.archived)} onclick = "archive(this)"><i class="fa fa-archive"></i></div>`
         + `<div class = "col-entry reservation-id res_id_${r.id}">${r.id}</div>`
         + `<div class = "col-entry reservation-user res_id_${r.id}">${r.user}</div>`
