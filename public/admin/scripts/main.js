@@ -8,10 +8,6 @@ $(document).ready(function() {
     });
 
     adminSocket.on('userChange', function(users, message){
-        console.log("we are in users change!");
-        console.log(users);
-        console.log(message);
-
         $('#users').empty();
         for(let i = 0; i < users.rowCount; i++){
             new User(users.rows[i]);
@@ -46,7 +42,6 @@ $(document).ready(function() {
             new Report(reports.rows[i]);
         }
     });
-
 
 
     $('#export-users').click(function(e){
@@ -184,8 +179,8 @@ function editVehicle(){
 }
 
 function insertVehicleImage(id, imgSrc){
-    let img = `<img src = "${imgSrc}"`
-    $(`#${id}`).append()
+    let img = `<img src = "${imgSrc}"`;
+    $(`#${id}`).append();
 }
 
 function deleteVehicle(license){
@@ -395,7 +390,8 @@ function setUploader(){
         } else {
             let options = {
                 data: {license: ""},
-                success: finishedUpload
+                success: finishedUpload,
+                error: uploadError
             };
             options.data.license = $("#licenseField").val();
             $(this).ajaxSubmit(options);
@@ -403,8 +399,10 @@ function setUploader(){
     });
 }
 
+function uploadError(data){
+    window.alert("The file type you are uploading is not supported.");
+}
 function finishedUpload(data){
-    console.log(data);
     $('#imageFileName').val(data);
     window.alert("Image uploaded successfully.");
 }
