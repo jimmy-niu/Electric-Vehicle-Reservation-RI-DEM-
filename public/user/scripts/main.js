@@ -352,8 +352,12 @@ function newReservation() {
     let end = $("#end-date").val();
 
     //convert strings to Date objects
-    let startDate = new Date(start);
-    let endDate = new Date(end);
+    let startDate = new Date(Date.parse(start));
+    let endDate = new Date(Date.parse(end));
+    let cooldownEnd = new Date(Date.parse(end));
+    cooldownEnd.setHours(endDate.getHours() + 2);
+    //alert(end);
+    //alert(Date.parse(end + "-"));
     //gets current date and time
     let today = new Date();
 
@@ -378,6 +382,8 @@ function newReservation() {
         let resData = {user: userEmail, start: start, end: end, stops: JSON.stringify(stops).split('},{').join('}, {'), override: false, justification: "", needsTrunk: trunk, needsOffRoad: offroad, needsRack: rack};
         //sends data to back end for vehicle assignment
         userSocket.emit('reservation', resData);
+        let cooldown = {user: null, start: end, end: end, stops: null, override: false, justification: "", needsTrunk: false, needsOffRoad: false, needsRack: false};
+        ///userSocket.emit('reservation', cooldown);
     }
 }
 
