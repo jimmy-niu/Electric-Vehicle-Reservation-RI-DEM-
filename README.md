@@ -17,8 +17,8 @@ Socket Handlers:
 Regular User- Server.js
 
 - Name: join
-Parameters: user, callback
-Purpose: Selects all reservations for given user and returns that data to the client by sending it as a parameter of the callback function. 
+	- Parameters: user, callback
+		- Purpose: Selects all reservations for given user and returns that data to the client by sending it as a parameter of the callback function. 
 
 - Name: reservation
 Parameters: reservationInfo (JSON object with fields- user, start, end, stops, override, justification, needsTrunk, needsOffRoad, needsRack), callback (function)
