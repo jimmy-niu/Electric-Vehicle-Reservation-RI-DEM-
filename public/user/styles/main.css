@@ -28,6 +28,9 @@ body {
     color: white;
 }
 
+.none{
+    display: none;
+}
 /* Sliding facts */
 .carousel {
     margin-left: 80px;
@@ -130,6 +133,10 @@ h3 {
 /* Vehicle reservation card */
 .card {
     margin: 10px;
+}
+
+.btn {
+    margin-right: 0.5vw !important;
 }
 
 /* Button to edit a reservation */
