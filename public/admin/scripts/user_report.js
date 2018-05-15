@@ -18,8 +18,8 @@ $(document).ready(function() {
     });
     
     adminSocket.on('newReport', function(report){
-        for(let i = 0; i < reports.rowCount; i++){
-            new Report(reports.rows[i]);
+        for(let i = 0; i < report.rowCount; i++){
+            new Report(report.rows[i]);
         }
     });
 
