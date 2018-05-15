@@ -25,7 +25,7 @@
             <div id = "first-part">
                 <img id="logo" src="./media/ri-dem-logo.png" alt="DEM logo">
                 <div id = "title" >
-                    <span style = "font-size: 6vh;">F</span>leet Management
+                    Fleet Management
                 </div>
             </div>
             <div>
@@ -78,7 +78,7 @@
                         </form>
                         Upload Image:
                         <form id="frmUploader" enctype="multipart/form-data" method="POST" action="api/Upload/">
-                            <input id = "imageInput" type="file" accept = ".png, .jpg, .jpeg" name="imgUploader">
+                            <input id = "imageInput" type="file" accept = "image/*" name="imgUploader">
                             <input type="submit" name="submit" id="btnSubmit" value="Upload"/>
                             <input id="imageFileName" type="text" style="display: none;" value="noPicture.png"/>
                         </form>

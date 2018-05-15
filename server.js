@@ -421,9 +421,7 @@ io.of('/user').on('connection', function(socket) {
         var endISO = endDate.toISOString().split('.')[0]+"Z";
         //console.log(user + "'s upcoming DEM trip (" + license + ")", startDate, endDate);
         removeEvent(user + "'s upcoming DEM trip (" + license + ")", startISO, endISO);
-        conn.query('SELECT * FROM reservations WHERE user = ?', [user], function(error, data){
-            socket.emit('reservationChange', data);
-        });
+
         conn.query('SELECT * FROM reservations', function(error, data){
             io.of('/admin').emit('reservationChange', data);
         });
@@ -786,7 +784,9 @@ function newReservation(socket, reservationInfo, isEdit){
                     reservationInfo.license = data.rows[0].license;
                     reservationInfo.isEV = data.rows[0].isEV;
                     reservationInfo.image = data.rows[0].image;
-                    socket.emit('newReservation', data, reservationInfo, isEdit, canCarpool, carpoolUsers);
+                    reservationInfo.canCarpool = canCarpool;
+                    reservationInfo.carpoolUsers = carpoolUsers;
+                    socket.emit('newReservation', data, reservationInfo, isEdit);
                 } else {
                     socket.emit('noVehicle');
                 }

@@ -24,7 +24,7 @@
         <!-- Sockets -->
         <script src="/socket.io/socket.io.js"></script>
 
-        <!-- Flatpicker for datepicker -->
+        <!-- Flatpickr for datepicker -->
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
         <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 
@@ -46,7 +46,7 @@
             <!-- User Greeting -->
             <div>
                 <div id = "user">
-                    <span id = "user_email">Welcome, dem_test_u@outlook.com <br>
+                    <span id = "user_email">Welcome, %user% <br>
 
                     </span>
                     <!-- Logout button -->
@@ -631,6 +631,7 @@
                                 <!-- Make sure user actually wants to cancel reservation -->
                                 Are you sure you want to cancel your reservation?  This action cannot be undone.
                             </div>
+                            <span id="cancelres_id" class='d.none'></span>
                             <div class="modal-footer">
                                 <!-- Cancel the cancellation (go back) -->
                                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Go back</button>

@@ -3,8 +3,11 @@ let userSocket = io.connect('http://localhost:8080/user', {forceNew: true});
 
 let userEmail = "";
 
-let currentCar = undefined;
+//current information for reservation being made or edited
+let currentReservation = undefined;
+//list of alternative vehicles for current reservation
 let alternateVehicles = [];
+//this state indicates if user is editing or making a new reservation
 let isEditing = false;
 
 
@@ -16,27 +19,37 @@ var autocompletes = {};
 var autocompletes_edit = {};
 var directionsDisplay = null;
 
+flatpickr(".datePicker", {
+        enableTime: true,
+        dateFormat: "Y-m-d H:i",
+        minDate: "today"
+});
+
+jQuery.fn.carousel.Constructor.TRANSITION_DURATION = 5000;
+
 // Sets up the sockets.
 $(document).ready(function() {
     initialize(map);
     $("#add-stop").click(addDestination);
 
+    //button handlers to add more destination fields
+    $("#add-stop").click(addDestination);
     $("#add-stop-edit").click(addDestination);
 
     $("#resModal").on("shown.bs.modal", function () {
         google.maps.event.trigger(map, "resize");
     });
 
+    //button handlers for cancel and make report
     $("#cancel-res").click(cancelReservation);
     $("#submit-report").click(submitFeedback);
 
+    //gets user email from DOM to use when making a reservation
     userEmail = $("#user_email").html().replace("Welcome, ", "").replace(" <br>", "").replace("\n", "").trim();
-    console.log(userEmail);
-    
+
+    //emits join event when user first loads page
     userSocket.emit('join',userEmail, function(reservations){
-        console.log("hello")
-        console.log(reservations);
-        //console.log(reservations.rows[0].reservations.id);
+        //loads all upcoming and past reservations for this user
         for(var i = 0; i < reservations.rows.length; i++){
             let a = reservations.rows[i].end;
             let n = new Date(Date.now());
@@ -49,23 +62,19 @@ $(document).ready(function() {
         }
     });
 
-    userSocket.on('reservationChange', function(reservations){
-        console.log("reservation change");
-        $("." + idToDelete).remove();
-    });
-
     userSocket.on('reassignReservation', function(data){
         console.log("reservations reassigned");
     });
 
+    //listens for newReservation event to be emitted by the server 
     userSocket.on('newReservation', function(vehicles, reservation, isEdit, canCarpool, carpoolUsers){
-        console.log('new reservation made');
-        currentCar = reservation;
-        console.log(currentCar);
-        currentCar.canCarpool = canCarpool;
-        currentCar.carpoolUsers = carpoolUsers;
+        //sets current info to the info about the new reservation
+        currentReservation = reservation;
+
+        //sets alternativeVehicles to the alternative vehicles for this new reservation 
         alternateVehicles = vehicles;
-        console.log(alternateVehicles)
+
+        //different text depending only whether there are any alternative vehicles
         if(alternateVehicles.rows.length === 1){
             if(isEditing){
                 $("#select-alt-vehicle-edit").html("There is only one vehicle that meets your needs.");
@@ -80,72 +89,63 @@ $(document).ready(function() {
                 $("#select-alt-vehicle").html("Please select a vehicle.");
             }
         }
+
+        //sets global variable isEditing to value returned by callback
         isEditing = isEdit;
+
+        //formats stops for display
+        let stopsArray = JSON.parse(reservation.stops);
+        let stop = "<ol>";
+        for(let i=0; i<stopsArray.length; i++){
+            stop += `<li>${stopsArray[i]}</li>`;
+        }
+        stop += "</ol>";
+
+        //fills in information for vehicle assignment modal
         if(isEditing){
             $("#carMakeMText-edit").html($("#carMakeMText-edit").html() + reservation.model);
             $("#plateNumberMText-edit").html($("#plateNumberMText-edit").html() + reservation.license);
             $("#startMText-edit").html($("#startMText-edit").html() + reservation.start);
             $("#endMText-edit").html($("#endMText-edit").html() + reservation.end);
-            $("#stopsMText-edit").html($("#stopsMText-edit").html() + JSON.parse(reservation.stops));
+            $("#stopsMText-edit").html($("#stopsMText-edit").html() + "<br>" + stop);
+            
+            //make vehicle assignment modal for edit appear
             $("#resModal-edit").modal();
         } else {
             $("#carMakeMText").html($("#carMakeMText").html() + reservation.model);
             $("#plateNumberMText").html($("#plateNumberMText").html() + reservation.license);
             $("#startMText").html($("#startMText").html() + reservation.start);
             $("#endMText").html($("#endMText").html() + reservation.end);
-
-            let stopsArray = JSON.parse(reservation.stops);
-            let stop = "<ol>";
-            for(let i=0; i<stopsArray.length; i++){
-                stop += `<li>${stopsArray[i]}</li>`;
-            }
-            stop += "</ol>";
-
             $("#stopsMText").html($("#stopsMText").html() + "<br>" + stop);
-            $("#resModal").modal();
+
+            //make vehicle assignment modal appear
+            $("#resModal").modal(); 
         }
     });
 
-    userSocket.on('reservationID', function(id){
-        currentCar.addClass('id');
-        console.log($("." + id))
-    });
-
-    userSocket.on('reservationOverride', function(reservations){
-        console.log("reservation vehicle override");
-    });
-
-    userSocket.on('alternateVehicles', function(vehicles, reservationInfo){
-        alternateVehicles = vehicles;
-    });
-
+    //listens for server to emit noVehicle event
+    //there are no eligible vehicles for the inputted reservation criteria
     userSocket.on('noVehicle', function(){
         if(isEditing){
             $("#messageMText-edit").html("There is no vehicle available at that time that meets your needs.");
-            $('#errorModal-edit').modal();
+            $('#errorModal-edit').modal(); //pops up error modal with new text
         } else {
             $("#messageMText").html("There is no vehicle available at that time that meets your needs.");
-            $('#errorModal').modal();
+            $('#errorModal').modal(); //pops up error modal with new text
         }
     });
 
+    //listens for server to emit isOverlap event
+    //dates inputted overlap with an upcoming reservation of the same user
     userSocket.on('isOverlap', function(){
         if(isEditing){
             $("#messageMText-edit").html("You have an existing reservation that overlaps with the times you selected.");
-            $('#errorModal-edit').modal();
+            $('#errorModal-edit').modal(); //pops up error modal with new text
         } else {
             $("#messageMText").html("You have an existing reservation that overlaps with the times you selected.");
-            $('#errorModal').modal();
+            $('#errorModal').modal(); //pops up error modal with new text
         }
     });
-
-    flatpickr(".datePicker", {
-        enableTime: true,
-        dateFormat: "Y-m-d H:i",
-        minDate: "today"
-    });
-
-    jQuery.fn.carousel.Constructor.TRANSITION_DURATION = 5000;
 
 
     let reservationTimer = setInterval(function(){
@@ -277,146 +277,10 @@ function sortOnKeys(dict) {
     return tempDict;
 }
 
-function cleanFields(){
-    if(isEditing){
-        console.log('clean edit')
-        $("#carMakeMText-edit").html("<span class='reservation-label'>Car Model</span>: ");
-        $("#plateNumberMText-edit").html("<span class='reservation-label'>License Plate</span>: ");
-        $("#startMText-edit").html("<span class='reservation-label'>Start Time</span>: ");
-        $("#endMText-edit").html("<span class='reservation-label'>End Time</span>: ");
-        $("#stopsMText-edit").html("<span class='reservation-label'>Stops</span>: ");
-
-        $("#distanceMText").html(`<span class="reservation-label">Total distance</span>: `);
-        $("#durationMText").html(`<span class="reservation-label">Total duration</span>: `);
-
-        $("#new-stops-edit").empty();
-    } else {
-        $("#carMakeMText").html("<span class='reservation-label'>Car Model</span>: ");
-        $("#plateNumberMText").html("<span class='reservation-label'>License Plate</span>: ");
-        $("#startMText").html("<span class='reservation-label'>Start Time</span>: ");
-        $("#endMText").html("<span class='reservation-label'>End Time</span>: ");
-        $("#stopsMText").html("<span class='reservation-label'>Stops</span>: ");
-
-        $("#distanceMText").html(`<span class="reservation-label">Total distance</span>: `);
-        $("#durationMText").html(`<span class="reservation-label">Total duration</span>: `);
-
-        $("#newReservationBody")
-            .find("input,textarea,select")
-            .val('')
-            .end()
-            .find("input[type=checkbox], input[type=radio]")
-            .prop("checked", "")
-            .end();
-        $("#new-stops").empty();
-    }
-    autocompletes = {};
-}
-
-$('#modal1').on('hidden.bs.modal', function (e) {
-
-})
-
-function override(){
-    if(isEditing){
-        currentCar.justification = $("#reasoning-field-edit").val();
-    } else{
-        currentCar.justification = $("#reasoning-field").val();
-    }
-    currentCar.override = true;
-    renderCar();
-}
-
-function renderCar(){
-    if(isEditing){
-        let id = $("#reservation-id-edit").html();
-        userSocket.emit('editReservation', currentCar, id, function(){
-            currentCar.id = id;
-
-            $("#start_" + id).html(currentCar.start)
-            $("#end_" + id).html(currentCar.end)
-            $("#stops_" + id).html(JSON.parse(currentCar.stops))
-            $("#model_" + id).html(currentCar.model);
-            $("#license_" + id).html(currentCar.license);
-
-            sortReservations();
-
-            $("#reasoning-field-edit").val("");
-
-            cleanFields();
-
-            carpoolAlert(currentCar.user, currentCar.canCarpool, currentCar.carpoolUsers);
-            currentCar = undefined;
-        });
-    } else {
-        userSocket.emit('addReservation', currentCar, function(id){
-            currentCar.id = id;
-
-            new Reservation(currentCar);
-            sortReservations();
-
-            $("#reasoning-field").val("");
-
-            cleanFields();
-
-            carpoolAlert(currentCar.user, currentCar.canCarpool, currentCar.carpoolUsers);
-            currentCar = undefined;
-        });
-    }
-}
-
-function carpoolAlert(user, canCarpool, carpoolUsers){
-    if(canCarpool){
-        $("#carpoolUsersList").empty();
-        for(let i = 0; i < carpoolUsers.length; i++){
-            console.log(carpoolUsers[i])
-            if (carpoolUsers[i] != user){
-                $("#carpoolUsersList").append("<li class = 'list-group-item'>" + carpoolUsers[i] + "</li>");
-            }
-        }
-        $("#carpoolModal").modal();
-    }
-}
-
-function setVehicle(index){
-    currentCar.license = alternateVehicles.rows[index].license;
-    currentCar.model = alternateVehicles.rows[index].model;
-    currentCar.image = alternateVehicles.rows[index].image;
-}
-
-function altVehicles(){
-    if(isEditing){
-        if($("#reasoning-field-edit").val().trim().length > 0){
-            $("#appealModal-edit").modal('hide');
-            $("#altModal-edit").modal();
-            $("#justification-help-edit").addClass('d-none');
-
-            $("#altVehiclesForm-edit").empty();
-            for(let i = 0; i < alternateVehicles.rowCount; i++){
-                let command = alternateVehicles.rows[i].model + " || " + alternateVehicles.rows[i].license + ` <input type = "radio" name="altVehiclesGroup-edit" onclick = "setVehicle(${i})"><br>`
-                $("#altVehiclesForm-edit").append(command);
-            }
-            //cleanFields();
-        } else {
-            $("#justification-help-edit").removeClass('d-none');
-        }
-    } else {
-        if($("#reasoning-field").val().trim().length > 0){
-            $("#appealModal").modal('hide');
-            $("#altModal").modal();
-            $("#justification-help").addClass('d-none');
-
-            $("#altVehiclesForm").empty();
-            for(let i = 0; i < alternateVehicles.rowCount; i++){
-                let command = alternateVehicles.rows[i].model + " || " + alternateVehicles.rows[i].license + ` <input type = "radio" name="altVehiclesGroup" onclick = "setVehicle(${i})"><br>`
-                $("#altVehiclesForm").append(command);
-            }
-            //cleanFields();
-        } else {
-            $("#justification-help").removeClass('d-none');
-        }
-    }
-}
-
+/**
+ * This function gets the information the user inputted and send it to the back end for
+ * vehicle assigment.
+ */
 function newReservation() {
     var bounds = new google.maps.LatLngBounds();
     var ac_sorted = Object.values(sortOnKeys(autocompletes));
@@ -453,6 +317,7 @@ function newReservation() {
         }
     });
 
+    //gets user inputted date/time
     let start = $("#start-date").val();
     let end = $("#end-date").val();
 
@@ -466,60 +331,46 @@ function newReservation() {
     //the reservation is in the present
     if(startDate >= endDate || startDate < today){
         $("#messageMText").html("The dates you entered are invalid. Please go back and try again.");
-        $('#errorModal').modal();
+        $('#errorModal').modal(); //pops up error modal with new text
     } else {
+        //creates an array of the user inputted stops
         let stops = [];
         $('.route-stop').each(function() {
             stops.push($(this).val());
         });
 
+        //gets extra feature info inputted by user
         let trunk = $("#trunk").prop('checked');
         let offroad = $("#offroading").prop('checked');
         let rack = $('#kayak').prop('checked');
+
+        //makes JSON object with data from user
         let resData = {user: userEmail, start: start, end: end, stops: JSON.stringify(stops).split('},{').join('}, {'), override: false, justification: "", needsTrunk: trunk, needsOffRoad: offroad, needsRack: rack};
-        userSocket.emit('reservation', resData, function(){
-
-        });
-        //2018-05-09 03:00
-        //alert(end);
-        var endDateString = endDate.getFullYear() + "-" + ("0"+(endDate.getMonth() + 1)).slice(-2) + "-" + ("0" + endDate.getDate()).slice(-2) + " " + ("0" + (endDate.getHours() + 6)).slice(-2) + ":" + ("0" + endDate.getMinutes()).slice(-2);
-        // alert(endDateString)
-        /*if (23 > 20) {
-            let resData = {user: userEmail, start: endDate.toString(), end: (new Date(endDate.setHours(endDate.getHours() + 2))).toString(), stops: "", override: false, justification: "", needsTrunk: false, needsOffRoad: false, needsRack: false};
-            userSocket.emit('reservation', resData, function(){
-
-            });
-        }*/
+        //sends data to back end for vehicle assignment
+        userSocket.emit('reservation', resData);
     }
 }
 
-function cancelReservation(){
-    let start = $("#start_" + idToDelete).html();
-    let end = $("#end_" + idToDelete).html();
-    let model = $("#model_" + idToDelete).html();
-    let license = $("#license_" + idToDelete).html();
-
-    userSocket.emit('cancel', idToDelete, userEmail, model, license, start, end, function(){
-    });
-
-    $("." + idToDelete).remove();
-    cleanFields();
-}
-function cancelReservationProcess(){
-    console.log(currentCar.id);
-    userSocket.emit('cancel', currentCar.rows[0].id, userEmail,function(){
-    });
-    cleanFields();
-}
-
-function fillInEditModal(data){
+/**
+ * This function populates the fields in the edit modal with the current values for the
+ * reservation.
+ * @params
+ * id: the id of the reservation user is editing
+ */
+function fillInEditModal(id){
     isEditing = true; 
 
-    $("#reservation-id-edit").html(data.id);
-    $("#start-date-edit").val(data.start);
-    $("#end-date-edit").val(data.end);
+    let data = JSON.parse($("#res_data_" + id).html());
 
-    let stopsArr = JSON.parse(data.stops)
+    let start = data.start;
+    let end = data.end;
+    let stops = data.stops;
+
+    $("#reservation-id-edit").html(id);
+    $("#start-date-edit").val(start);
+    $("#end-date-edit").val(end);
+
+    let stopsArr = JSON.parse(stops);
 
     let numExtraStops = stopsArr.length - 3;
     if(numExtraStops > 0){
@@ -554,11 +405,10 @@ function fillInEditModal(data){
     }
 }
 
-// function addIDToModal(reservationObj){
-//     $("#reservation-id-edit").html(reservationObj.id);
-//     idToDelete = reservationObj.id;
-// }
-
+/*
+ * This function gets the user inputted values for editing the reservation and sends them
+ * to the back end for vehicle (re)-assignment.
+ */
 function editReservation() {
     var totalDistance = 0;
     var totalDuration = 0;
@@ -597,7 +447,10 @@ function editReservation() {
         }
     });
 
+    //gets id from modal
     let id =  $("#reservation-id-edit").html();
+
+    //gets user inputted date/time
     let start = $("#start-date-edit").val();
     let end = $("#end-date-edit").val();
 
@@ -611,101 +464,212 @@ function editReservation() {
     //the reservation is in the present
     if(startDate >= endDate || startDate < today){
         $("#messageMText-edit").html("The dates you entered are invalid. Please go back and try again.");
-        $('#errorModal-edit').modal();
+        $('#errorModal-edit').modal(); //pops up error modal with new text
     } else {
+        //creates an array from the user inputted destinations
         let stops = [];
         $('.route-stop-edit').each(function() {
             stops.push($(this).val());
         });
 
+        //gets extra feature info from the checkboxes
         let trunk = $("#trunk-edit").prop('checked');
         let offroad = $("#offroading-edit").prop('checked');
         let rack = $('#kayak-edit').prop('checked');
 
+        //makes JSON object with updated reservation info and send it to the back end
         let resData = {id: id, user: userEmail, start: start, end: end, stops: JSON.stringify(stops).split('},{').join('}, {'), override: false, justification: "", needsTrunk: trunk, needsOffRoad: offroad, needsRack: rack};
-        userSocket.emit('edit', resData, function(){
-
-        });
-        idToDelete = id;
+        userSocket.emit('edit', resData);
     }
 }
 
+/**
+ * This function sends the reservation details to the back end so the reservation can be 
+ * added to the database, and displays the reservation card on the front end.
+ */
+function renderCar(){
+    if(isEditing){
+        //gets id so database knows which reservation to update
+        let id = $("#reservation-id-edit").html();
+        //sends updated information to the back end
+        userSocket.emit('editReservation', currentReservation, id, function(){
+            currentReservation.id = id;
 
-function submitFeedback(reservationID){
+            //updates reservation card
+            $("#start_" + id).html(currentReservation.start)
+            $("#end_" + id).html(currentReservation.end)
+            $("#stops_" + id).html(JSON.parse(currentReservation.stops))
+            $("#model_" + id).html(currentReservation.model);
+            $("#license_" + id).html(currentReservation.license);
+            $("#res_data_" + id).html(JSON.stringify(currentReservation));
+
+            sortReservations();
+
+            $("#reasoning-field-edit").val("");
+
+            cleanFields();
+
+            carpoolAlert(currentReservation.user, currentReservation.canCarpool, currentReservation.carpoolUsers);
+            
+            currentReservation = undefined;
+        });
+    } else {
+        //sends new reservation information to the backend
+        userSocket.emit('addReservation', currentReservation, function(id){
+            currentReservation.id = id;
+
+            //makes a new reservation object and displays the card
+            new Reservation(currentReservation);
+            sortReservations();
+
+            $("#reasoning-field").val("");
+
+            cleanFields();
+
+            carpoolAlert(currentReservation.user, currentReservation.canCarpool, currentReservation.carpoolUsers);
+            
+            currentReservation = undefined;
+        });
+    }
+}
+
+/*
+ * This function pops up an alert for the user if their reservation is at the same time and
+ * has the same route as someone else's reservation. 
+ * @params
+ * user: the user who is making/editing the current reservation
+ * canCarpool: true if there exists other users the user can carpool with for this reservation
+ * carpoolUsers: list of users with reservations at same time, traveling the same route
+ */
+function carpoolAlert(user, canCarpool, carpoolUsers){
+    if(canCarpool){
+        $("#carpoolUsersList").empty();
+        for(let i = 0; i < carpoolUsers.length; i++){
+            if (carpoolUsers[i] != user){
+                $("#carpoolUsersList").append("<li class = 'list-group-item'>" + carpoolUsers[i] + "</li>");
+            }
+        }
+        $("#carpoolModal").modal(); //displays carpool alert modal with list of potential carpool companions
+    }
+}
+
+/*
+ * This function is called if the user clicked the confirm alternative vehicle button, 
+ * therefore overriding their originally assigned vehicle.
+ */
+function override(){
+    //saves justification so it can be sent to back end
+    if(isEditing){
+        currentReservation.justification = $("#reasoning-field-edit").val();
+    } else{
+        currentReservation.justification = $("#reasoning-field").val();
+    }
+    //sets to true so back end knows its an override
+    currentReservation.override = true;
+    //display reservation card and send information to back end
+    renderCar();
+}
+
+/*
+ * This function is called when the user selects an alternative vehicle. It updates the current 
+ * reservation to contain this new information. 
+ * @params
+ * index: the index in the list alternativeVehicles of the car the user chose
+ */
+function setVehicle(index){
+    currentReservation.license = alternateVehicles.rows[index].license;
+    currentReservation.model = alternateVehicles.rows[index].model;
+    currentReservation.image = alternateVehicles.rows[index].image;
+}
+
+/*
+ * This function validates the justification input, populates the list of alternative vehicles,
+ * and makes the modal with that list appear.
+ */
+function altVehicles(){
+    if(isEditing){
+        //checks if user wrote some text in the justification field
+        if($("#reasoning-field-edit").val().trim().length > 0){
+            //hides appeal modal and shows list of alt vehicles
+            $("#appealModal-edit").modal('hide');
+            $("#altModal-edit").modal();
+            $("#justification-help-edit").addClass('d-none');
+
+            //populates list of alt vehicles
+            $("#altVehiclesForm-edit").empty();
+            for(let i = 0; i < alternateVehicles.rowCount; i++){
+                let command = alternateVehicles.rows[i].model + " || " + alternateVehicles.rows[i].license + ` <input type = "radio" name="altVehiclesGroup-edit" onclick = "setVehicle(${i})"><br>`
+                $("#altVehiclesForm-edit").append(command);
+            }
+        } else {
+            //shows text alerting the user they must enter a justification
+            $("#justification-help-edit").removeClass('d-none');
+        }
+    } else {
+        //checks if user wrote some text in the justification field
+        if($("#reasoning-field").val().trim().length > 0){
+            //hides appeal modal and shows list of alt vehicles
+            $("#appealModal").modal('hide');
+            $("#altModal").modal();
+            $("#justification-help").addClass('d-none');
+
+            //populates list of alt vehicles
+            $("#altVehiclesForm").empty();
+            for(let i = 0; i < alternateVehicles.rowCount; i++){
+                let command = alternateVehicles.rows[i].model + " || " + alternateVehicles.rows[i].license + ` <input type = "radio" name="altVehiclesGroup" onclick = "setVehicle(${i})"><br>`
+                $("#altVehiclesForm").append(command);
+            }
+        } else {
+            //shows text alerting the user they must enter a justification
+            $("#justification-help").removeClass('d-none');
+        }
+    }
+}
+
+/**
+ * This function is called when the user presses the 'yes, cancel my reservation' button;
+ * it cancels the reservation, removing it visually and from the database.
+ */
+function cancelReservation(){
+    //gets id from cancel confirmation modal
+    let id = $("#cancelres_id").html();
+
+    //gets reservation info from reservation card
+    let start = $("#start_" + id).html();
+    let end = $("#end_" + id).html();
+    let model = $("#model_" + id).html();
+    let license = $("#license_" + id).html();
+
+    //tells back end to remove the reservation from the database
+    userSocket.emit('cancel', id, userEmail, model, license, start, end);
+
+    //visually removed the reservation card
+    $("." + id).remove();
+
+    cleanFields();
+}
+
+/**
+ * This function stores the reservation id in the cancel confirmation modal so it can be
+ * used in the cancelReservation() function.
+ * @params
+ * id: the id of the reservation staged for cancellation
+ */
+function setCancelID(id){
+    $("#cancelres_id").html(id);
+}
+
+/**
+ * This function gets the user input from the report modal and sends it to the back end.
+ * @params
+ * id: the id of the reservation the report is about
+ */
+function submitFeedback(id){
     let report = $('#report-area').val();
     let serviceNeeded = $('#service-needed').is(":checked");
     let cleaningNeeded = $('#cleaning-needed').is(":checked");
     let notCharging = $('#not-charging').is(":checked");
-    userSocket.emit('reportAdded', reservationID, report, serviceNeeded, cleaningNeeded, notCharging);
-}
-
-let idToDelete = "";
-function setDeleteCard(obj){
-    idToDelete = obj.id;
-}
-
-class Reservation {
-
-    constructor(reservationData) {
-
-        if(reservationData.isEV == true){
-            reservationData.border = "border-success";
-        } else {
-            reservationData.border = "border-danger";
-        }
-        console.log(reservationData);
-        this.addToDom(reservationData);
-
-    }
-    addToDom(r) {
-        let data = JSON.stringify(r);
-        //console.log(r.id)
-        let imageFilePath = "./media/vehicle_images/"
-        let DOMobject = `<div class="card ${r.border} mb-3 ${r.id} upcomingReservation" style="width: 18rem;">`
-        + `<img class = "card-img-top" src="${imageFilePath + r.image}">`
-        + `<div class="card-body">`
-        + `<h5 class="card-title"><span id="model_${r.id}" class="card-model">${r.model}</span> <span id="license_${r.id}" class="card-license">${r.license}</span></h5>`
-        + `<p class="card-text"><strong>Start</strong>: <span id="start_${r.id}" class="card-start">${r.start}</span> <br>`
-        + `<strong>End</strong>:<span id="end_${r.id}" class="card-end">${r.end}</span> <br>`
-        + `<strong>Route</strong>: <span id = "stops_${r.id}">${JSON.parse(r.stops)}</span> </p>`
-        + `<span style = "display: none;" id = "res-id">${r.id}</span>`
-        + `<a href="#" id = "${r.id}" class="btn btn-primary edit" data-toggle="modal" data-target="#editModal" onclick = 'fillInEditModal(${data});'>Edit reservation</a>`
-        + `<a href="#" id = "${r.id}" class="btn btn-secondary" data-toggle="modal" data-target="#cancelModal" onclick = "setDeleteCard(this);">Cancel</a>`
-        + `</div>`
-        + `</div>`;
-
-        $('.cards').append(DOMobject);
-        //console.log(DOMobject)
-    }
-}
-
-class OldReservation {
-    constructor(reservationData) {
-        if(reservationData.isEV == true){
-            reservationData.border = "border-success";
-        } else {
-            reservationData.border = "border-danger";
-        }
-        this.addToDom(reservationData);
-    }
-    addToDom(r) {
-        let imageFilePath = "./media/vehicle_images/";
-        let DOMobject = `<div class="card mb-3 ${r.border}" style="width: 18rem;">
-<img class = "card-img-top" src="${imageFilePath + r.image}">
-<div class="card-body">
-<h5 class="card-title">${r.model} ${r.license}</h5>
-<p class="card-text"><strong>Start</strong>: ${r.start}<br>
-<strong>End</strong>: ${r.end}</p>
-<a href="#" class="btn btn-primary edit" data-toggle="modal" data-target="#reportModal">Make report </a>
-</div>
-</div>`;
-        $('#old-reservations').prepend(DOMobject);
-    }
-}
-
-
-function overrideVehicle(reservationID, license, model, justification){
-    userSocket.emit('vehicleOverride', reservationID, license, model, justification);
+    userSocket.emit('reportAdded', id, report, serviceNeeded, cleaningNeeded, notCharging);
 }
 
 function sortReservations(){
@@ -726,4 +690,100 @@ function sortReservations(){
     });
 
     reservations.detach().appendTo(cards);
+}
+
+/*
+ * This function clears the modal fields so that the data doesn't persist between discrete
+ * actions.
+ */
+function cleanFields(){
+    if(isEditing){
+        console.log('clean edit')
+        $("#carMakeMText-edit").html("<span class='reservation-label'>Car Model</span>: ");
+        $("#plateNumberMText-edit").html("<span class='reservation-label'>License Plate</span>: ");
+        $("#startMText-edit").html("<span class='reservation-label'>Start Time</span>: ");
+        $("#endMText-edit").html("<span class='reservation-label'>End Time</span>: ");
+        $("#stopsMText-edit").html("<span class='reservation-label'>Stops</span>: ");
+
+        $("#distanceMText").html(`<span class="reservation-label">Total distance</span>: `);
+        $("#durationMText").html(`<span class="reservation-label">Total duration</span>: `);
+
+        $("#new-stops-edit").empty();
+    } else {
+        $("#carMakeMText").html("<span class='reservation-label'>Car Model</span>: ");
+        $("#plateNumberMText").html("<span class='reservation-label'>License Plate</span>: ");
+        $("#startMText").html("<span class='reservation-label'>Start Time</span>: ");
+        $("#endMText").html("<span class='reservation-label'>End Time</span>: ");
+        $("#stopsMText").html("<span class='reservation-label'>Stops</span>: ");
+
+        $("#distanceMText").html(`<span class="reservation-label">Total distance</span>: `);
+        $("#durationMText").html(`<span class="reservation-label">Total duration</span>: `);
+
+        $("#newReservationBody")
+            .find("input,textarea,select")
+            .val('')
+            .end()
+            .find("input[type=checkbox], input[type=radio]")
+            .prop("checked", "")
+            .end();
+        $("#new-stops").empty();
+    }
+    autocompletes = {};
+}
+
+class Reservation {
+
+    constructor(reservationData) {
+
+        if(reservationData.isEV == true){
+            reservationData.border = "border-success";
+        } else {
+            reservationData.border = "border-danger";
+        }
+        console.log(reservationData);
+        this.addToDom(reservationData);
+
+    }
+    addToDom(r) {
+        let data = JSON.stringify(r);
+        //console.log(r.id)
+        let imageFilePath = "./media/vehicle_images/"
+        let DOMobject = `<div class="card ${r.border} mb-3 ${r.id} upcomingReservation" style="width: 18rem;">`
+            + `<img class = "card-img-top" src="${imageFilePath + r.image}">`
+            + `<div class="card-body">`
+            + `<h5 class="card-title"><span id="model_${r.id}" class="card-model">${r.model}</span> <span id="license_${r.id}" class="card-license">${r.license}</span></h5>`
+            + `<p class="card-text"><strong>Start</strong>: <span id="start_${r.id}" class="card-start">${r.start}</span> <br>`
+            + `<strong>End</strong>:<span id="end_${r.id}" class="card-end">${r.end}</span> <br>`
+            + `<strong>Route</strong>: <span id = "stops_${r.id}">${JSON.parse(r.stops)}</span> </p>`
+            + `<span style = "display: none;" id = "res_data_${r.id}">${data}</span>`
+            + `<a href="#" class="btn btn-primary edit" data-toggle="modal" data-target="#editModal" onclick = 'fillInEditModal(${r.id});'>Edit reservation</a>`
+            + `<a href="#" class="btn btn-secondary" data-toggle="modal" data-target="#cancelModal" onclick = "setCancelID(${r.id});">Cancel</a>`
+            + `</div>`
+            + `</div>`;
+        $('.cards').append(DOMobject);
+    }
+}
+
+class OldReservation {
+    constructor(reservationData) {
+        if(reservationData.isEV == true){
+            reservationData.border = "border-success";
+        } else {
+            reservationData.border = "border-danger";
+        }
+        this.addToDom(reservationData);
+    }
+    addToDom(r) {
+        let imageFilePath = "./media/vehicle_images/";
+        let DOMobject = `<div class="card mb-3 ${r.border}" style="width: 18rem;">`
+            + `<img class = "card-img-top" src="${imageFilePath + r.image}">`
+            + `<div class="card-body">`
+            + `<h5 class="card-title">${r.model} ${r.license}</h5>`
+            + `<p class="card-text"><strong>Start</strong>: ${r.start}<br>`
+            + `<strong>End</strong>: ${r.end}</p>`
+            + `<a href="#" class="btn btn-primary edit" data-toggle="modal" data-target="#reportModal">Make report </a>`
+            + `</div>`
+            + `</div>`;
+        $('#old-reservations').prepend(DOMobject);
+    }
 }
