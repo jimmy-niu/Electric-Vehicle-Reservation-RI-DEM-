@@ -543,7 +543,7 @@ app.get('/auth/outlook',
         function(req, res) {
 });
 
-app.get('/admin/download/users', 
+app.get('/admin/download/users',
     function(req, res) {
     var user_email = req.user._json.EmailAddress;
     if (adminEmails.includes(user_email)) {
@@ -588,7 +588,7 @@ app.get('/admin/download/reservations',
     }
 });
 
-app.get('/admin/download/reports', 
+app.get('/admin/download/reports',
     function(req, res) {
     var user_email = req.user._json.EmailAddress;
     if (adminEmails.includes(user_email)) {
@@ -923,16 +923,6 @@ app.post("/admin/api/Upload", upload.single("imgUploader"), function (req, res) 
 
 
 
-
-// //Users
-// conn.query('CREATE TABLE IF NOT EXISTS users(id INTEGER PRIMARY KEY AUTOINCREMENT, email TEXT, admin BOOLEAN)');
-// //Resevervations
-// conn.query('CREATE TABLE IF NOT EXISTS vehicles(id TEXT, license TEXT, model TEXT, color TEXT, inService BOOLEAN, miles DOUBLE PRECISION, isEV BOOLEAN, extraTrunk BOOLEAN, offRoad BOOLEAN, equipRack BOOLEAN, featureScore INTEGER, image TEXT)');
-// //Vehicles
-// conn.query('CREATE TABLE IF NOT EXISTS reservations(id INTEGER PRIMARY KEY AUTOINCREMENT, user TEXT, license TEXT, model TEXT, start TEXT, end TEXT, stops TEXT, override BOOLEAN, justification TEXT, needsTrunk BOOLEAN, needsOffRoad BOOLEAN, needsRack BOOLEAN, image TEXT)');
-// //Reports
-// conn.query('CREATE TABLE IF NOT EXISTS reports(id INTEGER PRIMARY KEY AUTOINCREMENT, reservation INTEGER, report TEXT, needsService BOOLEAN, needsCleaning BOOLEAN, notCharging BOOLEAN)');
-
 function exportUsers(callback){
     conn.query('SELECT * FROM users', function(error, data){
         let users = data.rows;
@@ -953,7 +943,6 @@ function exportUsers(callback){
             }
         });
     });
-
 }
 
 function exportVehicles(callback){
