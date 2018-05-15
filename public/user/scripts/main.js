@@ -563,7 +563,7 @@ function renderCar(){
             let endDate = moment(currentReservation.end, "YYYY-MM-DD HH:mm")
             let cooldownEnd = moment(currentReservation.end, "YYYY-MM-DD HH:mm").add(2, 'hours');
 
-            let cooldown = {user: 'dem_do-not-reply@outlook.com', start: currentReservation.end, end: cooldownEnd.format("YYYY-MM-DD HH:mm"), stops: null, override: false, justification: "", needsTrunk: false, needsOffRoad: false, needsRack: false};
+            let cooldown = {user: 'dem_do-not-reply@outlook.com', start: currentReservation.end, end: cooldownEnd.format("YYYY-MM-DD HH:mm"), license: currentReservation.license, model: currentReservation.model, stops: null, override: false, justification: "", needsTrunk: false, needsOffRoad: false, needsRack: false};
             userSocket.emit('addReservation', cooldown, function(id){
 
             });
