@@ -82,20 +82,20 @@ conn.query('CREATE TABLE IF NOT EXISTS users(id INTEGER PRIMARY KEY AUTOINCREMEN
 //Resevervations
 conn.query('CREATE TABLE IF NOT EXISTS vehicles(id TEXT, license TEXT, model TEXT, color TEXT, inService BOOLEAN, miles DOUBLE PRECISION, isEV BOOLEAN, extraTrunk BOOLEAN, offRoad BOOLEAN, equipRack BOOLEAN, featureScore INTEGER, image TEXT)');
 //Vehicles
-conn.query('CREATE TABLE IF NOT EXISTS reservations(id INTEGER PRIMARY KEY AUTOINCREMENT, user TEXT, license TEXT, model TEXT, start TEXT, end TEXT, stops TEXT, override BOOLEAN, justification TEXT, needsTrunk BOOLEAN, needsOffRoad BOOLEAN, needsRack BOOLEAN, image TEXT)');
+conn.query('CREATE TABLE IF NOT EXISTS reservations(id INTEGER PRIMARY KEY AUTOINCREMENT, user TEXT, license TEXT, model TEXT, start TEXT, end TEXT, stops TEXT, override BOOLEAN, justification TEXT, needsTrunk BOOLEAN, needsOffRoad BOOLEAN, needsRack BOOLEAN, image TEXT, archived BOOLEAN)');
 //Reports
 conn.query('CREATE TABLE IF NOT EXISTS reports(id INTEGER PRIMARY KEY AUTOINCREMENT, reservation INTEGER, report TEXT, needsService BOOLEAN, needsCleaning BOOLEAN, notCharging BOOLEAN)');
 
 //test data
-conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',["jenna.tishler@gmail.com", "1322", "2015 FORD CMAX", "2018-05-21 11:00", "2018-05-21 15:00", JSON.stringify(["563 North Main Street, Providence, RI, USA", "565 Atwells Avenue, Providence, RI, USA", "563 North Main Street, Providence, RI, USA"]), false, "", false, false, false, "fordcmax.jpg"]);
-conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',["jenna_tishler@brown.edu", "704", "2015 FORD CMAX", "2018-05-10 01:00", "2018-05-10 03:00", JSON.stringify(["home", "work", "home"]), false, "", false, false, false, "fordcmax.jpg"]);
-conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',["emily_kasbohm@brown.edu", "2254", "2016 FORD CMAX", "2018-05-21 11:00", "2018-05-21 15:00", JSON.stringify(["563 North Main Street, Providence, RI, USA", "565 Atwells Avenue, Providence, RI, USA", "563 North Main Street, Providence, RI, USA"]), false, "", false, false, false, "fordcmax.jpg"]);
-conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',["dem_test_u_2@outlook.com", "1869", "2011 CHEVROLET EQUINOX", "2018-05-06 14:00", "2018-05-06 17:00", JSON.stringify(["home", "work"]), true, "I have a reason.", false, false, false, "2011chevroletequinox.jpg"]);
-conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',["dem_test_u_2@outlook.com", "2254", "2016 FORD CMAX", "2018-05-21 10:00", "2018-05-21 10:30", JSON.stringify(["work", "beach"]), false, "", false, false, false, "fordcmax.jpg"]);
-conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',["dem_test_u@outlook.com", "704", "2015 FORD CMAX", "2017-05-19 11:00", "2017-05-20 11:00", JSON.stringify(["home", "work"]), false, "", false, false, false, "fordcmax.jpg"]);
-conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',["dem_test_u@outlook.com", "1322", "2015 FORD CMAX", "2011-05-18 11:00", "2011-05-18 15:00", JSON.stringify(["Work", "Home"]), false, "", false, false, false, "fordcmax.jpg"]);
-conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',["dem_test_u@outlook.com", "704", "2015 FORD CMAX", "2010-05-19 11:00", "2010-05-20 11:00", JSON.stringify(["home", "work"]), false, "", false, false, false, "fordcmax.jpg"]);
-conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',["dem_test_u@outlook.com", "2254", "2016 FORD CMAX", "2013-05-21 11:00", "2013-05-21 15:00", JSON.stringify(["563 North Main Street, Providence, RI, USA", "565 Atwells Avenue, Providence, RI, USA", "563 North Main Street, Providence, RI, USA"]), false, "", false, false, false, "fordcmax.jpg"]);
+conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',["jenna.tishler@gmail.com", "1322", "2015 FORD CMAX", "2018-05-21 11:00", "2018-05-21 15:00", JSON.stringify(["563 North Main Street, Providence, RI, USA", "565 Atwells Avenue, Providence, RI, USA", "563 North Main Street, Providence, RI, USA"]), false, "", false, false, false, "fordcmax.jpg", true]);
+conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',["jenna_tishler@brown.edu", "704", "2015 FORD CMAX", "2018-05-10 01:00", "2018-05-10 03:00", JSON.stringify(["home", "work", "home"]), false, "", false, false, false, "fordcmax.jpg", false]);
+conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',["emily_kasbohm@brown.edu", "2254", "2016 FORD CMAX", "2018-05-21 11:00", "2018-05-21 15:00", JSON.stringify(["563 North Main Street, Providence, RI, USA", "565 Atwells Avenue, Providence, RI, USA", "563 North Main Street, Providence, RI, USA"]), false, "", false, false, false, "fordcmax.jpg", false]);
+conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',["dem_test_u_2@outlook.com", "1869", "2011 CHEVROLET EQUINOX", "2018-05-06 14:00", "2018-05-06 17:00", JSON.stringify(["home", "work"]), true, "I have a reason.", false, false, false, "2011chevroletequinox.jpg", false]);
+conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',["dem_test_u_2@outlook.com", "2254", "2016 FORD CMAX", "2018-05-21 10:00", "2018-05-21 10:30", JSON.stringify(["work", "beach"]), false, "", false, false, false, "fordcmax.jpg", false]);
+conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',["dem_test_u@outlook.com", "704", "2015 FORD CMAX", "2017-05-19 11:00", "2017-05-20 11:00", JSON.stringify(["home", "work"]), false, "", false, false, false, "fordcmax.jpg", false]);
+conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',["dem_test_u@outlook.com", "1322", "2015 FORD CMAX", "2011-05-18 11:00", "2011-05-18 15:00", JSON.stringify(["Work", "Home"]), false, "", false, false, false, "fordcmax.jpg", false]);
+conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',["dem_test_u@outlook.com", "704", "2015 FORD CMAX", "2010-05-19 11:00", "2010-05-20 11:00", JSON.stringify(["home", "work"]), false, "", false, false, false, "fordcmax.jpg", false]);
+conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',["dem_test_u@outlook.com", "2254", "2016 FORD CMAX", "2013-05-21 11:00", "2013-05-21 15:00", JSON.stringify(["563 North Main Street, Providence, RI, USA", "565 Atwells Avenue, Providence, RI, USA", "563 North Main Street, Providence, RI, USA"]), false, "", false, false, false, "fordcmax.jpg", false]);
 
 conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, null, ?)', ["JF2GPBCC3FH253482", "1011", "2016 SUBARU XV", "Black/White", true, 11451.5, false, true, true, false, "2016subaruxv.jpg"]);
 conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, null, ?)', ["1FMCU59329KC41390", "1018", "2009 FORD ESCAPE", "Black/White", true, 151071.5, false, true, true, false, "2009fordescape.jpg"]);
@@ -112,15 +112,15 @@ conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, null, ?)',
 conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, null, ?)', ["2GNF1CEK9C6333734", "1869", "2011 CHEVROLET EQUINOX", "Black/White", true, 27513.0, false, true, true, false, "2011chevroletequinox.jpg"]);
 conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, null, ?)', ["1FMCU59H18KA54880", "1994", "2008 FORD ESCAPE", "Black/White", true, 235952.9, false, true, true, false, "2008fordescape.jpg"]);
 conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, null, ?)', ["1FMCU59H38KA54881", "2140", "2008 FORD ESCAPE", "Black/White", true, 77522.0, false, true, true, false, "2008fordescape.jpg"]);
-//conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', ["1FTYR10D67PA83081", "2224", "2007 FORD RANGER", "Black/White", true, 40558.2, false, true, true, true, "2007fordranger.jpg"]);
+//conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, null, ?)', ["1FTYR10D67PA83081", "2224", "2007 FORD RANGER", "Black/White", true, 40558.2, false, true, true, true, "2007fordranger.jpg"]);
 conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, null, ?)', ["1G1RA6E47EU133964", "2242", "2014 CHEVROLET VOLT", "Black", true, 9391.1, true, false, false, false, "2014chevroletvolt.jpg"]);
 conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, null, ?)', ["1FADP5CU6FL121721", "2254", "2016 FORD CMAX", "Black", true, 17993.8, true, false, false, false, "fordcmax.jpg"]);
 conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, null, ?)', ["JHMES96663S028859", "2468", "2004 HONDA CIVIC", "Black/White", true, 363.6, false, false, false, false, "2004hondacivic"]);
 conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, null, ?)', ["1FADP5CU8FL121722", "2472", "2015 FORD CMAX", "Black", true, 9327.3, true, false, false, false, "fordcmax.jpg"]);
 conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, null, ?)', ["1FADP5CU2FL121716", "2473", "2015 FORD CMAX", "Black", true, 13772.9, true, false, false, false, "fordcmax.jpg"]);
 conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, null, ?)', ["1GBDV13W07D219007", "2579", "2007 CHEVROLET UPLANDER", "Black/White", true, 36831.4, false, true, false, false, "2007chevroletuplander.jpg"]);
-//conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', ["1FTPW14587FB58781", "2709", "2007 FORD F150", "Black/White", true, 167668.3, false, true, true, true, "2007fordf150.jpg"]);
-//conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', ["1FTYR10D47PA83080", "315", "2007 FORD RANGER", "Black/White", true, 43196.2, false, true, true, true, "2007fordranger.jpg"]);
+//conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, null, ?)', ["1FTPW14587FB58781", "2709", "2007 FORD F150", "Black/White", true, 167668.3, false, true, true, true, "2007fordf150.jpg"]);
+//conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, null, ?)', ["1FTYR10D47PA83080", "315", "2007 FORD RANGER", "Black/White", true, 43196.2, false, true, true, true, "2007fordranger.jpg"]);
 conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, null, ?)', ["1FADP5CU0FL121715", "704", "2015 FORD CMAX", "Black", true, 5868.7, true, false, false, false, "fordcmax.jpg"]);
 conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, null, ?)', ["1FADP5CU8FL121719", "739", "2015 FORD CMAX", "Black", true, 7883.3, true, false, false, false, "fordcmax.jpg"]);
 conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, null, ?)', ["1FADP5CU6FL121718", "827", "2015 FORD CMAX", "Black", true, 9055.6, true, false, false, false, "fordcmax.jpg"]);
@@ -162,11 +162,14 @@ io.of('/admin').on('connection', function(socket){
 
     socket.on('updatePage', function(callback){
         updateAdminReservations();
+        updateAdminArchived();
         updateVehicles();
         updateReports();
         updateUsers();
         callback();
     });
+
+    socket.on('reservationArchived', setReservationArchived);
 
     socket.on('vehicleRemoved', function(license, callback){
         removeVehicle(license);
@@ -195,6 +198,7 @@ io.of('/admin').on('connection', function(socket){
 
 /**
  * This function adds a reservation as an event to the user's outlook calendar.
+ *
  * @params
  * title: String that contains user and license
  * bodytext: String that contains license, model, stops
@@ -318,23 +322,7 @@ io.of('/user').on('connection', function(socket) {
     });
 
     //used when the user confirms creation of new reservation
-    socket.on('addReservation', function(reservationInfo, callback){
-        //adds reservation to database
-        conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',[reservationInfo.user, reservationInfo.license, reservationInfo.model, reservationInfo.start, reservationInfo.end, reservationInfo.stops, reservationInfo.override, reservationInfo.justification, reservationInfo.needsTrunk, reservationInfo.needsOffRoad, reservationInfo.needsRack, reservationInfo.image],function(error, data){
-            //get information about newest reservation to the admin
-            conn.query('SELECT * FROM reservations WHERE id = ?', [data.lastInsertId], function(error, resData){
-                //sends back id created by database so client has it
-                callback(data.lastInsertId);
-                //sends new reservation to admins
-                io.of('/admin').emit("newReservation", resData);
-
-                //adds reservation to user's calendar
-                var start = new Date(reservationInfo.start);
-                var end = new Date(reservationInfo.end);
-                addEvent(reservationInfo.user + "'s upcoming DEM trip (" + reservationInfo.license + ")", reservationInfo.model + " " + reservationInfo.license + "\n" + reservationInfo.stops, start.toISOString(), end.toISOString());
-            });
-        });
-    });
+    socket.on('addReservation', insertReservation);
 
     //used when the user confirms the edit of a reservation
     socket.on('editReservation', function(reservationInfo, id, oldData, callback){
@@ -343,9 +331,9 @@ io.of('/user').on('connection', function(socket) {
     })
 
     //used when the user cancels a reservation
-    socket.on('cancel', function(reservationID, user, model, license, start, end, callback){
+    socket.on('cancel', function(reservationID, user, model, license, start, end){
         //removes reservation from database
-        cancelReservation(reservationID);
+        cancelReservation(reservationID, user, model, license, start, end);
     });
 
     //used when the user submits a report about a reservation
@@ -353,6 +341,23 @@ io.of('/user').on('connection', function(socket) {
         submitFeedback(reservationID, resport, needsService, needsCleaning, notCharging);
     });
 });
+
+function insertReservation(reservationInfo, callback){
+    conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',[reservationInfo.user, reservationInfo.license, reservationInfo.model, reservationInfo.start, reservationInfo.end, reservationInfo.stops, reservationInfo.override, reservationInfo.justification, reservationInfo.needsTrunk, reservationInfo.needsOffRoad, reservationInfo.needsRack, reservationInfo.image, false],function(error, data){
+        //get information about newest reservation to the admin
+        conn.query('SELECT * FROM reservations WHERE id = ?', [data.lastInsertId], function(error, resData){
+            //sends back id created by database so client has it
+            callback(data.lastInsertId);
+            //sends new reservation to admins
+            io.of('/admin').emit("newReservation", resData);
+
+            //adds reservation to user's calendar
+            var start = new Date(reservationInfo.start);
+            var end = new Date(reservationInfo.end);
+            addEvent(reservationInfo.user + "'s upcoming DEM trip (" + reservationInfo.license + ")", reservationInfo.model + " " + reservationInfo.license + "\n" + reservationInfo.stops, start.toISOString(), end.toISOString());
+        });
+    });
+}
 
 /**
  * Sets up the landing page to index.html.
@@ -524,10 +529,30 @@ app.all('*', function(req,res,next) {
 
 // ADMIN helper functions
 function updateAdminReservations(){
-    conn.query('SELECT * FROM reservations', function(error, data){
+    conn.query('SELECT * FROM reservations WHERE archived = ?', [false], function(error, data){
         io.of('/admin').emit('reservationChange', data);
     });
 }
+
+function setReservationArchived(id, status){
+    console.log("We in set reservationId");
+    console.log(id + " || " + status);
+    conn.query('UPDATE reservations SET archived = ? WHERE id = ?', [status, id], function (error){
+        if(error){
+            console.log('ERROR: ' + error);
+        } else {
+            updateAdminArchived();
+            updateAdminReservations();
+        }
+    });
+}
+
+function updateAdminArchived(){
+    conn.query('SELECT * FROM reservations WHERE archived = ?', [true], function(error, data){
+        io.of('/admin').emit('archivedReservations', data);
+    });
+}
+
 function updateVehicles(){
     conn.query('SELECT * FROM vehicles',function(error, data){
         io.of('/admin').emit('vehicleChange', data);
@@ -548,9 +573,9 @@ function editVehicle(vehicle, oldStatus){
             console.log(oldStatus);
             if(vehicle.inService === true && oldStatus === false){
                 reassignReservations(vehicle.license);
-            } else {
-                updateVehicles();
+
             }
+            updateVehicles();
         });
     });
 }
@@ -624,6 +649,7 @@ function removeUser(email){
  * This function checks if the reservation overlaps with another one of the same user's reservations,
  * checks if the user can carpool with others, and assigns a vehicle to the reservation. The assigned
  * vehicle and list of alternative vehicles is sent back to the client.
+ *
  * @params
  * socket: socket of user making the reservation
  * reservationInfo: data user submitted about reservation
@@ -705,6 +731,7 @@ function assignVehicle(socket, reservationInfo, oldData, isEdit){
 
 /**
  * This function updates the given reservation in the database to contain the updated information, and then sends that information to the admins.
+ *
  * @params
  * reservationInfo: updated information about the reservation
  * id: reservation id
@@ -738,22 +765,25 @@ function editReservation(reservationInfo, id, oldData, callback){
  * @params
  * id: the id of the reservation to be cancelled
  */
-function cancelReservation(id){
+function cancelReservation(id, user, model, license, start, end, callback){
     conn.query('DELETE FROM reservations WHERE id = ?', [id]);
 
     //removes event from user's calendar
     var startDate = new Date(start);
     var endDate = new Date(end);
+    console.log(start)
+    console.log(startDate)
     var startISO = startDate.toISOString().split('.')[0]+"Z";
     var endISO = endDate.toISOString().split('.')[0]+"Z";
     removeEvent(user + "'s upcoming DEM trip (" + license + ")", startISO, endISO);
 
     //tells admin clients which reservation to delete from table
-    io.of('/admin').emit('reservationCancellation', reservationID);
+    io.of('/admin').emit('reservationCancellation', id);
 }
 
 /**
  * This function adds the new report to the database, and emails the admin with information from the report.
+ *
  * @params
  * reservationID: id of the reservation connected to the report
  * report: text of the report
@@ -808,14 +838,47 @@ function reassignReservations(license){
             conn.query('SELECT license, model, image FROM vehicles WHERE inService != ? AND extraTrunk >= ? AND license != ? AND offRoad >= ? AND equipRack >= ? AND license NOT IN (SELECT license FROM reservations WHERE start <= ? AND end >= ?) ORDER BY isEV DESC, (extraTrunk + offRoad + equipRack) ASC, miles ASC', [true, reservationInfo.needsTrunk, license, reservationInfo.needsOffRoad, reservationInfo.needsRack, reservationInfo.end, reservationInfo.start], function(error, data){
                 console.log(data);
                 if(data !== undefined && data.rows.length !== 0){
+                    let mailOptions = {
+                        from: 'dem_do-not-reply@outlook.com',
+                        to: reservationInfo.user,
+                        subject: 'Important Change to Your Reservation',
+                        html: '<p>The vehicle you had reserved is now unavailable. You have been assigned a new vehicle. If you would like to change your vehicle, you can edit your reservation on the website.</p>'
+                            + '<h4>Old Vehicle: </h4>' + '<p>' + reservationInfo.model + " " + license + '</p>' + '<h4>Start: </h4>' + '<p>' + reservationInfo.start + '</p>' + '<h4>End: </h4>' + '<p>'
+                            + reservationInfo.end + '</p>' + '<h4>New Vehicle:</h4>' + '<p>' + data.rows[0].model + " " + data.rows[0].license + '</p>'
+                    };
+                    transporter.sendMail(mailOptions, function(error, info){
+                        if (error) {
+                            console.log(error);
+                        } else {
+                            console.log('Email sent: ' + info.response);
+                        }
+                    });
+
+
                     conn.query('UPDATE reservations SET license = ?, model = ?, image = ? WHERE id = ?',[data.rows[0].license, data.rows[0].model, data.rows[0].image, reservationInfo.id],function(error, data){
                         conn.query('SELECT * FROM reservations WHERE id = ?', [reservationInfo.id], function(error, data){
                             io.of('/admin').emit("newReservation", data);
                         });
                     });
                 } else {
-                    cancelReservation(reservationInfo.id);
-                    //Send email
+                    cancelReservation(reservationInfo.id, reservationInfo.user, reservationInfo.model, reservationInfo.license, reservationInfo.start, reservationInfo.end);
+
+                    let mailOptions = {
+                        from: 'dem_do-not-reply@outlook.com',
+                        to: reservationInfo.user,
+                        subject: 'Important Change to Your Reservation',
+                        html: '<p>The vehicle you had reserved is now unavailable. Unfortunately, there are no other vehicles available at this time that meet your needs. You can use the website to make a new '
+                        + 'reservation with different criteria.</p>' + '<h3>Cancelled Reservation Details:</h3>' + '<h4>Vehicle: </h4>' + '<p>' + reservationInfo.model + " " + license + '</p>' + '<h4>Start: </h4>'
+                        + '<p>' + reservationInfo.start + '</p>' + '<h4>End: </h4>' + '<p>' + reservationInfo.end + '</p>'
+                    };
+                    transporter.sendMail(mailOptions, function(error, info){
+                        if (error) {
+                            console.log(error);
+                        } else {
+                            console.log('Email sent: ' + info.response);
+                        }
+                    });
+>>>>>>> origin/master
                 }
             });
         }
