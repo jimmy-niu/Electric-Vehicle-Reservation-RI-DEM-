@@ -10,7 +10,7 @@ https://jimmy-niu.github.io/cs132FinalProject/public/index.html -->
 - Run `node server.js` to start the server
 - Navigate to `localhost:8080` in the browser
 
-## Front end to Back end Connection with Socket.io
+## Front End to Back End Connection with Socket.io
 We are connecting the frontend and the backend using socket.io. There are two namespaces, user and admin to distinguish between events for the two different types of users. Below are listed all the handlers along with the file that contains the handler. The corresponding server or client side file contains the emitter for each handler.
 
 Socket Handlers:
