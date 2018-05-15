@@ -115,7 +115,6 @@ function fillInEditModal(vehicleData){
 }
 
 function editVehicle(oldStatus){
-    console.log("old" + oldStatus);
     let id = $('#vinField-edit').val();
     let license = $('#licenseField-edit').val();
     let model = $('#modelField-edit').val();
