@@ -558,9 +558,9 @@ function editVehicle(vehicle, oldStatus){
             console.log(oldStatus);
             if(vehicle.inService === true && oldStatus === false){
                 reassignReservations(vehicle.license);
-
+            } else {
+                updateVehicles();
             }
-            updateVehicles();
         });
     });
 }
