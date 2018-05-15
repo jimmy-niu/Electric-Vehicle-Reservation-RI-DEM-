@@ -312,7 +312,7 @@ io.of('/user').on('connection', function(socket) {
     //used when the user submits information for a new reservation
     socket.on('reservation', function(reservationInfo, callback){
         //this function will asign a vehicle for the reservation
-        assignVehicle(socket, reservationInfo, false);
+        assignVehicle(socket, reservationInfo, null, false);
     });
 
     //used when user submits information an edited reservation
