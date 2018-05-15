@@ -419,8 +419,7 @@ function altVehicles(){
 
 function newReservation() {
     var bounds = new google.maps.LatLngBounds();
-    var ac_sorted = Object.values(sortOnKeys(autocompletes))
-    alert(JSON.stringify(sortOnKeys(autocompletes)));
+    var ac_sorted = Object.values(sortOnKeys(autocompletes));
     var directionsService = new google.maps.DirectionsService;
     directionsDisplay.setMap(map);
 
