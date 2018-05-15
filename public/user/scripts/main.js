@@ -682,6 +682,14 @@ function submitFeedback(id){
     userSocket.emit('reportAdded', id, report, serviceNeeded, cleaningNeeded, notCharging);
 }
 
+/**
+ * This function is called when the make report button is pressed, so it clears the text
+ * box in the modal before it appears.
+ */
+function clearReportModal(){
+    $('#report-area').val("");
+}
+
 function sortReservations(){
     var cards = $('.cards');
     var reservations = $('.upcomingReservation');
@@ -791,7 +799,7 @@ class OldReservation {
         + `<h5 class="card-title">${r.model} ${r.license}</h5>`
         + `<p class="card-text"><strong>Start</strong>: ${r.start}<br>`
         + `<strong>End</strong>: ${r.end}</p>`
-        + `<a href="#" class="btn btn-primary edit" data-toggle="modal" data-target="#reportModal">Make report </a>`
+        + `<a href="#" class="btn btn-primary edit" data-toggle="modal" data-target="#reportModal" onclick = "clearReportModal()">Make report </a>`
         + `</div>`
         + `</div>`;
         $('#old-reservations').prepend(DOMobject);
