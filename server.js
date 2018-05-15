@@ -347,16 +347,6 @@ io.of('/user').on('connection', function(socket) {
     socket.on('cancel', function(reservationID, user, model, license, start, end, callback){
         //removes reservation from database
         cancelReservation(reservationID);
-
-        //removes event from user's calendar
-        var startDate = new Date(start);
-        var endDate = new Date(end);
-        var startISO = startDate.toISOString().split('.')[0]+"Z";
-        var endISO = endDate.toISOString().split('.')[0]+"Z";
-        removeEvent(user + "'s upcoming DEM trip (" + license + ")", startISO, endISO);
-
-        //tells admin clients which reservation to delete from table
-        io.of('/admin').emit('reservationCancellation', reservationID);
     });
 
     //used when the user submits a report about a reservation
@@ -728,13 +718,14 @@ function editReservation(reservationInfo, id, oldData, callback){
             //sends updated reservation info to admin
             io.of('/admin').emit("reservationChange", data);
 
+            //remove old calendar event
             var startDate = new Date(oldData.start);
             var endDate = new Date(oldData.end);
             var startISO = startDate.toISOString().split('.')[0]+"Z";
             var endISO = endDate.toISOString().split('.')[0]+"Z";
             removeEvent(reservationInfo.user + "'s upcoming DEM trip (" + oldData.license + ")", startISO, endISO);
             
-            //Calendar event
+            //adds calendar event with updated information
             var start = new Date(reservationInfo.start);
             var end = new Date(reservationInfo.end);
             addEvent(reservationInfo.user + "'s upcoming DEM trip (" + reservationInfo.license + ")", reservationInfo.model + " " + reservationInfo.license + "\n" + reservationInfo.stops, start.toISOString(), end.toISOString());
@@ -742,17 +733,42 @@ function editReservation(reservationInfo, id, oldData, callback){
     });
 }
 
+/**
+ * This function cancels the given reservation and removes it from the user's calendar.
+ * @params
+ * id: the id of the reservation to be cancelled
+ */
 function cancelReservation(id){
-    conn.query('DELETE FROM reservations WHERE id = ?', [id], function(error, data){
-        console.log('cancelled');
-    });
+    conn.query('DELETE FROM reservations WHERE id = ?', [id]);
+
+    //removes event from user's calendar
+    var startDate = new Date(start);
+    var endDate = new Date(end);
+    var startISO = startDate.toISOString().split('.')[0]+"Z";
+    var endISO = endDate.toISOString().split('.')[0]+"Z";
+    removeEvent(user + "'s upcoming DEM trip (" + license + ")", startISO, endISO);
+
+    //tells admin clients which reservation to delete from table
+    io.of('/admin').emit('reservationCancellation', reservationID);
 }
 
+/**
+ * This function adds the new report to the database, and emails the admin with information from the report.
+ * @params
+ * reservationID: id of the reservation connected to the report
+ * report: text of the report
+ * needsService: boolean indicating if the car needs immediate service
+ * needsCleaning: boolean indicating if the car needs immediate cleaning
+ * notCharging: boolean indicating if the car is not charging/no charging spot was available
+ */
 function submitFeedback(reservationID, report, needsService, needsCleaning, notCharging){
+    //adds report to database
     conn.query("INSERT INTO reports VALUES(null, ?, ?, ?, ?, ?)", [reservationID, report, needsService, needsCleaning, notCharging], function(error, data){
+        //sends report to admins
         updateReports();
     });
 
+    //gets reservation details to include in email
     conn.query('SELECT * FROM reservations WHERE id = ?', [5], function(error, data){
         let mailOptions = {
             from: 'dem_do-not-reply@outlook.com',
@@ -770,64 +786,16 @@ function submitFeedback(reservationID, report, needsService, needsCleaning, notC
     });
 }
 
-function carpoolNotification(reservationInfo){
-    var transporter = nodemailer.createTransport({
-        pool: true,
-        maxConnections: 10,
-        host: "smtp-mail.outlook.com", // hostname
-        secureConnection: false, // TLS requires secureConnection to be false
-        port: 587, // port for secure SMTP
-        auth: {
-            user: 'dem_do-not-reply@outlook.com',
-            pass: 'DEMnoreply123'
-        },
-        tls: {
-            ciphers:'SSLv3'
-        }
-    });
-
-    console.log("You can carpool!");
-    let mailOptionsList = [];
-    for(let i = 0; i < reservationInfo.carpoolUsers.length; i++){
-        let mailOptions = {
-            from: 'dem_do-not-reply@outlook.com',
-            to: reservationInfo.carpoolUsers[i],
-            subject: 'Carpool Notifcation',
-            html: "<h2>Carpool Alert!</h2>" +
-                "<p>You are receiving this email because you and at least one other " +
-                "user have made reservations at the same exact time with the same route. " +
-                "We strongly encourage you to talk to them and arrange a carpool. By " +
-                "carpooling just twice a week, 1,600 pounds of greenhouse gases can be " +
-                "kept out of the air each year. Here is a list of the people you can " +
-                "carpool with: " + JSON.stringify(reservationInfo.carpoolUsers) + "</p>" +
-                "<h5>Reservation Details</h5>" + "<p><strong>Vehicle:</strong>" + reservationInfo.model +
-                " " + reservationInfo.license + "</p>" + "<p><strong>Start:</strong>" + reservationInfo.start +
-                "</p>" + "<p><strong>End:</strong>" + reservationInfo.end + "</p>"
-        }
-        mailOptionsList.push(mailOptions);
-    }
-
-    transporter.on('idle', function(){
-        //send next message from the pending queue
-        console.log("idle")
-        while (transporter.isIdle() && mailOptionsList.length > 0) {
-            console.log("email")
-            transporter.sendMail (mailOptionsList.shift(), function(error, info){
-                if (error) {
-                    console.log(error);
-                } else {
-                    console.log('Email sent: ' + info.response);
-                }
-            });
-        }
-    });
-}
-
+/**
+ * This function updates the mileage of the vehicle with the given license place by adding the given amount of miles.
+ * @params
+ * license: license plate of car to be updated
+ * miles: miles to add to mileage of car
+ */
 function updateVehicleMiles(license, miles){
     conn.query('UPDATE vehicles SET miles = miles + ? WHERE license = ?', [miles, license]);
 }
 
-//id TEXT, license TEXT, model TEXT, color TEXT, inService BOOLEAN, miles DOUBLE PRECISION, isEV BOOLEAN, extraTrunk BOOLEAN, offRoad BOOLEAN, equipRack BOOLEAN
 function reassignReservations(license){
     conn.query('SELECT * FROM reservations WHERE license = ? ORDER BY id ASC', [license], function(error, data){
         for(let i = 0; i < data.rowCount; i ++){
