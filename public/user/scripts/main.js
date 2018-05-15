@@ -712,11 +712,13 @@ function setCancelID(id){
  * @params
  * id: the id of the reservation the report is about
  */
-function submitFeedback(id){
+function submitFeedback(){
     let report = $('#report-area').val();
     let serviceNeeded = $('#service-needed').is(":checked");
     let cleaningNeeded = $('#cleaning-needed').is(":checked");
     let notCharging = $('#not-charging').is(":checked");
+    let id = $('#report-id').html();
+
     userSocket.emit('reportAdded', id, report, serviceNeeded, cleaningNeeded, notCharging);
 }
 
@@ -724,8 +726,13 @@ function submitFeedback(id){
  * This function is called when the make report button is pressed, so it clears the text
  * box in the modal before it appears.
  */
-function clearReportModal(){
+function clearReportModal(id){
     $('#report-area').val("");
+    $('#service-needed').prop("checked", false);
+    $('#cleaning-needed').prop("checked", false);
+    $('#not-charging').prop("checked", false);
+
+    $('#report-id').html(id);
 }
 
 function sortReservations(){
@@ -834,7 +841,7 @@ class OldReservation {
         + `<h5 class="card-title">${r.model} ${r.license}</h5>`
         + `<p class="card-text"><strong>Start</strong>: ${r.start}<br>`
         + `<strong>End</strong>: ${r.end}</p>`
-        + `<a href="#" class="btn btn-primary edit" data-toggle="modal" data-target="#reportModal" onclick = "clearReportModal()">Make report </a>`
+        + `<a href="#" class="btn btn-primary edit" data-toggle="modal" data-target="#reportModal" onclick = "clearReportModal(${r.id})">Make report </a>`
         + `</div>`
         + `</div>`;
         $('#old-reservations').prepend(DOMobject);
