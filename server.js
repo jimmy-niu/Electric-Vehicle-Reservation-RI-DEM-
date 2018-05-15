@@ -162,7 +162,6 @@ io.of('/admin').on('connection', function(socket){
 
     socket.on('updatePage', function(callback){
         loadAdminReservations();
-        updateAdminArchived();
         updateVehicles();
         updateReports();
         updateUsers();
@@ -516,25 +515,23 @@ app.all('*', function(req,res,next) {
 function loadAdminReservations(){
     conn.query('SELECT * FROM reservations WHERE archived = ?', [false], function(error, data){
         io.of('/admin').emit('loadReservations', data);
+        updateAdminArchived();
     });
 }
 
 function setReservationArchived(id, status){
-    console.log("We in set reservationId");
-    console.log(id + " || " + status);
     conn.query('UPDATE reservations SET archived = ? WHERE id = ?', [status, id], function (error){
         if(error){
             console.log('ERROR: ' + error);
         } else {
-            updateAdminArchived();
-            loadAdminReservations();
+            io.of('/admin').emit('singleArchived', id, status);
         }
     });
 }
 
 function updateAdminArchived(){
     conn.query('SELECT * FROM reservations WHERE archived = ?', [true], function(error, data){
-        io.of('/admin').emit('archivedReservations', data);
+        io.of('/admin').emit('loadArchived', data);
     });
 }
 

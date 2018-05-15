@@ -25,6 +25,10 @@ function getBooleanStr(aNumber){
     }
 }
 
+function getBoolean(aNumber){
+    return aNumber === 1;
+}
+
 /*
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  *  Functions below are not currently wired up.

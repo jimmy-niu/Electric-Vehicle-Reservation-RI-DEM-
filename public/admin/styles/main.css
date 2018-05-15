@@ -76,7 +76,7 @@ h2{
 /*****************************************************************/
 
 :root{
-    --reservation_columns: 5% 20% 15% 15% 20% 10% 15%;
+    --reservation_columns: 5% 5% 25% 15% 20% 10% 15%;
     --fleet_columns: 20% 20% 20% 20% 20%;
     --report_columns: 10% 30% 15% 15% 15%;
     --user_columns: 20% 10%;
@@ -173,6 +173,7 @@ h2{
     font-weight: bold;
     text-align: center;
     margin-bottom: 0px;
+    overflow-wrap: break-word;
 }
 
 .col-entry{
@@ -219,4 +220,17 @@ h2{
 .edit {
     background-color: #4c719d;
     border: 0px;
+}
+
+.reservation-archive{
+    font-size: 1.75vw;
+    text-align: center;
+    padding: 1vh 0 0 0;
+    line-height: 1vh;
+    color: lightgrey;
+}
+
+.reservation-archive:hover{
+    cursor: pointer;
+    color: grey;
 }
