@@ -532,7 +532,7 @@ function updateAdminReservations(){
 function updateVehicles(){
     conn.query('SELECT * FROM vehicles',function(error, data){
         io.of('/admin').emit('vehicleChange', data);
-        console.log(data)
+        //console.log(data)
     });
 }
 function addVehicle(vehicle){
@@ -547,9 +547,13 @@ function editVehicle(vehicle){
     console.log(vehicle)
     conn.query('UPDATE vehicles SET license = ?, model = ?, color = ?, miles = ?, inService = ?, isEV = ?, extraTrunk = ?, offRoad = ?, equipRack = ?, image = ? WHERE id = ?',[vehicle.license, vehicle.model, vehicle.color, vehicle.miles, vehicle.inService, vehicle.isEV, vehicle.extraTrunk, vehicle.offRoad, vehicle.equipRack, vehicle.image, vehicle.id],function(error, data){
         conn.query('UPDATE vehicles SET featureScore = extraTrunk + offRoad + equipRack WHERE id = ?', [vehicle.id], function(){
-            updateVehicles();
-            if(vehicle.inService === 1){
+            console.log('reached1');
+            console.log(vehicle.inService);
+            if(vehicle.inService === true){
+                console.log('reached2');
                 reassignReservations(vehicle.license);
+            } else {
+                updateVehicles();
             }
         });
     });
@@ -800,19 +804,11 @@ function reassignReservations(license){
     conn.query('SELECT * FROM reservations WHERE license = ? ORDER BY id ASC', [license], function(error, data){
         for(let i = 0; i < data.rowCount; i ++){
             let reservationInfo = data.rows[i];
-            conn.query('SELECT license, model, image FROM vehicles WHERE extraTrunk >= ? AND license != ? AND offRoad >= ? AND equipRack >= ? AND license NOT IN (SELECT license FROM reservations WHERE start <= ? AND end >= ?) ORDER BY isEV DESC, (extraTrunk + offRoad + equipRack) ASC, miles ASC', [reservationInfo.needsTrunk, license, reservationInfo.needsOffRoad, reservationInfo.needsRack, reservationInfo.end, reservationInfo.start], function(error, data){
+            conn.query('SELECT license, model, image FROM vehicles WHERE inService != ? AND extraTrunk >= ? AND license != ? AND offRoad >= ? AND equipRack >= ? AND license NOT IN (SELECT license FROM reservations WHERE start <= ? AND end >= ?) ORDER BY isEV DESC, (extraTrunk + offRoad + equipRack) ASC, miles ASC', [true, reservationInfo.needsTrunk, license, reservationInfo.needsOffRoad, reservationInfo.needsRack, reservationInfo.end, reservationInfo.start], function(error, data){
                 console.log(data);
                 if(data !== undefined && data.rows.length !== 0){
                     conn.query('UPDATE reservations SET license = ?, model = ?, image = ? WHERE id = ?',[data.rows[0].license, data.rows[0].model, data.rows[0].image, reservationInfo.id],function(error, data){
                         conn.query('SELECT * FROM reservations WHERE id = ?', [reservationInfo.id], function(error, data){
-
-                            // for(let i = 0; i < data.rows.length; i++){
-                            //     if(data.rows[i].user === io.sockets.sockets[i].nickname){
-                            //
-                            //         socket.emit('reassignReservation', data);
-                            //     }
-                            // }
-                            // io.of('/admin').emit("newReservation", data);
                             io.of('/admin').emit("newReservation", data);
                         });
                     });
