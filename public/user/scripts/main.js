@@ -1,5 +1,5 @@
+//import flatpickr from "flatpickr";
 let userSocket = io.connect('http://localhost:8080/user', {forceNew: true});
-// import flatpickr from "flatpickr";
 
 let userEmail = "";
 
