@@ -236,14 +236,14 @@ function updateVehicleStatus(license, status){
     });
 }
 
-function setJustificationModal(text){
+function getJustificationModal(id, text){
     $('#justificationModalText').empty();
     $('#justificationModalText').append(text);
 }
 
 /*
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- *  Classes used to make reservations.
+ *  Classes used to make dom objects.
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  */
 class Reservation {
@@ -252,16 +252,23 @@ class Reservation {
     }
     addToDOM(r){
         let justification = r.justification;
+        let justificationButton = ``;
+        
+        let justificaitonModal = 
         if(justification !== ''){
-            justification = `<a href = "#justificationModal" class = "btn btn-large btn-primary drop-shadow" data-toggle="modal" onclick = "setJustificationModal('${r.justification}')">Click To See</a>`
+            justification_button = `<a href = "#justificationModal_${r.license}" class = "btn btn-large btn-primary drop-shadow" data-toggle="modal" onclick = "setJustificationModal('${r.justification}')">Click To See</a>`
         }
+        
+        
         //console.log(r);
         let DOMobject = `<div class = "col-entry reservation-user ${r.license}">${r.user}</div>`
         + `<div class = "col-entry reservation-start ${r.license}">${r.start}</div>`
         + `<div class = "col-entry reservation-end ${r.license}">${r.end}</div>`
         + `<div class = "col-entry carModel ${r.license}">${r.model}</div>`
         + `<div class = "col-entry reservation-license ${r.license}">${r.license}</div>`
-        + `<div class = "col-entry reservation-pickup> ${r.license}">${justification}</div>`;
+        + `<div class = "col-entry reservation-pickup> ${r.license}">${justificationButton}</div>`;
+        
+        
 
         $('#upcoming').append(DOMobject);
     }
