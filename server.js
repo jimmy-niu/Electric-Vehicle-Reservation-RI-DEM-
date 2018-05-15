@@ -62,7 +62,7 @@ var transporter = nodemailer.createTransport({
     port: 587, // port for secure SMTP
     auth: {
         user: 'dem_do-not-reply@outlook.com',
-        pass: 'DEMnoreply123'
+        pass: 'DEMnoreply123' //this shouldn't be hardcoded in- you should set up an environment variable or something
     },
     tls: {
         ciphers:'SSLv3'

@@ -354,7 +354,6 @@ function newReservation() {
     //convert strings to Date objects
     let startDate = moment(start, "YYYY-MM-DD HH:mm")
     let endDate = moment(end, "YYYY-MM-DD HH:mm")
-    let cooldownEnd = moment(end, "YYYY-MM-DD HH:mm").add(2, 'hours');
     /*alert(startDate);
     alert(endDate);
     alert(cooldownEnd);
@@ -384,8 +383,6 @@ function newReservation() {
         let resData = {user: userEmail, start: start, end: end, stops: JSON.stringify(stops).split('},{').join('}, {'), override: false, justification: "", needsTrunk: trunk, needsOffRoad: offroad, needsRack: rack};
         //sends data to back end for vehicle assignment
         userSocket.emit('reservation', resData);
-        let cooldown = {user: null, start: end, end: cooldownEnd.format("YYYY-MM-DD HH:mm"), stops: null, override: false, justification: "", needsTrunk: false, needsOffRoad: false, needsRack: false};
-        //userSocket.emit('reservation', cooldown);
     }
 }
 
@@ -562,6 +559,15 @@ function renderCar(){
 
             //makes a new reservation object and displays the card
             new Reservation(currentReservation);
+
+            let endDate = moment(currentReservation.end, "YYYY-MM-DD HH:mm")
+            let cooldownEnd = moment(currentReservation.end, "YYYY-MM-DD HH:mm").add(2, 'hours');
+
+            let cooldown = {user: 'dem_do-not-reply@outlook.com', start: currentReservation.end, end: cooldownEnd.format("YYYY-MM-DD HH:mm"), stops: null, override: false, justification: "", needsTrunk: false, needsOffRoad: false, needsRack: false};
+            userSocket.emit('addReservation', cooldown, function(id){
+
+            });
+
             sortReservations();
 
             $("#reasoning-field").val("");
