@@ -718,7 +718,7 @@ function submitFeedback(){
     let cleaningNeeded = $('#cleaning-needed').is(":checked");
     let notCharging = $('#not-charging').is(":checked");
     let id = $('#report-id').html();
-    console.log(id)
+
     userSocket.emit('reportAdded', id, report, serviceNeeded, cleaningNeeded, notCharging);
 }
 
