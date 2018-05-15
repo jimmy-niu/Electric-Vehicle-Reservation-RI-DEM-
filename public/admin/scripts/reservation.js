@@ -16,18 +16,17 @@ $(document).ready(function() {
     });
     
     adminSocket.on('reservationChange', function(res_data){
-        console.log("in resChange");
-        console.log(res_data);
+        editReservation(res_data);
     });
     
     adminSocket.on('reservationCancellation', function(id){
         $(`.res_id_${id}`).remove();
     });
     
-    bindClickHandlers2();
+    bindClickHandlers();
 });
 
-function bindClickHandlers2(){
+function bindClickHandlers(){
     $('#export-reservations').click(function(e){
         e.preventDefault();
         window.location.href = 'download/reservations';
@@ -38,29 +37,6 @@ function bindClickHandlers2(){
         toggleHidden('upcoming_header');
         toggleTitle(this);
     });
-}
-
-function modifyUser() {
-    let email = $('#emailField').val();
-
-    let isAdmin = undefined;
-    if($('#adminChoice').is(':checked') || $('#userChoice').is(':checked')) {
-        isAdmin = $('#adminChoice').is(':checked');
-    }
-
-    let isAdd = undefined;
-    if($('#removeChoice').is(':checked') || $('#addChoice').is(':checked')) {
-        isAdd = $('#addChoice').is(':checked');
-    }
-
-    if(email != undefined && isAdd != undefined){
-        if(isAdd  && isAdmin != undefined){
-            adminSocket.emit('userAdded', email, isAdmin);
-        } else {
-            adminSocket.emit('userRemoved', email);
-        }
-    }
-    clearForms($('#userForm'));
 }
 
 function getJustificationModal(id, text){
@@ -79,6 +55,10 @@ function getJustificationModal(id, text){
     +   `</div>`
     +`</div>`;
     return modal;
+}
+
+function editReservation(res_data){
+    console.log(res_data);
 }
 
 class Reservation {

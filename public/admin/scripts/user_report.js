@@ -45,7 +45,34 @@ function bindClickHandlers(){
     });
 }
 
+function modifyUser() {
+    let email = $('#emailField').val();
 
+    let isAdmin = undefined;
+    if($('#adminChoice').is(':checked') || $('#userChoice').is(':checked')) {
+        isAdmin = $('#adminChoice').is(':checked');
+    }
+
+    let isAdd = undefined;
+    if($('#removeChoice').is(':checked') || $('#addChoice').is(':checked')) {
+        isAdd = $('#addChoice').is(':checked');
+    }
+
+    if(email != undefined && isAdd != undefined){
+        if(isAdd  && isAdmin != undefined){
+            adminSocket.emit('userAdded', email, isAdmin);
+        } else {
+            adminSocket.emit('userRemoved', email);
+        }
+    }
+    clearForms($('#userForm'));
+}
+
+/*
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ *  Classes used to append to the DOM. 
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ */
 class Report {
     constructor(reportData){
         this.addToDOM(reportData);

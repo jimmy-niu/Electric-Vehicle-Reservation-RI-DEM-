@@ -3,7 +3,6 @@ $(document).ready(function() {
     });
     
     adminSocket.on('vehicleChange', function(vehicles){
-        console.log("in vehicle chnage");
         $('#current_fleet').empty();
         for(let i = 0; i < vehicles.rowCount; i++){
             new Vehicle(vehicles.rows[i]);
@@ -149,10 +148,9 @@ function updateVehicleStatus(license, status){
 
 /*
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- *  Class used to appending to the DOM. 
+ *  Class used to append to the DOM. 
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  */
- 
 class Vehicle {
     constructor(vehicleData){
         this.addToDOM(vehicleData);

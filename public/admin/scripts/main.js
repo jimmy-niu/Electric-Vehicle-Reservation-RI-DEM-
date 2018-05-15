@@ -1,5 +1,4 @@
 let adminSocket = io.connect('http://localhost:8080/admin', {forceNew: true});
-let currentVehicle = 0;
 
 function toggleHidden(id){
     document.getElementById(id).classList.toggle('hidden');
