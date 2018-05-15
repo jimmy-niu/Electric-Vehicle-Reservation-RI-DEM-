@@ -676,9 +676,9 @@ function updateReports(){
         io.of('/admin').emit('reportChange', data);
     });
 }
-function updateUsers(){
+function updateUsers(message){
     conn.query('SELECT * FROM users ORDER BY admin DESC', function(error, data){
-        io.of('/admin').emit('userChange', data);
+        io.of('/admin').emit('userChange', data, message);
         populateEmailLists();
     });
 }
@@ -694,8 +694,22 @@ function getSpecificReports(reservation){
 }
 
 function addUser(email, admin){
-    conn.query('INSERT INTO users VALUES(null, ?, ?) IF NOT EXISTS(SELECT * FROM users WHERE email = ?)',[email, admin, email],function(error, data){
-        updateUsers();
+    conn.query('SELECT * FROM users WHERE email = ?', [email], function(error,data){
+        if(data.rowCount === 0){
+            conn.query('INSERT INTO users VALUES(null, ?, ?)',[email, admin],function(error, data){
+                if(admin === 1){
+                    updateUsers(`${email} added as an admin.`);
+                } else {
+                    updateUsers(`${email} added as a user.`);
+                }
+            });
+        } else{
+            if(data.rows[0].admin === 1){
+                updateUsers(`${email} is already an admin.`);
+            } else {
+                updateUsers(`${email} is already a user.`);
+            }
+        }
     });
 }
 

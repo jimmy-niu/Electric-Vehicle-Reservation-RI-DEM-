@@ -7,9 +7,10 @@ $(document).ready(function() {
         // Callback
     });
 
-    adminSocket.on('userChange', function(users){
+    adminSocket.on('userChange', function(users, message){
         console.log("we are in users change!");
         console.log(users);
+        console.log(message);
 
         $('#users').empty();
         for(let i = 0; i < users.rowCount; i++){
@@ -269,8 +270,8 @@ function updateVehicleStatus(license, status){
 }
 
 function getJustificationModal(id, text){
-    let modal = `<div id="justification_modal_${id}" class="modal fade">` 
-    +`<div class="modal-dialog">` 
+    let modal = `<div id="justification_modal_${id}" class="modal fade">`
+    +`<div class="modal-dialog">`
     +   `<div class="modal-content">`
     +       `<div class="modal-header">`
     +           `<h3>Override Justification</h3>`
@@ -314,7 +315,7 @@ class Reservation {
         + `<div class = "col-entry reservation-license ${r.license}">${r.license}</div>`
         + `<div class = "col-entry reservation-pickup> ${r.license}">${justification_button}</div>`
         + modal;
-        
+
         $('#upcoming').append(DOMobject);
     }
 }
