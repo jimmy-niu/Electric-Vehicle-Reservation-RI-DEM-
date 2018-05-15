@@ -269,8 +269,21 @@ function updateVehicleStatus(license, status){
 }
 
 function getJustificationModal(id, text){
-    $('#justificationModalText').empty();
-    $('#justificationModalText').append(text);
+    let modal = `<div id="justification_modal_${id}" class="modal fade">` 
+    +`<div class="modal-dialog">` 
+    +   `<div class="modal-content">`
+    +       `<div class="modal-header">`
+    +           `<h3>Override Justification</h3>`
+    +           `<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>`
+    +       `</div>`
+    +       `<div class="modal-body"> ${text} </div>`
+    +       `<div class="modal-footer">`
+    +            `<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>`
+    +         `</div>`
+    +      `</div>`
+    +   `</div>`
+    +`</div>`;
+    return modal;
 }
 
 /*
@@ -283,22 +296,25 @@ class Reservation {
         this.addToDOM(reservationData);
     }
     addToDOM(r){
-        let justification = r.justification;
-        let justificationButton = ``;
-        
-        let justificaitonModal = 
-        if(justification !== ''){
-            justification_button = `<a href = "#justificationModal_${r.license}" class = "btn btn-large btn-primary drop-shadow" data-toggle="modal" onclick = "setJustificationModal('${r.justification}')">Click To See</a>`
+        let justification_button = "";
+        let modal = "";
+
+        if(r.justification !== '' && r.justification !== null && r.justification !== undefined){
+            modal = getJustificationModal(r.license, r.justification);
+
+            justification_button = `<a href = "#justification_modal_${r.license}" class = "btn btn-large btn-primary drop-shadow" data-toggle="modal">Click To See</a>`;
         }
-        
-        
+
+
         //console.log(r);
         let DOMobject = `<div class = "col-entry reservation-user ${r.license}">${r.user}</div>`
         + `<div class = "col-entry reservation-start ${r.license}">${r.start}</div>`
         + `<div class = "col-entry reservation-end ${r.license}">${r.end}</div>`
         + `<div class = "col-entry carModel ${r.license}">${r.model}</div>`
         + `<div class = "col-entry reservation-license ${r.license}">${r.license}</div>`
-        + `<div class = "col-entry reservation-pickup> ${r.license}">${justificationButton}</div>`;
+        + `<div class = "col-entry reservation-pickup> ${r.license}">${justification_button}</div>`
+        + modal;
+        
         $('#upcoming').append(DOMobject);
     }
 }
@@ -315,14 +331,14 @@ class Vehicle {
         }
         let data = JSON.stringify(v);
         let DOMobject = `<div class = "col-entry ${v.license}">${v.license}</div>` + `<div class = "col-entry ${v.license}">${v.color} ${v.model}</div>`
-                      + `<div class = "col-entry ${v.license}">${v.miles} miles</div>`
-                      + `<div class = "col-entry ${v.license}">${carType}</div>`
-                      + `<div class = "col-entry ${v.license}"><span class="dropdown">`
-                      + `<button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Change Status</button>`
-                      + `<ul class="dropdown-menu">`
-                      + `<a href="#editVehicle" data-toggle="modal" data-target="#editVehicleModal" onclick = 'fillInEditModal(${data});'<li><i class="fa fa-wrench"></i> Edit Car</li></a>`
-                      + `<div onclick = 'deleteVehicle("${v.license}")'><li><i class="fa fa-archive"></i> Retire</li></div>`
-                      + `</ul></span></div>`;
+        + `<div class = "col-entry ${v.license}">${v.miles} miles</div>`
+        + `<div class = "col-entry ${v.license}">${carType}</div>`
+        + `<div class = "col-entry ${v.license}"><span class="dropdown">`
+        + `<button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Change Status</button>`
+        + `<ul class="dropdown-menu">`
+        + `<a href="#editVehicle" data-toggle="modal" data-target="#editVehicleModal" onclick = 'fillInEditModal(${data});'<li><i class="fa fa-wrench"></i> Edit Car</li></a>`
+        + `<div onclick = 'deleteVehicle("${v.license}")'><li><i class="fa fa-archive"></i> Retire</li></div>`
+        + `</ul></span></div>`;
         $('#current_fleet').append(DOMobject);
     }
 }
@@ -334,10 +350,10 @@ class Report {
 
     addToDOM(r){
         let DOMobject = `<div class = "col-entry report-res-id ${r.id}">${r.id}</div>`
-                      + `<div class = "col-entry report-content ${r.id}">${r.report}</div>`
-                      + `<div class = "col-entry needs-cleaning ${r.id}">${getBooleanStr(r.needsCleaning)}</div>`
-                      + `<div class = "col-entry needs-service ${r.id}">${getBooleanStr(r.needsService)}</div>`
-                      + `<div class = "col-entry charging ${r.id}">${getBooleanStr(r.notCharging)}</div>`;
+        + `<div class = "col-entry report-content ${r.id}">${r.report}</div>`
+        + `<div class = "col-entry needs-cleaning ${r.id}">${getBooleanStr(r.needsCleaning)}</div>`
+        + `<div class = "col-entry needs-service ${r.id}">${getBooleanStr(r.needsService)}</div>`
+        + `<div class = "col-entry charging ${r.id}">${getBooleanStr(r.notCharging)}</div>`;
         $('#reports').append(DOMobject);
     }
 }
@@ -349,7 +365,7 @@ class User {
 
     addToDOM(r){
         let DOMobject = `<div class = "col-entry ${r.id}">${r.email}</div>`
-                      + `<div class = "col-entry ${r.id}">${getBooleanStr(r.admin)}</div>`
+        + `<div class = "col-entry ${r.id}">${getBooleanStr(r.admin)}</div>`
         $('#users').append(DOMobject);
     }
 }

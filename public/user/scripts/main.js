@@ -18,24 +18,7 @@ var directionsDisplay = null;
 
 // Sets up the sockets.
 $(document).ready(function() {
-    var mapOptions = {
-        center: new google.maps.LatLng(41.8267, -71.3977),
-        zoom: 15,
-        mapTypeId: google.maps.MapTypeId.ROADMAP
-    };
-    map = new google.maps.Map(document.getElementById("mapCanvas"), mapOptions);
-    map_edit = new google.maps.Map(document.getElementById("mapCanvasEdit"), mapOptions);
-
-    directionsDisplay = new google.maps.DirectionsRenderer;
-
-    if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(function (position) {
-            initialLocation = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
-            map.setCenter(initialLocation);
-            map_edit.setCenter(initialLocation);
-        });
-    }
-    initMap(map);
+    initialize(map);
     $("#add-stop").click(addDestination);
 
     $("#add-stop-edit").click(addDestination);
@@ -45,7 +28,6 @@ $(document).ready(function() {
     });
 
     $("#cancel-res").click(cancelReservation);
-    //$("#add-stop").click(function() {addStop(); return false; });
     $("#submit-report").click(submitFeedback);
 
     userEmail = $("#user_email").html().replace("Welcome, ", "").replace(" <br>", "").replace("\n", "").trim();
@@ -196,16 +178,38 @@ function addDestination(){
     if(isEditing){
         count_edit++;
         addStopEdit(count);
-        initMap(count);
+        initializeListeners();
     } else {
         count++;
         addStop(count);
-        initMap(count);
+        initializeListeners();
     }
 }
 
 
-function initMap(map) {
+function initialize() {
+    var mapOptions = {
+        center: new google.maps.LatLng(41.8267, -71.3977),
+        zoom: 15,
+        mapTypeId: google.maps.MapTypeId.ROADMAP
+    };
+    map = new google.maps.Map(document.getElementById("mapCanvas"), mapOptions);
+    map_edit = new google.maps.Map(document.getElementById("mapCanvasEdit"), mapOptions);
+
+    directionsDisplay = new google.maps.DirectionsRenderer;
+
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function (position) {
+            initialLocation = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+            map.setCenter(initialLocation);
+            map_edit.setCenter(initialLocation);
+        });
+    }
+
+    initializeListeners();
+}
+
+function initializeListeners() {
     var i;
     var inputs = document.getElementsByClassName('route-stop');
     var inputs_edit = document.getElementsByClassName('route-stop-edit');
@@ -218,7 +222,6 @@ function initMap(map) {
             //alert(place.formatted_address)
             //alert(this.inputId)
             autocompletes[this.inputId] = place;
-            autocompletes_edit[this.inputId] = place;
         })
     }
     for (i = 0; i < inputs_edit.length; i++) {
@@ -234,34 +237,6 @@ function initMap(map) {
     }
 }
 
-function getBoundsZoomLevel(bounds, mapDim) {
-    var WORLD_DIM = { height: 256, width: 256 };
-    var ZOOM_MAX = 21;
-
-    function latRad(lat) {
-        var sin = Math.sin(lat * Math.PI / 180);
-        var radX2 = Math.log((1 + sin) / (1 - sin)) / 2;
-        return Math.max(Math.min(radX2, Math.PI), -Math.PI) / 2;
-    }
-
-    function zoom(mapPx, worldPx, fraction) {
-        return Math.floor(Math.log(mapPx / worldPx / fraction) / Math.LN2);
-    }
-
-    var ne = bounds.getNorthEast();
-    var sw = bounds.getSouthWest();
-
-    var latFraction = (latRad(ne.lat()) - latRad(sw.lat())) / Math.PI;
-
-    var lngDiff = ne.lng() - sw.lng();
-    var lngFraction = ((lngDiff < 0) ? (lngDiff + 360) : lngDiff) / 360;
-
-    var latZoom = zoom(mapDim.height, WORLD_DIM.height, latFraction);
-    var lngZoom = zoom(mapDim.width, WORLD_DIM.width, lngFraction);
-
-    return Math.min(latZoom, lngZoom, ZOOM_MAX);
-}
-
 function addStop(count) {
     let newStop = ` <div class="form-group">
 <label>Destination <span onclick = "deleteStop(this);"
@@ -275,7 +250,7 @@ function addStopEdit(count) {
     let newStop = ` <div class="form-group">
 <label>Destination <span onclick = "deleteStop(this);"
 id = "deleteX">x</span></label>
-<input type=text class="form-control route-stop-edit" id="route-stop-` + count + `">
+<input type=text class="form-control route-stop-edit" id="route-stop-` + count + `-edit">
 </div>`
     $('#stops-edit').append(newStop);
 }
@@ -444,21 +419,22 @@ function altVehicles(){
 
 function newReservation() {
     var bounds = new google.maps.LatLngBounds();
-    var ac_sorted = Object.values(sortOnKeys(autocompletes))
-
+    var ac_sorted = Object.values(sortOnKeys(autocompletes));
     var directionsService = new google.maps.DirectionsService;
     directionsDisplay.setMap(map);
 
     var waypoints = [];
-    for (var i = 1; i < ac_sorted.length - 1; i++) {
-        waypoints.push({
-            location: new google.maps.LatLng(ac_sorted[i].geometry.location.lat(), ac_sorted[i].geometry.location.lng()),
-            stopover: true
-        })
+    for (var i = 1; i < ac_sorted.length; i++) {
+        if (i != 2) {
+            waypoints.push({
+                location: new google.maps.LatLng(ac_sorted[i].geometry.location.lat(), ac_sorted[i].geometry.location.lng()),
+                stopover: true
+            });
+        }
     }
     directionsService.route({
         origin: new google.maps.LatLng(ac_sorted[0].geometry.location.lat(), ac_sorted[0].geometry.location.lng()),
-        destination: new google.maps.LatLng(ac_sorted[ac_sorted.length - 1].geometry.location.lat(), ac_sorted[ac_sorted.length - 1].geometry.location.lng()),
+        destination: new google.maps.LatLng(ac_sorted[2].geometry.location.lat(), ac_sorted[2].geometry.location.lng()),
         waypoints: waypoints,
         travelMode: 'DRIVING'
     }, function(response, status) {
@@ -554,10 +530,10 @@ function fillInEditModal(data){
     }
 
     let i = 0;
-    $('.route-stop-edit').each(function() {
+    /*$('.route-stop-edit').each(function() {
         $(this).val(stopsArr[i]);
         i++;
-    });
+    });*/
 
     if(data.needsTrunk == 1){
         $('#trunk-edit').prop("checked", true);
@@ -588,20 +564,21 @@ function editReservation() {
     var totalDuration = 0;
     var bounds = new google.maps.LatLngBounds();
     var ac_sorted = Object.values(sortOnKeys(autocompletes_edit));
-    
     var directionsService = new google.maps.DirectionsService;
     directionsDisplay.setMap(map_edit);
 
     var waypoints = [];
-    for (var i = 1; i < ac_sorted.length - 1; i++) {
-        waypoints.push({
-            location: new google.maps.LatLng(ac_sorted[i].geometry.location.lat(), ac_sorted[i].geometry.location.lng()),
-            stopover: true
-        })
+    for (var i = 1; i < ac_sorted.length; i++) {
+        if (i != 2) {
+            waypoints.push({
+                location: new google.maps.LatLng(ac_sorted[i].geometry.location.lat(), ac_sorted[i].geometry.location.lng()),
+                stopover: true
+            });
+        }
     }
     directionsService.route({
         origin: new google.maps.LatLng(ac_sorted[0].geometry.location.lat(), ac_sorted[0].geometry.location.lng()),
-        destination: new google.maps.LatLng(ac_sorted[ac_sorted.length - 1].geometry.location.lat(), ac_sorted[ac_sorted.length - 1].geometry.location.lng()),
+        destination: new google.maps.LatLng(ac_sorted[2].geometry.location.lat(), ac_sorted[2].geometry.location.lng()),
         waypoints: waypoints,
         travelMode: 'DRIVING'
     }, function(response, status) {
