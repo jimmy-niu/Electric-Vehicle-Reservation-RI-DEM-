@@ -738,7 +738,7 @@ function newReservation(socket, reservationInfo, isEdit){
             // }
 
             conn.query('SELECT license, model, vehicles.isEV, image FROM vehicles WHERE inService != true AND extraTrunk >= ? AND offRoad >= ? AND equipRack >= ? AND license NOT IN (SELECT license FROM reservations WHERE start <= ? AND end >= ?) ORDER BY isEV DESC, featureScore ASC, miles ASC', [needsTrunk, needsOffRoad, needsRack, reservationInfo.end, reservationInfo.start], function(error, data){
-                if(data.rows.length !== 0){
+                if(data !== undefined && data.rows.length !== 0){
                     reservationInfo.model = data.rows[0].model;
                     reservationInfo.license = data.rows[0].license;
                     reservationInfo.isEV = data.rows[0].isEV;
