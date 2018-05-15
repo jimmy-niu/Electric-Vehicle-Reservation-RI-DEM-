@@ -1,12 +1,8 @@
-
-.pac-container {
-    z-index: 1050;
-}
-
 body {
     font-family: sans-serif;
 }
 
+/* Top bar of page */
 .header{
     display: flex;
     justify-content: space-between;
@@ -15,6 +11,7 @@ body {
     padding: 2vh 2vw 2vh 2vw;
 }
 
+/* Fun fact slideshow container */
 #fact-container {
     background-image: url("../media/polar_bear.png");
     background-repeat: no-repeat;
@@ -26,62 +23,65 @@ body {
     color: white;
 }
 
+/* Sliding facts */
 .carousel {
     margin-left: 80px;
     padding-top: 12px;
 }
 
-
+/* Consistent height for vehicle images */
 .card-img-top{
     max-height: 20vw !important;
 }
 
+/* Consistent height for vehicle cards */
 .card-body{
     max-height: 60vh;
     overflow: auto;
 }
 
-
+/* Styling for deleting an extra stop  */
 #deleteX {
     color: grey;
     cursor: pointer;
 }
 
-.bold{
-    font-weight: 600;
-    color: orange;
-}
-
+/* Handles scrolling for overlong modals */
 .modal-body{
     overflow: auto;
     max-height: 72vh;
 }
 
+/* Styling for danger (red) buttons */
 .btn-danger{
     font-weight: 400 !important;
 }
 
+/* Styling for success (green) buttons */
 .btn-success{
     font-weight: 600 !important;
 }
 
+/* DEM logo and title */
 #first-part{
     display: flex;
     justify-content: flex-start;
     align-items: flex-end; 
 }
 
-
+/* DEM logo image */
 #logo{
     height: 8vh;
     padding-right: 1vw;
 }
 
+/* Application title */
 #title{
     font-size: 5vh;
     color: white;
 }
 
+/* Styling for username */
 #user{
     color: white;
     font-size: 3vh;
@@ -89,6 +89,7 @@ body {
     float: right !important;
 }
 
+/* 6th-level heading */
 h6 {
     color: #d7a342;
 }
@@ -97,6 +98,7 @@ h6 {
     padding-left: 30px;
 }
 
+/* New reservation modal */
 #new-res {
     margin-top: 20px;
     background-color: #6ab351;
@@ -104,33 +106,40 @@ h6 {
     font-weight: bold;
 }
 
+/* Submitting new reservation */
 #submit-res {
     background-color: #6ab351;
     border: 1px solid #6ab352; 
 }
 
+/* 3rd-level heading */
 h3 {
     margin-top: 20px;
 }
 
+/* Row of vehicle reservation cards */
 .row {
     margin: 0;
 }
 
+/* Vehicle reservation card */
 .card {
     margin: 10px;
 }
 
+/* Button to edit a reservation */
 .edit {
     background-color: #4c719d;
     border: 0px;
 }
 
+/* Button to decline a reservation */
 #decline {
     margin-right: auto;
     font-weight: bold;
 }
 
+/* Labels for reservation information */
 .reservation-label {
     font-weight: bold;
 }
