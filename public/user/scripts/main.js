@@ -13,13 +13,13 @@ let alternateVehicles = [];
 let isEditing = false;
 
 
-var count = 3;
-var count_edit = 3;
-var map = null;
-var map_edit = null;
-var autocompletes = {};
-var autocompletes_edit = {};
-var directionsDisplay = null;
+let count = 3;
+let count_edit = 3;
+let map = null;
+let map_edit = null;
+let autocompletes = {};
+let autocompletes_edit = {};
+let directionsDisplay = null;
 
 jQuery.fn.carousel.Constructor.TRANSITION_DURATION = 5000;
 
@@ -792,6 +792,24 @@ function cleanFields(){
     autocompletes = {};
 }
 
+function getLocationModal(id, text){
+    let modal = `<div id="location_modal_${id}" class="modal fade">`
+    +`<div class="modal-dialog">`
+    +   `<div class="modal-content">`
+    +       `<div class="modal-header">`
+    +           `<h3>Reservation Time</h3>`
+    +           `<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>`
+    +       `</div>`
+    +       `<div class="modal-body"> ${text} </div>`
+    +       `<div class="modal-footer">`
+    +            `<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>`
+    +         `</div>`
+    +      `</div>`
+    +   `</div>`
+    +`</div>`;
+    return modal;
+}
+
 class Reservation {
 
     constructor(reservationData) {
@@ -807,14 +825,26 @@ class Reservation {
     addToDom(r) {
         let data = JSON.stringify(r);
 
-        let imageFilePath = "./media/vehicle_images/"
+        let imageFilePath = "./media/vehicle_images/";
+        
+        let stopsArray = JSON.parse(r.stops);
+        let stop = "<ol>";
+        for(let i=0; i<stopsArray.length; i++){
+            stop += `<li>${stopsArray[i]}</li>`;
+        }
+        stop += "</ol>";
+        
+        let location_button = `<a href = "#location_modal_${r.id}" data-toggle="modal">${stopsArray[0].substring(0, 16)}... </a>`;
+        let location_modal = getLocationModal(r.id, stop);
+        
         let DOMobject = `<div class="card ${r.border} mb-3 ${r.id} upcomingReservation" style="width: 18rem;">`
         + `<img class = "card-img-top" src="${imageFilePath + r.image}">`
         + `<div class="card-body">`
         + `<h5 class="card-title"><span id="model_${r.id}" class="card-model">${r.model}</span> <span id="license_${r.id}" class="card-license">${r.license}</span></h5>`
         + `<p class="card-text"><strong>Start</strong>: <span id="start_${r.id}" class="card-start">${r.start}</span> <br>`
         + `<strong>End</strong>:<span id="end_${r.id}" class="card-end">${r.end}</span> <br>`
-        + `<strong>Route</strong>: <span id = "stops_${r.id}">${JSON.parse(r.stops)}</span> </p>`
+        + `<strong>Route</strong>: <span id = "stops_${r.id}">${location_button}</span> </p>` 
+        + `${location_modal}` 
         + `<span style = "display: none;" id = "res_data_${r.id}">${data}</span>`
         + `<a href="#" class="btn btn-primary edit" data-toggle="modal" data-target="#editModal" onclick = 'fillInEditModal(${r.id});'>Edit reservation</a>`
         + `<a href="#" class="btn btn-secondary" data-toggle="modal" data-target="#cancelModal" onclick = "setCancelID(${r.id});">Cancel</a>`
