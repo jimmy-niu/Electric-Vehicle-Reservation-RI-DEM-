@@ -41,8 +41,6 @@ $(document).ready(function() {
 });
 
 function setClickHandlers(){
-    $("#add-stop").click(addDestination);
-
     //button handlers to add more destination fields
     $("#add-stop").click(addDestination);
     $("#add-stop-edit").click(addDestination);
