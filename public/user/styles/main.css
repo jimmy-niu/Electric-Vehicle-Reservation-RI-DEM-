@@ -127,11 +127,13 @@ h3 {
     margin: 10px;
 }
 
+/* Button to edit a reservation */
 .edit {
     background-color: #4c719d;
     border: 0px;
 }
 
+/* Button to decline a reservation */
 #decline {
     margin-right: auto;
     font-weight: bold;
