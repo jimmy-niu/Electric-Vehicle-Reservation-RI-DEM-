@@ -179,7 +179,9 @@ function editVehicle(){
     if(id !== '' && license !== '' && model !== '' && color !== ''){
         let vehicle = {id: id, license: license, model: model, color: color, miles: miles, inService: status,
                        isEV: carType, extraTrunk: trunk, offRoad: offRoad, equipRack: equipmentRack};
-        adminSocket.emit('vehicleEdited', vehicle);
+        adminSocket.emit('vehicleEdited', vehicle, function(){
+            //Callback
+        });
     }
 }
 
@@ -190,6 +192,7 @@ function insertVehicleImage(id, imgSrc){
 
 function deleteVehicle(license){
     adminSocket.emit("vehicleRemoved", license, function(){
+        //Callback
     });
     $('.'+license).remove();
 }
@@ -206,7 +209,7 @@ function fillInEditModal(vehicleData){
     $('#colorField-edit').val(vehicleData.color);
     $('#milesField-edit').val(vehicleData.miles);
 
-    if(vehicleData.inService == 1){
+    if(vehicleData.inService == 0){
         $('#carStatusField-edit').val("ready");
     } else {
         $('#carStatusField-edit').val("service");

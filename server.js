@@ -640,7 +640,7 @@ function updateAdminReservations(){
 function updateVehicles(){
     conn.query('SELECT * FROM vehicles',function(error, data){
         io.of('/admin').emit('vehicleChange', data);
-        //console.log(data)
+        console.log(data)
     });
 }
 function addVehicle(vehicle){
@@ -654,8 +654,12 @@ function addVehicle(vehicle){
 function editVehicle(vehicle){
     console.log(vehicle)
     conn.query('UPDATE vehicles SET license = ?, model = ?, color = ?, miles = ?, inService = ?, isEV = ?, extraTrunk = ?, offRoad = ?, equipRack = ?, image = ? WHERE id = ?',[vehicle.license, vehicle.model, vehicle.color, vehicle.miles, vehicle.inService, vehicle.isEV, vehicle.extraTrunk, vehicle.offRoad, vehicle.equipRack, vehicle.image, vehicle.id],function(error, data){
-        conn.query('UPDATE vehicles SET featureScore = extraTrunk + offRoad + equipRack WHERE id = ?', [vehicle.id]);
-        updateVehicles();
+        conn.query('UPDATE vehicles SET featureScore = extraTrunk + offRoad + equipRack WHERE id = ?', [vehicle.id], function(){
+            updateVehicles();
+            if(vehicle.inService === 1){
+                reassignReservations(vehicle.license);
+            }
+        });
     });
 }
 function removeVehicle(license){
@@ -778,7 +782,7 @@ function newReservation(socket, reservationInfo, isEdit){
             //     carpoolNotification(carpoolUsers);
             // }
 
-            conn.query('SELECT license, model, vehicles.isEV, image FROM vehicles WHERE extraTrunk >= ? AND offRoad >= ? AND equipRack >= ? AND license NOT IN (SELECT license FROM reservations WHERE start <= ? AND end >= ?) ORDER BY isEV DESC, featureScore ASC, miles ASC', [needsTrunk, needsOffRoad, needsRack, reservationInfo.end, reservationInfo.start], function(error, data){
+            conn.query('SELECT license, model, vehicles.isEV, image FROM vehicles WHERE inService != true AND extraTrunk >= ? AND offRoad >= ? AND equipRack >= ? AND license NOT IN (SELECT license FROM reservations WHERE start <= ? AND end >= ?) ORDER BY isEV DESC, featureScore ASC, miles ASC', [needsTrunk, needsOffRoad, needsRack, reservationInfo.end, reservationInfo.start], function(error, data){
                 if(data.rows.length !== 0){
                     reservationInfo.model = data.rows[0].model;
                     reservationInfo.license = data.rows[0].license;
