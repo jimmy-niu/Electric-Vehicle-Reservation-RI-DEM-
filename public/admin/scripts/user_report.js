@@ -16,6 +16,12 @@ $(document).ready(function() {
             new Report(reports.rows[i]);
         }
     });
+    
+    adminSocket.on('newReport', function(report){
+        for(let i = 0; i < reports.rowCount; i++){
+            new Report(reports.rows[i]);
+        }
+    });
 
     $('#export-users').click(function(e){
         e.preventDefault();
