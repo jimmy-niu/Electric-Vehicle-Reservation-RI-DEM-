@@ -161,7 +161,7 @@ io.of('/admin').on('connection', function(socket){
     });
 
     socket.on('updatePage', function(callback){
-        updateAdminReservations();
+        loadAdminReservations();
         updateAdminArchived();
         updateVehicles();
         updateReports();
@@ -513,9 +513,9 @@ app.all('*', function(req,res,next) {
 });
 
 // ADMIN helper functions
-function updateAdminReservations(){
+function loadAdminReservations(){
     conn.query('SELECT * FROM reservations WHERE archived = ?', [false], function(error, data){
-        io.of('/admin').emit('reservationChange', data);
+        io.of('/admin').emit('loadReservations', data);
     });
 }
 
@@ -527,7 +527,7 @@ function setReservationArchived(id, status){
             console.log('ERROR: ' + error);
         } else {
             updateAdminArchived();
-            updateAdminReservations();
+            loadAdminReservations();
         }
     });
 }
@@ -889,7 +889,6 @@ function reassignReservations(license){
                             console.log('Email sent: ' + info.response);
                         }
                     });
->>>>>>> origin/master
                 }
             });
         }
