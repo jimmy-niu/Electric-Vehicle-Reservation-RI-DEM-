@@ -42,6 +42,7 @@ $(document).ready(function() {
     });
     
     bindClickHandlers();
+    $("#archived_title").click();
 });
 
 function archive(obj){
@@ -60,6 +61,12 @@ function bindClickHandlers(){
     $("#upcoming_title").bind("click", function(){
         toggleHidden('upcoming');
         toggleHidden('upcoming_header');
+        toggleTitle(this);
+    });
+    
+    $("#archived_title").bind("click", function(){
+        toggleHidden('archived');
+        toggleHidden('archived_header');
         toggleTitle(this);
     });
 }
