@@ -873,6 +873,10 @@ function carpoolNotification(reservationInfo){
     });
 }
 
+function updateVehicleMiles(license, miles){
+    conn.query('UPDATE vehicles SET miles = miles + ? WHERE license = ?', [miles, license]);
+}
+
 //id TEXT, license TEXT, model TEXT, color TEXT, inService BOOLEAN, miles DOUBLE PRECISION, isEV BOOLEAN, extraTrunk BOOLEAN, offRoad BOOLEAN, equipRack BOOLEAN
 function reassignReservations(license){
     conn.query('SELECT * FROM reservations WHERE license = ? ORDER BY id ASC', [license], function(error, data){
