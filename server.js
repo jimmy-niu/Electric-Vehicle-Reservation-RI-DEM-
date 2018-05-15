@@ -249,13 +249,7 @@ function removeEvent(subject, start, end) {
             console.log('getEvents returned an error: ' + error);
         }
         else if (result) {
-            console.log('getEvents returned ' + result.value.length + ' events.');
-            //return result.value;
             result.value.forEach(function(event) {
-                console.log(event.Start)
-                console.log(start)
-                console.log(event.End)
-                console.log(end)
                 if (event.Subject === subject && event.Start === start && event.End == end) {
                     outlook.calendar.deleteEvent({token: token, eventId: event.Id},
                                                  function(error, result) {
@@ -271,6 +265,7 @@ function removeEvent(subject, start, end) {
     });
 }
 
+//for testing purposes only- remove before deployment!
 function nukeEvents() {
     var queryParams = {
         '$select': 'Subject,Start,End,Id',
@@ -304,117 +299,69 @@ function nukeEvents() {
 
 //handles events when a regular user is connnected
 io.of('/user').on('connection', function(socket) {
+    //used when the user first logs in, sends back all reservations for that user, ordered by date/time
     socket.on('join', function(user, callback){
         conn.query('SELECT *, vehicles.isEV, reservations.id FROM reservations INNER JOIN vehicles ON reservations.license = vehicles.license WHERE user = ? ORDER BY end ASC', [user], function(error, data){
             callback(data);
         });
     });
-    //emitted when a user makes a new reservation
+
+    //used when the user submits information for a new reservation
     socket.on('reservation', function(reservationInfo, callback){
-        //console.log("got a reservation!");
-        newReservation(socket, reservationInfo, false);
+        //this function will asign a vehicle for the reservation
+        assignVehicle(socket, reservationInfo, false);
     });
 
+    //used when user submits information an edited reservation
+    socket.on('edit', function(reservationInfo, oldData){
+        //this function will reassign a vehicle for the reservation
+        assignVehicle(socket, reservationInfo, oldData, true);
+    });
+
+    //used when the user confirms creation of new reservation
     socket.on('addReservation', function(reservationInfo, callback){
+        //adds reservation to database
         conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',[reservationInfo.user, reservationInfo.license, reservationInfo.model, reservationInfo.start, reservationInfo.end, reservationInfo.stops, reservationInfo.override, reservationInfo.justification, reservationInfo.needsTrunk, reservationInfo.needsOffRoad, reservationInfo.needsRack, reservationInfo.image],function(error, data){
+            //get information about newest reservation to the admin
             conn.query('SELECT * FROM reservations WHERE id = ?', [data.lastInsertId], function(error, resData){
+                //sends back id created by database so client has it
                 callback(data.lastInsertId);
+                //sends new reservation to admins
                 io.of('/admin').emit("newReservation", resData);
+
+                //adds reservation to user's calendar
                 var start = new Date(reservationInfo.start);
                 var end = new Date(reservationInfo.end);
-
                 addEvent(reservationInfo.user + "'s upcoming DEM trip (" + reservationInfo.license + ")", reservationInfo.model + " " + reservationInfo.license + "\n" + reservationInfo.stops, start.toISOString(), end.toISOString());
-                // if(reservationInfo.canCarpool){
-                //     console.log("ya")
-                //     carpoolNotification(reservationInfo);
-                // }
             });
         });
     });
 
-    socket.on('editReservation', function(reservationInfo, id, callback){
-        console.log('edit')
-        console.log(id)
-        conn.query('UPDATE reservations SET license = ?, model = ?, start = ?, end = ?, stops = ?, override = ?, justification = ?, needsTrunk = ?, needsOffRoad = ?, needsRack = ?, image = ? WHERE id = ?',[reservationInfo.license, reservationInfo.model, reservationInfo.start, reservationInfo.end, reservationInfo.stops, reservationInfo.override, reservationInfo.justification, reservationInfo.needsTrunk, reservationInfo.needsOffRoad, reservationInfo.needsRack, reservationInfo.image, id],function(error, data){
-            conn.query('SELECT * FROM reservations', function(error, data){
-                console.log(data)
-                callback();
-                io.of('/admin').emit("reservationChange", data);
-                //Calendar event
-                var start = new Date(reservationInfo.start);
-                var end = new Date(reservationInfo.end);
-
-                addEvent(reservationInfo.user + "'s upcoming DEM trip (" + reservationInfo.license + ")", reservationInfo.model + " " + reservationInfo.license + "\n" + reservationInfo.stops, start.toISOString(), end.toISOString());
-                // if(reservationInfo.canCarpool){
-                //     carpoolNotification(reservationInfo);
-                // }
-            });
-        });
+    //used when the user confirms the edit of a reservation
+    socket.on('editReservation', function(reservationInfo, id, oldData, callback){
+        //updates reservation entry in database
+        editReservation(reservationInfo, id, oldData, callback);
     })
 
-    socket.on('edit', function(reservationInfo){
-        //editReservation(reservationID, reservationInfo.start, reservationInfo.end, reservationInfo.stops, reservationInfo.justification);
-        // conn.query('DELETE FROM reservations WHERE id = ?', [reservationID], function(error, data){
-
-        // });
-        newReservation(socket, reservationInfo, true);
-        // conn.query('UPDATE reservations SET start = ?, end = ?, stops = ?, justification = ? WHERE id = ?', [reservationInfo.start, reservationInfo.end, reservationInfo.stops, reservationInfo.justification, reservationID], function(error, data){
-        //     conn.query('SELECT * FROM reservations WHERE user = ?', [reservationInfo.user], function(error, data){
-        //         socket.emit('reservationChange', data);
-        //     });
-        //     conn.query('SELECT * FROM reservations', function(error, data){
-        //         io.of('/admin').emit('reservationChange', data);
-        //     });
-        // });
-    });
-
+    //used when the user cancels a reservation
     socket.on('cancel', function(reservationID, user, model, license, start, end, callback){
+        //removes reservation from database
         cancelReservation(reservationID);
+
+        //removes event from user's calendar
         var startDate = new Date(start);
         var endDate = new Date(end);
         var startISO = startDate.toISOString().split('.')[0]+"Z";
         var endISO = endDate.toISOString().split('.')[0]+"Z";
-        //console.log(user + "'s upcoming DEM trip (" + license + ")", startDate, endDate);
         removeEvent(user + "'s upcoming DEM trip (" + license + ")", startISO, endISO);
 
-        conn.query('SELECT * FROM reservations', function(error, data){
-            io.of('/admin').emit('reservationChange', data);
-        });
+        //tells admin clients which reservation to delete from table
+        io.of('/admin').emit('reservationCancellation', reservationID);
     });
 
+    //used when the user submits a report about a reservation
     socket.on('reportAdded', function(reservationID, report, needsService, needsCleaning, notCharging){
-        //submitFeedback(reservationID, resport);
-        console.log('report added')
-        conn.query("INSERT INTO reports VALUES(null, ?, ?, ?, ?, ?)", [reservationID, report, needsService, needsCleaning, notCharging], function(error, data){
-            updateReports();
-        });
-
-        conn.query('SELECT * FROM reservations WHERE id = ?', [5], function(error, data){
-            let mailOptions = {
-                from: 'dem_do-not-reply@outlook.com',
-                to: 'dem_test_a@outlook.com',
-                subject: 'New Report Added',
-                html: '<h1>Reservation: ' + data.rows[0].id + '</h1>' + '<h2>User: ' + data.rows[0].user + '</h2>' + '<h2>Vehicle: ' + data.rows[0].model + " " + data.rows[0].license + '</h2>' + '<p style="font-size: 22px;">Report: ' + report + '<p><br>' + '<p>Needs Service: ' + needsService + '<p>' + '<p>Needs Cleaning: ' + needsCleaning + '<p>' + '<p>Not Charging: ' + notCharging + '<p>'
-            };
-            transporter.sendMail(mailOptions, function(error, info){
-                if (error) {
-                    console.log(error);
-                } else {
-                    console.log('Email sent: ' + info.response);
-                }
-            });
-        });
-    });
-
-    socket.on('vehicleOverride', function(reservationID, license, model, justification){
-        conn.query('UPDATE reservations SET license = ?, model = ?, override = ?, justification = ? WHERE id = ?', [license, model, true, justification, reservationID], function(error, data){
-            conn.query('SELECT * FROM reservations WHERE id = ?', [reservationID], function(error, data){
-                socket.emit('reservationOverride', data);
-            });
-            conn.query('SELECT * FROM reservations', function(error, data){
-                io.of('/admin').emit('reservationChange', data);
-            });
-        });
+        submitFeedback(reservationID, resport, needsService, needsCleaning, notCharging);
     });
 });
 
@@ -678,7 +625,18 @@ function removeUser(email){
 }
 
 // USER help functions
-function newReservation(socket, reservationInfo, isEdit){
+
+/**
+ * This function checks if the reservation overlaps with another one of the same user's reservations,
+ * checks if the user can carpool with others, and assigns a vehicle to the reservation. The assigned 
+ * vehicle and list of alternative vehicles is sent back to the client. 
+ * @params 
+ * socket: socket of user making the reservation
+ * reservationInfo: data user submitted about reservation
+ * isEdit: true if the user is editing an existing reservation
+ */
+function assignVehicle(socket, reservationInfo, oldData, isEdit){
+    //calculates feature score of reservation
     var needsTrunk;
     if(reservationInfo.needsTrunk){
         needsTrunk = 1;
@@ -703,9 +661,8 @@ function newReservation(socket, reservationInfo, isEdit){
     var isOverlap = false;
     var canCarpool = false;
     var carpoolUsers = [reservationInfo.user];
-    //this queries finds overlapping reservations
+    //this query finds overlapping reservations
     conn.query('SELECT id, user, start, end, stops FROM reservations WHERE (start >= ? AND start <= ?) OR (end >= ? AND end <= ?)', [reservationInfo.start, reservationInfo.end, reservationInfo.start, reservationInfo.end], function(error, data){
-        console.log(data);
         for(var i = 0; i < data.rows.length; i++){
             //if reservations overlaps and is from same user
             //unless is editing then allows overlap with same id
@@ -727,22 +684,24 @@ function newReservation(socket, reservationInfo, isEdit){
             socket.emit('isOverlap');
         }
         else {
-            //alerts users via email that they have reservations at the same time w/ same stops
-            // if(canCarpool){
-            //     console.log("carpool!")
-            //     carpoolNotification(carpoolUsers);
-            // }
-
+            //selects all vehicles that meet user's needs, sort them by prioritizing EVs, the lowest feature score, then lowest mileage
             conn.query('SELECT license, model, vehicles.isEV, image FROM vehicles WHERE extraTrunk >= ? AND offRoad >= ? AND equipRack >= ? AND license NOT IN (SELECT license FROM reservations WHERE start <= ? AND end >= ?) ORDER BY isEV DESC, featureScore ASC, miles ASC', [needsTrunk, needsOffRoad, needsRack, reservationInfo.end, reservationInfo.start], function(error, data){
                 if(data.rows.length !== 0){
+                    //updates reservation info with car info
                     reservationInfo.model = data.rows[0].model;
                     reservationInfo.license = data.rows[0].license;
                     reservationInfo.isEV = data.rows[0].isEV;
                     reservationInfo.image = data.rows[0].image;
                     reservationInfo.canCarpool = canCarpool;
                     reservationInfo.carpoolUsers = carpoolUsers;
-                    socket.emit('newReservation', data, reservationInfo, isEdit);
+                    //sends updated reservation info to client so user can confirm/decline vehicle
+                    if(isEdit){
+                        socket.emit('editReservation', data, reservationInfo, oldData, isEdit);
+                    } else {
+                        socket.emit('newReservation', data, reservationInfo, isEdit);
+                    }
                 } else {
+                    //if no vehicle meets needs of the user, alert them
                     socket.emit('noVehicle');
                 }
             });
@@ -750,28 +709,60 @@ function newReservation(socket, reservationInfo, isEdit){
     });
 }
 
-function editReservation(id, start, end, stops, justification){
-    conn.query('UPDATE reservations SET start = ?, end = ?, stops = ?, justification = ? WHERE reservationID = ?', [start, end, stops, justification, id], function(error, data){
+/**
+ * This function updates the given reservation in the database to contain the updated information, and then sends that information to the admins.
+ * @params
+ * reservationInfo: updated information about the reservation
+ * id: reservation id
+ * callback: when called the client side updates the reservation card visually
+ */
+function editReservation(reservationInfo, id, oldData, callback){
+   conn.query('UPDATE reservations SET license = ?, model = ?, start = ?, end = ?, stops = ?, override = ?, justification = ?, needsTrunk = ?, needsOffRoad = ?, needsRack = ?, image = ? WHERE id = ?',[reservationInfo.license, reservationInfo.model, reservationInfo.start, reservationInfo.end, reservationInfo.stops, reservationInfo.override, reservationInfo.justification, reservationInfo.needsTrunk, reservationInfo.needsOffRoad, reservationInfo.needsRack, reservationInfo.image, id],function(error, data){
+        conn.query('SELECT * FROM reservations WHERE id = ?', [id], function(error, data){
+            //callback tells client to update reservation card visually
+            callback();
+            //sends updated reservation info to admin
+            io.of('/admin').emit("reservationChange", data);
 
+            var startDate = new Date(oldData.start);
+            var endDate = new Date(oldData.end);
+            var startISO = startDate.toISOString().split('.')[0]+"Z";
+            var endISO = endDate.toISOString().split('.')[0]+"Z";
+            removeEvent(reservationInfo.user + "'s upcoming DEM trip (" + oldData.license + ")", startISO, endISO);
+            
+            //Calendar event
+            var start = new Date(reservationInfo.start);
+            var end = new Date(reservationInfo.end);
+            addEvent(reservationInfo.user + "'s upcoming DEM trip (" + reservationInfo.license + ")", reservationInfo.model + " " + reservationInfo.license + "\n" + reservationInfo.stops, start.toISOString(), end.toISOString());
+        });
     });
 }
+
 function cancelReservation(id){
     conn.query('DELETE FROM reservations WHERE id = ?', [id], function(error, data){
         console.log('cancelled');
     });
 }
-function submitFeedback(reservationID, report){
-    conn.query("INSERT INTO reports VALUES(null, ?, ?)", [reservationID, report], function(error, data){
+
+function submitFeedback(reservationID, report, needsService, needsCleaning, notCharging){
+    conn.query("INSERT INTO reports VALUES(null, ?, ?, ?, ?, ?)", [reservationID, report, needsService, needsCleaning, notCharging], function(error, data){
         updateReports();
     });
 
-    conn.query('SELECT * FROM reservations WHERE id = ?', [reservationID], function(error, data){
+    conn.query('SELECT * FROM reservations WHERE id = ?', [5], function(error, data){
         let mailOptions = {
-            from: 'jenna_tishler@brown.edu',
-            to: 'jenna.tishler@gmail.com',
-            subject: 'Sending Email using Node.js',
-            html: '<h1>Reservation: ' + data.rows[0].id + '</h1>' + '<h2>Name: ' + data.rows[0].user + '</h2>' + '<h2>License Plate: ' + data.rows[0].license + '</h2>' + '<p>Report: ' + report + '<p>'
+            from: 'dem_do-not-reply@outlook.com',
+            to: 'dem_test_a@outlook.com',
+            subject: 'New Report Added',
+            html: '<h1>Reservation: ' + data.rows[0].id + '</h1>' + '<h2>User: ' + data.rows[0].user + '</h2>' + '<h2>Vehicle: ' + data.rows[0].model + " " + data.rows[0].license + '</h2>' + '<p style="font-size: 22px;">Report: ' + report + '<p><br>' + '<p>Needs Service: ' + needsService + '<p>' + '<p>Needs Cleaning: ' + needsCleaning + '<p>' + '<p>Not Charging: ' + notCharging + '<p>'
         };
+        transporter.sendMail(mailOptions, function(error, info){
+            if (error) {
+                console.log(error);
+            } else {
+                console.log('Email sent: ' + info.response);
+            }
+        });
     });
 }
 
