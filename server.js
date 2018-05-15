@@ -322,7 +322,9 @@ io.of('/user').on('connection', function(socket) {
     });
 
     //used when the user confirms creation of new reservation
-    socket.on('addReservation', insertReservation);
+    socket.on('addReservation', function(reservationInfo, callback){
+        newReservation(reservationInfo, callback);
+    });
 
     //used when the user confirms the edit of a reservation
     socket.on('editReservation', function(reservationInfo, id, oldData, callback){
@@ -341,23 +343,6 @@ io.of('/user').on('connection', function(socket) {
         submitFeedback(reservationID, resport, needsService, needsCleaning, notCharging);
     });
 });
-
-function insertReservation(reservationInfo, callback){
-    conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',[reservationInfo.user, reservationInfo.license, reservationInfo.model, reservationInfo.start, reservationInfo.end, reservationInfo.stops, reservationInfo.override, reservationInfo.justification, reservationInfo.needsTrunk, reservationInfo.needsOffRoad, reservationInfo.needsRack, reservationInfo.image, false],function(error, data){
-        //get information about newest reservation to the admin
-        conn.query('SELECT * FROM reservations WHERE id = ?', [data.lastInsertId], function(error, resData){
-            //sends back id created by database so client has it
-            callback(data.lastInsertId);
-            //sends new reservation to admins
-            io.of('/admin').emit("newReservation", resData);
-
-            //adds reservation to user's calendar
-            var start = new Date(reservationInfo.start);
-            var end = new Date(reservationInfo.end);
-            addEvent(reservationInfo.user + "'s upcoming DEM trip (" + reservationInfo.license + ")", reservationInfo.model + " " + reservationInfo.license + "\n" + reservationInfo.stops, start.toISOString(), end.toISOString());
-        });
-    });
-}
 
 /**
  * Sets up the landing page to index.html.
@@ -726,6 +711,32 @@ function assignVehicle(socket, reservationInfo, oldData, isEdit){
                 }
             });
         }
+    });
+}
+
+/**
+ * This function adds the new reservation to the database, adds the event to the user's calendar,
+ * and sends the new reservation info the to admins. Also calls a callback function that adds the
+ * reservation visually on the front end. 
+ * 
+ * @params
+ * reservationInfo: contains all of the info about the new reservation
+ * callback: function that tells the front end to add the reservation visually
+ */
+function newReservation(reservationInfo, callback){
+    conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',[reservationInfo.user, reservationInfo.license, reservationInfo.model, reservationInfo.start, reservationInfo.end, reservationInfo.stops, reservationInfo.override, reservationInfo.justification, reservationInfo.needsTrunk, reservationInfo.needsOffRoad, reservationInfo.needsRack, reservationInfo.image, false],function(error, data){
+        //get information about newest reservation to the admin
+        conn.query('SELECT * FROM reservations WHERE id = ?', [data.lastInsertId], function(error, resData){
+            //sends back id created by database so client has it
+            callback(data.lastInsertId);
+            //sends new reservation to admins
+            io.of('/admin').emit("newReservation", resData);
+
+            //adds reservation to user's calendar
+            var start = new Date(reservationInfo.start);
+            var end = new Date(reservationInfo.end);
+            addEvent(reservationInfo.user + "'s upcoming DEM trip (" + reservationInfo.license + ")", reservationInfo.model + " " + reservationInfo.license + "\n" + reservationInfo.stops, start.toISOString(), end.toISOString());
+        });
     });
 }
 
