@@ -16,11 +16,11 @@ We are connecting the frontend and the backend using socket.io. There are two na
 Socket Handlers:
 Regular User- Server.js
 
--Name: join
+- Name: join
 Parameters: user, callback
 Purpose: Selects all reservations for given user and returns that data to the client by sending it as a parameter of the callback function. 
 
--Name: reservation
+- Name: reservation
 Parameters: reservationInfo (JSON object with fields- user, start, end, stops, override, justification, needsTrunk, needsOffRoad, needsRack), callback (function)
 Purpose: Emitted by the user when a user inputs information to make a new reservation. Assigns a vehicle to the reservation based off user needs and time of reservation. Prioritizes use of EVs. Does not allow the user to make a reservation that overlaps with one they already have. Adds the id and new vehicle information to the reservation JSON object, as well as information about carpooling if possible. Sends back new reservation information to user. 
 
