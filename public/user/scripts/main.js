@@ -32,7 +32,7 @@ $(document).ready(function() {
 
     userEmail = $("#user_email").html().replace("Welcome, ", "").replace(" <br>", "").replace("\n", "").trim();
     console.log(userEmail);
-
+    
     userSocket.emit('join',userEmail, function(reservations){
         console.log("hello")
         console.log(reservations);
@@ -335,6 +335,9 @@ function renderCar(){
             $("#start_" + id).html(currentCar.start)
             $("#end_" + id).html(currentCar.end)
             $("#stops_" + id).html(JSON.parse(currentCar.stops))
+            $("#model_" + id).html(currentCar.model);
+            $("#license_" + id).html(currentCar.license);
+
             sortReservations();
 
             $("#reasoning-field-edit").val("");

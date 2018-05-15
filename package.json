@@ -44,12 +44,15 @@
     "passport-outlook": "^2.1.0",
     "pug": "^2.0.3",
     "querystring": "^0.2.0",
+    "redis-server": "^1.2.0",
     "replace": "^0.3.0",
     "sendmail": "^1.4.1",
     "should": "^13.2.1",
     "simple-oauth2": "^1.5.2",
     "socket.io": "^2.1.0",
     "socket.io-client": "^2.1.0",
+    "socket.io-emitter": "^3.1.1",
+    "socket.io-redis": "^5.2.0",
     "sqlite3": "^4.0.0"
   }
 }
