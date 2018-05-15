@@ -74,15 +74,19 @@ function fillInEditModal(vehicleData){
     $('#modelField-edit').val(vehicleData.model);
     $('#colorField-edit').val(vehicleData.color);
     $('#milesField-edit').val(vehicleData.miles);
+    console.log(vehicleData.inService);
+    document.getElementById('vehicle-edit-submit').removeAttribute('onClick');
     if(vehicleData.inService == 0){
         $('#carStatusField-edit').val("ready");
         $('#vehicle-edit-submit').click(function(e){
+            console.log('reached1');
             e.preventDefault();
             editVehicle(false); //Edit vehicle with oldStatus false if the vehicle was not being serviced.
         });
     } else {
         $('#carStatusField-edit').val("service");
         $('#vehicle-edit-submit').click(function(e){
+            console.log('reached2');
             e.preventDefault();
             editVehicle(true); //Edit vehicle with oldStatus true if the vehicle was being serviced.
         });
