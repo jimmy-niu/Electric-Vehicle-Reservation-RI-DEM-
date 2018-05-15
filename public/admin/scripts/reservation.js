@@ -59,6 +59,9 @@ function getJustificationModal(id, text){
 function editReservation(res_data){
     console.log("in edit reservation data");
     console.log(res_data);
+    let data = res_data.rows[0];
+    $(`.res_id_${data.id}`).remove();
+    new Reservation(data);
 }
 
 function getReservationDom(reservationData){
