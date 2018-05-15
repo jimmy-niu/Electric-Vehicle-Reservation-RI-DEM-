@@ -100,8 +100,8 @@ conn.query('INSERT INTO reservations VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 
 conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, null, ?)', ["JF2GPBCC3FH253482", "1011", "2016 SUBARU XV", "Black/White", true, 11451.5, false, true, true, false, "2016subaruxv.jpg"]);
 conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, null, ?)', ["1FMCU59329KC41390", "1018", "2009 FORD ESCAPE", "Black/White", true, 151071.5, false, true, true, false, "2009fordescape.jpg"]);
 conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, null, ?)', ["1GNDT13S552325449", "1052", "2005 CHEVROLET TRAILBLAZER", "Black/White", true, 62759.9, false, false, false, false, "2005chevrolettrailblazer.jpg"]);
-conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, null, ?)', ["1FADP5CU7FL121713", "1252", "2015 FORD CMAX", "Black", true, 6041.9, true, false, false, false, "fordcmax.jpg"]);
-conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, null, ?)', ["1FADP5CU9FL121714", "1254", "2015 FORD CMAX", "Black", true, 9543.2, true, false, false, false, "fordcmax.jpg"]);
+conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, null, ?)', ["1FADP5CU7FL121713", "1252", "2015 FORD CMAX", "Black", false, 6041.9, true, false, false, false, "fordcmax.jpg"]);
+conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, null, ?)', ["1FADP5CU9FL121714", "1254", "2015 FORD CMAX", "Black", false, 9543.2, true, false, false, false, "fordcmax.jpg"]);
 conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, null, ?)', ["1FADP5CU4FL121717", "1322", "2015 FORD CMAX", "Black", true, 13594.4, true, false, false, false, "fordcmax.jpg"]);
 conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, null, ?)', ["1FMYU96H76KD26489", "1583", "2006 FORD ESCAPE", "Black/White", true, 72981.1, false, true, true, false, "2006fordescape.jpg"]);
 conn.query('INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, null, ?)', ["JTMRJREV1HD152175", "1650", "2017 TOYOTA RAV 4", "Black/White", true, 11295.3, false, true, true, false, "2017toyotarav4.jpg"]);
@@ -142,7 +142,7 @@ function populateEmailLists(){
     conn.query('SELECT * FROM users', function(error, data){
         console.log(data);
         for(let i = 0; i < data.rowCount; i++) {
-            if(data.rows[i].admin === 1){
+            if(data !== undefined && data.rows[i].admin === 1){
                 adminEmails.push(data.rows[i].email);
             } else {
                 normalEmails.push(data.rows[i].email);
@@ -652,7 +652,7 @@ function getSpecificReports(reservation){
 
 function addUser(email, admin){
     conn.query('SELECT * FROM users WHERE email = ?', [email], function(error,data){
-        if(data.rowCount === 0){
+        if(data !== undefined && data.rowCount === 0){
             conn.query('INSERT INTO users VALUES(null, ?, ?)',[email, admin],function(error, data){
                 if(admin === 1){
                     updateUsers(`${email} added as an admin.`);
@@ -661,7 +661,7 @@ function addUser(email, admin){
                 }
             });
         } else{
-            if(data.rows[0].admin === 1){
+            if(data !== undefined && data.rows[0].admin === 1){
                 updateUsers(`${email} is already an admin.`);
             } else {
                 updateUsers(`${email} is already a user.`);
@@ -713,7 +713,7 @@ function newReservation(socket, reservationInfo, isEdit){
         for(var i = 0; i < data.rows.length; i++){
             //if reservations overlaps and is from same user
             //unless is editing then allows overlap with same id
-            if(data.rows[i].user === reservationInfo.user){
+            if(data !== undefined && data.rows[i].user === reservationInfo.user){
                 if(!isEdit || data.rows[i].id != reservationInfo.id){
                     isOverlap = true;
                 }
@@ -737,7 +737,7 @@ function newReservation(socket, reservationInfo, isEdit){
             //     carpoolNotification(carpoolUsers);
             // }
 
-            conn.query('SELECT license, model, vehicles.isEV, image FROM vehicles WHERE inService != true AND extraTrunk >= ? AND offRoad >= ? AND equipRack >= ? AND license NOT IN (SELECT license FROM reservations WHERE start <= ? AND end >= ?) ORDER BY isEV DESC, featureScore ASC, miles ASC', [needsTrunk, needsOffRoad, needsRack, reservationInfo.end, reservationInfo.start], function(error, data){
+            conn.query('SELECT license, model, vehicles.isEV, image FROM vehicles WHERE inService != ? AND extraTrunk >= ? AND offRoad >= ? AND equipRack >= ? AND license NOT IN (SELECT license FROM reservations WHERE start <= ? AND end >= ?) ORDER BY isEV DESC, featureScore ASC, miles ASC', [true, needsTrunk, needsOffRoad, needsRack, reservationInfo.end, reservationInfo.start], function(error, data){
                 if(data.rows.length !== 0){
                     reservationInfo.model = data.rows[0].model;
                     reservationInfo.license = data.rows[0].license;
@@ -843,7 +843,7 @@ function reassignReservations(license){
             let reservationInfo = data.rows[i];
             conn.query('SELECT license, model, image FROM vehicles WHERE extraTrunk >= ? AND license != ? AND offRoad >= ? AND equipRack >= ? AND license NOT IN (SELECT license FROM reservations WHERE start <= ? AND end >= ?) ORDER BY isEV DESC, (extraTrunk + offRoad + equipRack) ASC, miles ASC', [reservationInfo.needsTrunk, license, reservationInfo.needsOffRoad, reservationInfo.needsRack, reservationInfo.end, reservationInfo.start], function(error, data){
                 console.log(data);
-                if(data.rows.length !== 0){
+                if(data !== undefined && data.rows.length !== 0){
                     conn.query('UPDATE reservations SET license = ?, model = ?, image = ? WHERE id = ?',[data.rows[0].license, data.rows[0].model, data.rows[0].image, reservationInfo.id],function(error, data){
                         conn.query('SELECT * FROM reservations WHERE id = ?', [reservationInfo.id], function(error, data){
 
