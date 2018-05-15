@@ -172,9 +172,8 @@ io.of('/admin').on('connection', function(socket){
         removeVehicle(license);
         callback();
     });
-    socket.on('vehicleEdited', function(vehicle){
-        editVehicle(vehicle);
-        //callback();
+    socket.on('vehicleEdited', function(vehicle, oldStatus){
+        editVehicle(vehicle, oldStatus);
     });
     socket.on('vehicleStatusUpdated', function(license, status, callback){
         updateVehicleStatus(license, status);
@@ -543,14 +542,11 @@ function addVehicle(vehicle){
     console.log(vehicle);
 }
 
-function editVehicle(vehicle){
-    console.log(vehicle)
+function editVehicle(vehicle, oldStatus){
     conn.query('UPDATE vehicles SET license = ?, model = ?, color = ?, miles = ?, inService = ?, isEV = ?, extraTrunk = ?, offRoad = ?, equipRack = ?, image = ? WHERE id = ?',[vehicle.license, vehicle.model, vehicle.color, vehicle.miles, vehicle.inService, vehicle.isEV, vehicle.extraTrunk, vehicle.offRoad, vehicle.equipRack, vehicle.image, vehicle.id],function(error, data){
         conn.query('UPDATE vehicles SET featureScore = extraTrunk + offRoad + equipRack WHERE id = ?', [vehicle.id], function(){
-            console.log('reached1');
-            console.log(vehicle.inService);
-            if(vehicle.inService === true){
-                console.log('reached2');
+            console.log(oldStatus);
+            if(vehicle.inService === true && oldStatus === false){
                 reassignReservations(vehicle.license);
             } else {
                 updateVehicles();
@@ -626,9 +622,9 @@ function removeUser(email){
 
 /**
  * This function checks if the reservation overlaps with another one of the same user's reservations,
- * checks if the user can carpool with others, and assigns a vehicle to the reservation. The assigned 
- * vehicle and list of alternative vehicles is sent back to the client. 
- * @params 
+ * checks if the user can carpool with others, and assigns a vehicle to the reservation. The assigned
+ * vehicle and list of alternative vehicles is sent back to the client.
+ * @params
  * socket: socket of user making the reservation
  * reservationInfo: data user submitted about reservation
  * isEdit: true if the user is editing an existing reservation
@@ -728,7 +724,7 @@ function editReservation(reservationInfo, id, oldData, callback){
             var startISO = startDate.toISOString().split('.')[0]+"Z";
             var endISO = endDate.toISOString().split('.')[0]+"Z";
             removeEvent(reservationInfo.user + "'s upcoming DEM trip (" + oldData.license + ")", startISO, endISO);
-            
+
             //adds calendar event with updated information
             var start = new Date(reservationInfo.start);
             var end = new Date(reservationInfo.end);
@@ -800,6 +796,11 @@ function updateVehicleMiles(license, miles){
     conn.query('UPDATE vehicles SET miles = miles + ? WHERE license = ?', [miles, license]);
 }
 
+/**
+ * This function acts like newReservation but creates a new reservation from the data of a given,existing reservation for all reservations with the given license, deleting the old one.
+ * @params
+ * license: the licencse of the old vehicle
+ */
 function reassignReservations(license){
     conn.query('SELECT * FROM reservations WHERE license = ? ORDER BY id ASC', [license], function(error, data){
         for(let i = 0; i < data.rowCount; i ++){
@@ -813,7 +814,7 @@ function reassignReservations(license){
                         });
                     });
                 } else {
-                    cancelReservation();
+                    cancelReservation(reservationInfo.id);
                     //Send email
                 }
             });
@@ -822,7 +823,7 @@ function reassignReservations(license){
 }
 
 
-// Code Below is Used for Image Processing
+//======Image Processing======//
 let tempName = "";
 let Storage = multer.diskStorage({
     destination: function (req, file, callback) {
@@ -852,8 +853,12 @@ app.post("/admin/api/Upload", upload.single("imgUploader"), function (req, res) 
     });
 });
 
-
-
+//======CSV EXPORTING======//
+/**
+ * This function exports all user data to a csv in /admin/temp.
+ * @params
+ * callback: callback function that alerts the user side when a file has been created.
+ */
 function exportUsers(callback){
     conn.query('SELECT * FROM users', function(error, data){
         let users = data.rows;
@@ -866,7 +871,7 @@ function exportUsers(callback){
                 if(err) {
                     return console.log(err);
                 }
-                console.log("The file was saved!");
+                console.log("The file was saved");
                 callback();
             });
             if(err) {
@@ -875,7 +880,6 @@ function exportUsers(callback){
         });
     });
 }
-
 function exportVehicles(callback){
     conn.query('SELECT * FROM vehicles', function(error, data){
         let vehicles = data.rows;
@@ -895,7 +899,7 @@ function exportVehicles(callback){
                 if(err) {
                     return console.log(err);
                 }
-                console.log("The file was saved!");
+                console.log("The file was saved");
                 callback();
             });
             if(err) {
@@ -904,7 +908,6 @@ function exportVehicles(callback){
         });
     });
 }
-
 function exportReservations(callback){
     conn.query('SELECT * FROM reservations', function(error, data){
         let reservations = data.rows;
@@ -926,7 +929,7 @@ function exportReservations(callback){
                 if(err) {
                     return console.log(err);
                 }
-                console.log("The file was saved!");
+                console.log("The file was saved");
                 callback();
             });
             if(err) {
@@ -935,7 +938,6 @@ function exportReservations(callback){
         });
     });
 }
-
 function exportReports(callback){
     conn.query('SELECT * FROM reports', function(error, data){
         let reports = data.rows;
@@ -951,7 +953,7 @@ function exportReports(callback){
                 if(err) {
                     return console.log(err);
                 }
-                console.log("The file was saved!");
+                console.log("The file was saved");
                 callback();
             });
             if(err) {
