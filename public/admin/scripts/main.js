@@ -7,9 +7,10 @@ $(document).ready(function() {
         // Callback
     });
 
-    adminSocket.on('userChange', function(users){
+    adminSocket.on('userChange', function(users, message){
         console.log("we are in users change!");
         console.log(users);
+        console.log(message);
 
         $('#users').empty();
         for(let i = 0; i < users.rowCount; i++){
@@ -39,7 +40,6 @@ $(document).ready(function() {
 
     adminSocket.on('reportChange', function(reports){
         console.log("we are in reportchange!");
-        console.log(reports);
 
         $('#reports').empty();
         for(let i = 0; i < reports.rowCount; i++){
@@ -269,8 +269,8 @@ function updateVehicleStatus(license, status){
 }
 
 function getJustificationModal(id, text){
-    let modal = `<div id="justification_modal_${id}" class="modal fade">` 
-    +`<div class="modal-dialog">` 
+    let modal = `<div id="justification_modal_${id}" class="modal fade">`
+    +`<div class="modal-dialog">`
     +   `<div class="modal-content">`
     +       `<div class="modal-header">`
     +           `<h3>Override Justification</h3>`
@@ -307,14 +307,15 @@ class Reservation {
 
 
         //console.log(r);
-        let DOMobject = `<div class = "col-entry reservation-user ${r.license}">${r.user}</div>`
+        let DOMobject = `<div class = "col-entry reservation-id ${r.license}">${r.id}</div>`
+        +`<div class = "col-entry reservation-user ${r.license}">${r.user}</div>`
         + `<div class = "col-entry reservation-start ${r.license}">${r.start}</div>`
         + `<div class = "col-entry reservation-end ${r.license}">${r.end}</div>`
         + `<div class = "col-entry carModel ${r.license}">${r.model}</div>`
         + `<div class = "col-entry reservation-license ${r.license}">${r.license}</div>`
         + `<div class = "col-entry reservation-pickup> ${r.license}">${justification_button}</div>`
         + modal;
-        
+
         $('#upcoming').append(DOMobject);
     }
 }
@@ -346,10 +347,11 @@ class Vehicle {
 class Report {
     constructor(reportData){
         this.addToDOM(reportData);
+        console.log(reportData);
     }
 
     addToDOM(r){
-        let DOMobject = `<div class = "col-entry report-res-id ${r.id}">${r.id}</div>`
+        let DOMobject = `<div class = "col-entry report-res-id ${r.id}">${r.reservation}</div>`
         + `<div class = "col-entry report-content ${r.id}">${r.report}</div>`
         + `<div class = "col-entry needs-cleaning ${r.id}">${getBooleanStr(r.needsCleaning)}</div>`
         + `<div class = "col-entry needs-service ${r.id}">${getBooleanStr(r.needsService)}</div>`

@@ -2,6 +2,11 @@ body {
     font-family: sans-serif;
 }
 
+/* Sets the autocomplete z-index to the top of the page */
+.pac-container {
+    z-index: 1050;
+}
+
 /* Top bar of page */
 .header{
     display: flex;

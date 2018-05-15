@@ -16,9 +16,9 @@
 
         <!-- Custom CSS -->
         <link rel="stylesheet" href="./styles/main.css">
-        
+
         <!-- Google Maps integration -->
-        <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCkO-QHCX9_TOtsTOpkh1ssAJRG0ZZYLec&libraries=places"
+        <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCkO-QHCX9_TOtsTOpkh1ssAJRG0ZZYLec&libraries=places&callback=initialize"
                 async defer></script>
 
         <!-- Sockets -->
@@ -46,6 +46,7 @@
             <!-- User Greeting -->
             <div>
                 <div id = "user">
+                    
                     <span id = "user_email">Welcome, dem_test_u_2@outlook.com <br>
 
                     </span>
@@ -118,14 +119,15 @@
                                     <!-- New stops get added here -->
                                 </div>
 
-                                <p><a href="#" id="add-stop"><small>Add a destination</small></a></p>
-                                
                                 <div class="form-group">
                                     <!-- Dropoff location field -->
                                     <label>Dropoff Location</label>
                                     <input class="form-control route-stop" id="route-stop-3" type="text" placeholder="Enter a location"/>
                                     <!-- <input type=text class="form-control route-stop" value="Home"> -->
                                 </div>
+
+                                <p><a href="#" id="add-stop"><small>Add a destination</small></a></p>
+
                                 <div class="form-group">
                                     <!-- Checkboxes for extra features -->
                                     <label>Extra Features</label>
@@ -203,15 +205,16 @@
                                     <div id = "new-stops-edit"></div>
                                 </div>
 
+                                <div class="form-group">
+                                    <!-- Dropoff location field -->
+                                    <label>Dropoff Location</label>
+                                    <input class="form-control route-stop-edit" id="route-stop-3-edit"type="text" placeholder="Enter a location"/>
+                                    <!-- <input type=text class="form-control route-stop" value="Home"> -->
+                                </div>
+
                                 <!-- Link to add a destination -->
                                 <p><a href="#" id="add-stop-edit"><small>Add a destination</small></a></p>
-                                    
-                                    <div class="form-group">
-                                        <!-- Dropoff location field -->
-                                        <label>Dropoff Location</label>
-                                        <input class="form-control route-stop-edit" id="route-stop-3-edit"type="text" placeholder="Enter a location"/>
-                                        <!-- <input type=text class="form-control route-stop" value="Home"> -->
-                                    </div>
+
                                 <div class="form-group">
                                     <!-- Checkboxes for extra features -->
                                     <label>Extra Features</label>
@@ -262,25 +265,25 @@
                         <div id="carModal" class="modal-body">
                             <!-- Initial Car Model -->
                             <p id = "carMakeMText"><span class="reservation-label">Car Model</span>: </p>
-                            
+
                             <!-- Initial Vehicle plate Number-->
                             <p id = "plateNumberMText"><span class="reservation-label">Plate Number</span>: </p>
-                           
+
                             <!-- Initial Reservation start time -->
                             <p id = "startMText"><span class="reservation-label">Start Time</span>: </p>
-                           
+
                             <!-- Initial Reservation end time -->
                             <p id = "endMText"><span class="reservation-label">End Date</span>: </p>
-                            
+
                             <!-- Initial List of route stops -->
                             <p id = "stopsMText"><span class="reservation-label">Stops</span>: </p>
-                           
+
                             <!-- Initial Total route distance -->
                             <p id = "distanceMText"><span class="reservation-label">Total distance</span>: </p>
-                            
+
                             <!-- Initial Total route duration -->
                             <p id = "durationMText"><span class="reservation-label">Total duration</span>: </p>
-                            
+
                             <!-- Initial Map route -->
                             <div id="mapCanvas" style="width: 450px; height: 300px; margin-left:auto; margin-right:auto; margin-bottom: 10px"></div>
                         </div>
@@ -313,25 +316,25 @@
                         <div id="carModal-edit" class="modal-body">
                             <!-- Edited Car model -->
                             <p id = "carMakeMText-edit"><span class="reservation-label">Car Model</span>: </p>
-                            
+
                             <!-- Edited Vehicle plate number -->
                             <p id = "plateNumberMText-edit"><span class="reservation-label">Plate Number</span>: </p>
-                            
+
                             <!-- Edited Reservation start time -->
                             <p id = "startMText-edit"><span class="reservation-label">Start Time</span>: </p>
-                            
+
                             <!-- Edited Reservation end time -->
                             <p id = "endMText-edit"><span class="reservation-label">End Date</span>: </p>
-                            
+
                             <!-- Edited list of route stops -->
                             <p id = "stopsMText-edit"><span class="reservation-label">Stops</span>: </p>
-                           
+
                             <!-- Edited cumulative route distance -->
                             <p id = "distanceMText-edit"><span class="reservation-label">Total distance</span>: </p>
-                            
+
                             <!-- Edited route duration -->
                             <p id = "durationMText-edit"><span class="reservation-label">Total duration</span>: </p>
-                            
+
                             <!-- Edited route map -->
                             <div id="mapCanvasEdit" style="width: 450px; height: 300px; margin-left:auto; margin-right:auto; margin-bottom: 10px"></div>
                         </div>
@@ -366,7 +369,7 @@
                         <div class="modal-footer" id="backCancelButton">
                             <!-- Button to continue to vehicle appeal -->
                             <button type="button" id="decline" class="btn btn-danger" data-toggle="modal" data-target="#appealModal" data-dismiss="modal">Continue to Appeal</button>
-                            
+
                             <!-- Button to go back and accept previously returned vehicle -->
                             <button type="button" class="btn btn-success" data-dismiss="modal" data-toggle="modal" data-target="#resModal">Go Back and Accept</button>
                         </div>
@@ -423,7 +426,7 @@
                         <div class="modal-footer" id="backCancelButton">
                             <!-- Go back to edit reservation -->
                             <button type="button" id="decline" class="btn btn-danger" data-toggle="modal" data-target="#new-res-form" data-dismiss="modal">Back</button>
-                            
+
                             <!-- Stop making reservation -->
                             <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
                         </div>
@@ -451,7 +454,7 @@
                         <div class="modal-footer" id="backCancelButton">
                             <!-- Button for going back to editing reservation -->
                             <button type="button" id="decline-edit" class="btn btn-danger" data-toggle="modal" data-target="#edtModal" data-dismiss="modal">Back</button>
-                            
+
                             <!-- Button to cancel edits -->
                             <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
                         </div>
@@ -635,7 +638,7 @@
                             <div class="modal-footer">
                                 <!-- Cancel the cancellation (go back) -->
                                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Go back</button>
-                                
+
                                 <!-- Confirm the cancellation -->
                                 <button type="button" id="cancel-res" class="btn btn-danger" data-dismiss="modal">Yes, cancel my reservation</button>
                             </div>
@@ -681,11 +684,11 @@
                                         <!-- Immediate maintenance needed -->
                                         <input type="checkbox" class="form-check-input" id="service-needed">
                                         <label class="form-check-label" for="service-needed">Immediate maintenance needed</label>
-                                        
+
                                         <!-- Immediate cleaning needed -->
                                         <input type="checkbox" class="form-check-input" id="cleaning-needed">
                                         <label class="form-check-label" for="cleaning-needed">Immediate cleaning needed</label>
-                                        
+
                                         <!-- Not charging; no charging space available -->
                                         <input type="checkbox" class="form-check-input" id="not-charging">
                                         <label class="form-check-label" for="not-charging">Not charging/No charging space available</label>
@@ -695,7 +698,7 @@
                             <div class="modal-footer">
                                 <!-- Button to cancel report -->
                                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                                
+
                                 <!-- Button to submit report -->
                                 <button type="button" id="submit-report" class="btn btn-primary" data-dismiss="modal">Submit Report</button>
                             </div>
